@@ -570,13 +570,13 @@
         //====================个推推送开始=================================
         <meta-data
             android:name="PUSH_APPID"
-            android:value="fn4zeTabxU6Z7jbRgm0d19" />
+            android:value="yPMqx9Vdvv83DBNzbzge38" />
         <meta-data
             android:name="PUSH_APPKEY"
-            android:value="lhFmeD04jY7NEqOm6xW7E2" />
+            android:value="PnWSuVBbWR7ou7hjBMHVy" />
         <meta-data
             android:name="PUSH_APPSECRET"
-            android:value="SgdwgVRTVU8XW9UajLdjX1" />
+            android:value="oZE1tvauTi76c9XR3TysG1" />
 
         <!-- 配置SDK核心服务 -->
         <service
@@ -742,7 +742,7 @@
 
         <!-- Required  . Enable it you can get statistics data with channel -->
         <meta-data android:name="JPUSH_CHANNEL" android:value="developer-default"/>
-        <meta-data android:name="JPUSH_APPKEY" android:value="0717c67de0e1382a75d51989" /> <!--  </>值来自开发者平台取得的AppKey-->
+        <meta-data android:name="JPUSH_APPKEY" android:value="a8ef70016763b46620f696d5" /> <!--  </>值来自开发者平台取得的AppKey-->
 
         //====================极光推送结束=================================
 
