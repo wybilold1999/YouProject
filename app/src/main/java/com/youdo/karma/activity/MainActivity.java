@@ -151,7 +151,7 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 				/**
 				 * 注册小米推送
 				 */
-//				MiPushClient.registerPush(MainActivity.this, AppConstants.MI_PUSH_APP_ID, AppConstants.MI_PUSH_APP_KEY);
+				MiPushClient.registerPush(MainActivity.this, AppConstants.MI_PUSH_APP_ID, AppConstants.MI_PUSH_APP_KEY);
 
 				//个推
 				initGeTuiPush();

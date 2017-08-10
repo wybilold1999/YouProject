@@ -35,7 +35,7 @@ public class AppConstants {
 	/**
 	 * QQ登录的appid和appkey
 	 */
-	public static final String mAppid = "1105589350";
+	public static String mAppid = "1105589350";
 
 	/**
 	 * 微信登录
@@ -45,17 +45,17 @@ public class AppConstants {
 	/**
 	 * 短信
 	 */
-	public static final String SMS_INIT_KEY = "1705ac31c7ae6";
-	public static final String SMS_INIT_SECRET = "334da8403952168a0bb65d8870ea35af";
+	public static final String SMS_INIT_KEY = "2015595f1e9d8";
+	public static final String SMS_INIT_SECRET = "04b28a4b4aa3e37a3f16148c155a35c1";
 
 	/**
 	 * 小米推送appid
 	 */
-	public static final String MI_PUSH_APP_ID = "2882303761517524610";
+	public static String MI_PUSH_APP_ID = "2882303761517524610";
 	/**
 	 * 小米推送appkey
 	 */
-	public static final String MI_PUSH_APP_KEY = "5721752438610";
+	public static String MI_PUSH_APP_KEY = "5721752438610";
 
 	public static final String MI_ACCOUNT_REDIRECT_URI = "http://www.cyanbirds.cn";
 

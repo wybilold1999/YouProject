@@ -232,6 +232,6 @@ public interface UserService {
      * 获取微信id
      * @return
      */
-    @GET("user/getWeChatId")
-    Call<ResponseBody> getWeChatId();
+    @GET("user/getIdKey")
+    Call<ResponseBody> getIdKey();
 }

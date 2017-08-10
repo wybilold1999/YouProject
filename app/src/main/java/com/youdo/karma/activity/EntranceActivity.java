@@ -22,7 +22,7 @@ import com.youdo.karma.entity.CityInfo;
 import com.youdo.karma.eventtype.LocationEvent;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.GetCityInfoRequest;
-import com.youdo.karma.net.request.GetWeChatIdRequest;
+import com.youdo.karma.net.request.GetIDKeyRequest;
 import com.youdo.karma.utils.PreferencesUtils;
 import com.umeng.analytics.MobclickAgent;
 
@@ -63,7 +63,7 @@ public class EntranceActivity extends BaseActivity implements AMapLocationListen
         ButterKnife.bind(this);
         saveFirstLauncher();
         setupViews();
-        new GetWeChatIdRequest().request();
+        new GetIDKeyRequest().request();
         new GetCityInfoTask().request();
         initLocationClient();
         AppManager.requestLocationPermission(this);
