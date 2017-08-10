@@ -18,32 +18,32 @@ public class FileAccessorUtils {
 	
 	/** 默认路径 */
 	public static final String DEFAULT_PATH = getExternalStorePath()
-			+ "/tanlove";
+			+ "/youlove";
 	/** 文件存储路径 */
 	public static final String FILE_PATH = getExternalStorePath()
-			+ "/tanlove/.file";
+			+ "/youlove/.file";
 	/** 图像的存储路径 */
 	public static final String IMESSAGE_IMAGE = getExternalStorePath()
-			+ "/tanlove/.image";
+			+ "/youlove/.image";
 	/** 头像存储路径 */
 	public static final String FACE_IMAGE = getExternalStorePath()
-			+ "/tanlove/.face";
+			+ "/youlove/.face";
 	/** 语音存储路径 */
 	public static final String VOICE_PATH = getExternalStorePath()
-			+ "/tanlove/.voice";
+			+ "/youlove/.voice";
 	/** 视频存储路径 */
 	public static final String VIDEO_PATH = getExternalStorePath()
-			+ "/tanlove/.video";
+			+ "/youlove/.video";
 	/** 缓存路径 */
 	public static final String CACHE_PATH = getExternalStorePath()
-			+ "/tanlove/.cache";
+			+ "/youlove/.cache";
 	/** crash路径 */
 	public static final String CRASH_PATH = getExternalStorePath()
-			+ "/tanlove/.crash";
+			+ "/youlove/.crash";
 
 	/** APK文件暂时存放的路径 */
 	public static final String APK_PATH = getExternalStorePath()
-			+ "/tanlove/.apk";
+			+ "/youlove/.apk";
 
 	/**
 	 * 外置存储卡的路径

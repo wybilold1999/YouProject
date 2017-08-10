@@ -17,91 +17,91 @@ import com.youdo.karma.manager.AppManager;
 public class PreferencesUtils {
 
 	/** 保存登陆账号 */
-	public static final String SETTINGS_RL_ACCOUNT = "com.cyanbird.tanlove_account";
+	public static final String SETTINGS_RL_ACCOUNT = "com.youdo.karma_account";
 	/** 保存登陆密码 */
-	public static final String SETTINGS_RL_PASSWORD = "com.cyanbird.tanlove_p";
+	public static final String SETTINGS_RL_PASSWORD = "com.youdo.karma_p";
 	/** 保存是否第一次启动 */
-	public static final String SETTINGS_RL_FIRST_LAUNCHER = "com.cyanbird.tanlove_first_launcher";
+	public static final String SETTINGS_RL_FIRST_LAUNCHER = "com.youdo.karma_first_launcher";
 	/** 用户年龄 */
-	public static final String SETTINGS_RL_USER_AGE = "com.cyanbird.tanlove_age";
+	public static final String SETTINGS_RL_USER_AGE = "com.youdo.karma_age";
 	/** 头像url */
-	public static final String SETTINGS_RL_USER_FACE_URL = "com.cyanbird.tanlove_face_url";
+	public static final String SETTINGS_RL_USER_FACE_URL = "com.youdo.karma_face_url";
 	/** 手机号 */
-	public static final String SETTINGS_RL_USER_MOBILE = "com.cyanbird.tanlove_mobile";
+	public static final String SETTINGS_RL_USER_MOBILE = "com.youdo.karma_mobile";
 	/** 个性签名 */
-	public static final String SETTINGS_RL_USER_SIGNATURE = "com.cyanbird.tanlove_signature";
+	public static final String SETTINGS_RL_USER_SIGNATURE = "com.youdo.karma_signature";
 	/** 保存用户性别 */
-	public static final String SETTINGS_RL_USER_SEX = "com.cyanbird.tanlove_sex";
+	public static final String SETTINGS_RL_USER_SEX = "com.youdo.karma_sex";
 	/** 用户名 */
-	public static final String SETTINGS_RL_USER_USER_NAME = "com.cyanbird.tanlove_user_name";
+	public static final String SETTINGS_RL_USER_USER_NAME = "com.youdo.karma_user_name";
 	/** 某用户是否第一次登录 */
-	public static final String SETTINGS_RL_FIRST_LOGIN = "com.cyanbird.tanlove_first_login";
+	public static final String SETTINGS_RL_FIRST_LOGIN = "com.youdo.karma_first_login";
 	/** 是否登录 */
-	public static final String SETTINGS_RL_IS_LOGIN = "com.cyanbird.tanlove_is_login";
+	public static final String SETTINGS_RL_IS_LOGIN = "com.youdo.karma_is_login";
 	/** 本地头像地址 */
-	public static final String SETTINGS_RL_FACE_LOCAL = "com.cyanbird.tanlove_face_local";
+	public static final String SETTINGS_RL_FACE_LOCAL = "com.youdo.karma_face_local";
 	/**sessionId */
-	public static final String SETTINGS_RL_SESSIONID = "com.cyanbird.tanlove_sessionid";
+	public static final String SETTINGS_RL_SESSIONID = "com.youdo.karma_sessionid";
 	/**qq号 */
-	public static final String SETTINGS_RL_QQ = "com.cyanbird.tanlove_qq";
+	public static final String SETTINGS_RL_QQ = "com.youdo.karma_qq";
 	/**微信号 */
-	public static final String SETTINGS_RL_WEIXIN = "com.cyanbird.tanlove_weixin";
+	public static final String SETTINGS_RL_WEIXIN = "com.youdo.karma_weixin";
 	/**身高 */
-	public static final String SETTINGS_RL_TALL = "com.cyanbird.tanlove_tall";
+	public static final String SETTINGS_RL_TALL = "com.youdo.karma_tall";
 	/**体重 */
-	public static final String SETTINGS_RL_WEIGHT = "com.cyanbird.tanlove_weight";
+	public static final String SETTINGS_RL_WEIGHT = "com.youdo.karma_weight";
 	/**距离 */
-	public static final String SETTINGS_RL_DISTANCE = "com.cyanbird.tanlove_distance";
+	public static final String SETTINGS_RL_DISTANCE = "com.youdo.karma_distance";
 	/**情感状态 */
-	public static final String SETTINGS_RL_EMOTION_STATUS = "com.cyanbird.tanlove_emotion_status";
+	public static final String SETTINGS_RL_EMOTION_STATUS = "com.youdo.karma_emotion_status";
 	/**星座 */
-	public static final String SETTINGS_RL_CONSTELLATION = "com.cyanbird.tanlove_constellation";
+	public static final String SETTINGS_RL_CONSTELLATION = "com.youdo.karma_constellation";
 	/**城市 */
-	public static final String SETTINGS_RL_CITY = "com.cyanbird.tanlove_city";
+	public static final String SETTINGS_RL_CITY = "com.youdo.karma_city";
 	/**职业 */
-	public static final String SETTINGS_RL_OCCUPATION = "com.cyanbird.tanlove_occupation";
+	public static final String SETTINGS_RL_OCCUPATION = "com.youdo.karma_occupation";
 	/**教育 */
-	public static final String SETTINGS_RL_EDUCATION = "com.cyanbird.tanlove_education";
+	public static final String SETTINGS_RL_EDUCATION = "com.youdo.karma_education";
 	/**交友目的 */
-	public static final String SETTINGS_RL_PURPOSE = "com.cyanbird.tanlove_purpose";
+	public static final String SETTINGS_RL_PURPOSE = "com.youdo.karma_purpose";
 	/**爱爱地点 */
-	public static final String SETTINGS_RL_LOVE_WHERE = "com.cyanbird.tanlove_love_where";
+	public static final String SETTINGS_RL_LOVE_WHERE = "com.youdo.karma_love_where";
 	/**首次见面希望 */
-	public static final String SETTINGS_RL_DO_WHAT_FIRST = "com.cyanbird.tanlove_do_what_first";
+	public static final String SETTINGS_RL_DO_WHAT_FIRST = "com.youdo.karma_do_what_first";
 	/**恋爱观念 */
-	public static final String SETTINGS_RL_CONCEPTION = "com.cyanbird.tanlove_conception";
+	public static final String SETTINGS_RL_CONCEPTION = "com.youdo.karma_conception";
 	/**是否显示 */
-	public static final String SETTINGS_RL_IS_SHOW = "com.cyanbird.tanlove_is_show";
+	public static final String SETTINGS_RL_IS_SHOW = "com.youdo.karma_is_show";
 	/**是否vip */
-	public static final String SETTINGS_RL_IS_VIP = "com.cyanbird.tanlove_is_vip";
+	public static final String SETTINGS_RL_IS_VIP = "com.youdo.karma_is_vip";
 	/**isCheckPhone */
-	public static final String SETTINGS_RL_IS_CHECK_PHONE = "com.cyanbird.tanlove_is_check_phone";
+	public static final String SETTINGS_RL_IS_CHECK_PHONE = "com.youdo.karma_is_check_phone";
 	/**publicSocialNumber */
-	public static final String SETTINGS_RL_PUBLIC_SOCIALNUMBER = "com.cyanbird.tanlove_public_socialnumber";
+	public static final String SETTINGS_RL_PUBLIC_SOCIALNUMBER = "com.youdo.karma_public_socialnumber";
 	/** 新消息提醒 */
-	public static final String SETTINGS_RL_NEW_MESSAGE_NOTICE = "com.cyanbird.tanlove_new_message_notice";
+	public static final String SETTINGS_RL_NEW_MESSAGE_NOTICE = "com.youdo.karma_new_message_notice";
 	/** 通知显示消息详情 */
-	public static final String SETTINGS_RL_NOTICE_MESSAGE_INFO = "com.cyanbird.tanlove_notice_message_info";
+	public static final String SETTINGS_RL_NOTICE_MESSAGE_INFO = "com.youdo.karma_notice_message_info";
 	/** 通知声音*/
-	public static final String SETTINGS_RL_NOTICE_VOICE = "com.cyanbird.tanlove_notice_voice";
+	public static final String SETTINGS_RL_NOTICE_VOICE = "com.youdo.karma_notice_voice";
 	/** 通知震动*/
-	public static final String SETTINGS_RL_NOTICE_SHOCK = "com.cyanbird.tanlove_notice_shock";
+	public static final String SETTINGS_RL_NOTICE_SHOCK = "com.youdo.karma_notice_shock";
 	/** 听筒播放*/
-	public static final String SETTINGS_RL_EARPIECE_PLAY_VOICE = "com.cyanbird.tanlove_earpiece_play_voice";
+	public static final String SETTINGS_RL_EARPIECE_PLAY_VOICE = "com.youdo.karma_earpiece_play_voice";
 	/** 极光推送设置别名是否成功*/
-	public static final String SETTINGS_JPUSH_SET_ALIAS = "com.cyanbird.tanlove_jpush_set_alias";
+	public static final String SETTINGS_JPUSH_SET_ALIAS = "com.youdo.karma_jpush_set_alias";
 	/** 抽奖次数*/
-	public static final String SETTINGS_REWARD_COUNT = "com.cyanbird.tanlove_reward_count";
+	public static final String SETTINGS_REWARD_COUNT = "com.youdo.karma_reward_count";
 	/** 定位到的城市*/
-	public static final String SETTINGS_CURRENT_CITY = "com.cyanbird.tanlove_current_city";
+	public static final String SETTINGS_CURRENT_CITY = "com.youdo.karma_current_city";
 	/** 最近喜欢我的userid*/
-	public static final String SETTINGS_LOVE_ME_USER_ID = "com.cyanbird.tanlove_love_me_user_id";
+	public static final String SETTINGS_LOVE_ME_USER_ID = "com.youdo.karma_love_me_user_id";
 	/** 最近关注我的userid*/
-	public static final String SETTINGS_ATTENTION_ME_USER_ID = "com.cyanbird.tanlove_attention_me_user_id";
+	public static final String SETTINGS_ATTENTION_ME_USER_ID = "com.youdo.karma_attention_me_user_id";
 	/** 最近送我礼物的userid*/
-	public static final String SETTINGS_GIFT_ME_USER_ID = "com.cyanbird.tanlove_gift_me_user_id";
+	public static final String SETTINGS_GIFT_ME_USER_ID = "com.youdo.karma_gift_me_user_id";
 	/** 登录时间*/
-	public static final String SETTINGS_LOGIN_TIME = "com.cyanbird.tanlove_login_time";
+	public static final String SETTINGS_LOGIN_TIME = "com.youdo.karma_login_time";
 
 	/**
 	 * 获取RL账号
