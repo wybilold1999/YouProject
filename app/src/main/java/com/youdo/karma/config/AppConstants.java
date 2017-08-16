@@ -12,7 +12,7 @@ import com.xiaomi.account.openauth.XiaomiOAuthConstants;
  */
 public class AppConstants {
 	
-//	public static final String BASE_URL = "http://120.77.65.198/YouLoveServer/";
+//	public static final String BASE_URL = "http://112.74.85.193/YouLoveServer/";
 //	public static final String BASE_URL = "http://192.168.1.100/YouLoveServer/";
 	public static final String BASE_URL = "http://10.0.108.135:8080/YouLoveServer/";
 
