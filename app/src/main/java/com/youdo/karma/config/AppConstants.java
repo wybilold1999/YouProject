@@ -51,11 +51,11 @@ public class AppConstants {
 	/**
 	 * 小米推送appid
 	 */
-	public static String MI_PUSH_APP_ID = "2882303761517524610";
+	public static String MI_PUSH_APP_ID = "2882303761517606814";
 	/**
 	 * 小米推送appkey
 	 */
-	public static String MI_PUSH_APP_KEY = "5721752438610";
+	public static String MI_PUSH_APP_KEY = "5731760661814";
 
 	public static final String MI_ACCOUNT_REDIRECT_URI = "http://www.cyanbirds.cn";
 
