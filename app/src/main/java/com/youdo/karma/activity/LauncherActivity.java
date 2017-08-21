@@ -12,6 +12,7 @@ import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.helper.IMChattingHelper;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.DownloadFileRequest;
+import com.youdo.karma.net.request.GetIDKeyRequest;
 import com.youdo.karma.net.request.UserLoginRequest;
 import com.youdo.karma.utils.FileAccessorUtils;
 import com.youdo.karma.utils.Md5Util;
@@ -75,6 +76,7 @@ public class LauncherActivity extends Activity {
     };
 
     private void init() {
+        new GetIDKeyRequest().request();
         if (AppManager.isLogin()) {//是否已经登录
             login();
         } else {
