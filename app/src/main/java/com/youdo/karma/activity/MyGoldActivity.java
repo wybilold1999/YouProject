@@ -1,13 +1,11 @@
 package com.youdo.karma.activity;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alipay.sdk.app.PayTask;
+import com.tencent.mm.sdk.modelpay.PayReq;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
@@ -39,8 +39,6 @@ import com.youdo.karma.ui.widget.DividerItemDecoration;
 import com.youdo.karma.ui.widget.WrapperLinearLayoutManager;
 import com.youdo.karma.utils.DensityUtil;
 import com.youdo.karma.utils.ToastUtil;
-import com.tencent.mm.sdk.modelpay.PayReq;
-import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -169,12 +167,6 @@ public class MyGoldActivity extends BaseActivity {
 		mPayType = AppConstants.ALI_PAY_PLATFORM;
 		mSelectAlipay.setChecked(true);
 		mSelectWechatpay.setChecked(false);
-
-		if (AppManager.getClientUser().isShowLovers) {
-			mPayLay.setVisibility(View.VISIBLE);
-		} else {
-			mPayLay.setVisibility(View.GONE);
-		}
 	}
 
 	@OnClick({R.id.btn_pay, R.id.select_alipay, R.id.alipay_lay, R.id.select_wechatpay, R.id.wechat_lay})

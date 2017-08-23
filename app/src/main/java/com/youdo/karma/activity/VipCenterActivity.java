@@ -19,12 +19,14 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
-import android.text.style.URLSpan;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alipay.sdk.app.PayTask;
+import com.sunfusheng.marqueeview.MarqueeView;
+import com.tencent.mm.sdk.modelpay.PayReq;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
@@ -50,9 +52,6 @@ import com.youdo.karma.ui.widget.WrapperLinearLayoutManager;
 import com.youdo.karma.utils.DensityUtil;
 import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.ToastUtil;
-import com.sunfusheng.marqueeview.MarqueeView;
-import com.tencent.mm.sdk.modelpay.PayReq;
-import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -353,11 +352,7 @@ public class VipCenterActivity extends BaseActivity {
 		@Override
 		public void onItemClick(View view, int position) {
 			MemberBuy memberBuy = mAdapter.getItem(position);
-			if (AppManager.getClientUser().isShowLovers) {
-				showPayDialog(memberBuy);
-			} else {
-				new GetAliPayOrderInfoTask().request(memberBuy.id, AppConstants.ALI_PAY_PLATFORM);
-			}
+			showPayDialog(memberBuy);
 		}
 	};
 
