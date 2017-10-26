@@ -32,6 +32,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.AppConstants;
@@ -190,7 +191,13 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 				}
 			}, 5000 * 10);
 		}
+		registerWeiXin();
+	}
 
+	private void registerWeiXin() {
+		// 通过WXAPIFactory工厂，获取IWXAPI的实例
+		AppManager.setIWX_PAY_API(WXAPIFactory.createWXAPI(this, AppConstants.WEIXIN_PAY_ID, true));
+		AppManager.getIWX_PAY_API().registerApp(AppConstants.WEIXIN_PAY_ID);
 	}
 
 	/**

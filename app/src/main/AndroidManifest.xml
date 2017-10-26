@@ -509,12 +509,6 @@
         // 应用处理程序逻辑服务
         <service android:name=".receiver.YuntxNotifyReceiver$NotifyService" />
 
-        //下载主apk的service
-        <service android:name=".service.DownloadUpdateService"/>
-
-        //下载apk的service
-        <service android:name=".service.DownloadAppService"/>
-
         //====================小米推送开始=================================
         <service
             android:name="com.xiaomi.push.service.XMJobService"

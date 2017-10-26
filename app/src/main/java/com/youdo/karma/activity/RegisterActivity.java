@@ -61,20 +61,14 @@ import mehdi.sakout.fancybuttons.FancyButton;
 /**
  * Created by Administrator on 2016/4/23.
  */
-public class RegisterActivity extends BaseActivity {
-    @BindView(R.id.phone_num)
+public class RegisterActivity extends BaseActivity implements View.OnClickListener{
+
     EditText phoneNum;
-    @BindView(R.id.next)
     FancyButton next;
-    @BindView(R.id.qq_login)
     ImageView qqLogin;
-    @BindView(R.id.weixin_login)
     ImageView weiXinLogin;
-    @BindView(R.id.select_man)
     ImageView mSelectMan;
-    @BindView(R.id.select_lady)
     ImageView mSelectLady;
-    @BindView(R.id.xm_login)
     ImageView xmLogin;
 
     /**
@@ -99,7 +93,6 @@ public class RegisterActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        ButterKnife.bind(this);
         EventBus.getDefault().register(this);
         Toolbar toolbar = getActionBarToolbar();
         if (toolbar != null) {
@@ -113,11 +106,31 @@ public class RegisterActivity extends BaseActivity {
         mCurrrentCity = getIntent().getStringExtra(ValueKey.LOCATION);
         curLat = getIntent().getStringExtra(ValueKey.LATITUDE);
         curLon = getIntent().getStringExtra(ValueKey.LONGITUDE);
+
+        setupView();
+        setupEvent();
+    }
+
+    private void setupView() {
+        phoneNum = (EditText) findViewById(R.id.phone_num);
+        next = (FancyButton) findViewById(R.id.next);
+        weiXinLogin = (ImageView) findViewById(R.id.weixin_login);
+        qqLogin = (ImageView) findViewById(R.id.qq_login);
+        mSelectMan = (ImageView) findViewById(R.id.select_man);
+        mSelectLady = (ImageView) findViewById(R.id.select_lady);
+
+    }
+
+    private void setupEvent() {
+        next.setOnClickListener(this);
+        mSelectMan.setOnClickListener(this);
+        mSelectLady.setOnClickListener(this);
+        qqLogin.setOnClickListener(this);
+        weiXinLogin.setOnClickListener(this);
     }
 
 
-    @OnClick({R.id.next, R.id.qq_login,
-            R.id.select_man, R.id.select_lady, R.id.weixin_login, R.id.xm_login})
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.next:
@@ -147,7 +160,11 @@ public class RegisterActivity extends BaseActivity {
                 SendAuth.Req req = new SendAuth.Req();
                 req.scope = "snsapi_userinfo";
                 req.state = "wechat_sdk_demo_test";
-                CSApplication.api.sendReq(req);
+                if (null != AppManager.getIWXAPI()) {
+                    AppManager.getIWXAPI().sendReq(req);
+                } else {
+                    CSApplication.api.sendReq(req);
+                }
                 break;
             case R.id.xm_login:
                 XiaomiOAuthFuture<XiaomiOAuthResults> future = new XiaomiOAuthorize()

@@ -60,20 +60,14 @@ import mehdi.sakout.fancybuttons.FancyButton;
 /**
  * Created by Administrator on 2016/4/23.
  */
-public class LoginActivity extends BaseActivity {
-    @BindView(R.id.login_account)
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
+
     EditText loginAccount;
-    @BindView(R.id.login_pwd)
     EditText loginPwd;
-    @BindView(R.id.btn_login)
     FancyButton btnLogin;
-    @BindView(R.id.forget_pwd)
     TextView forgetPwd;
-    @BindView(R.id.weixin_login)
     ImageView weiXinLogin;
-    @BindView(R.id.qq_login)
     ImageView qqLogin;
-    @BindView(R.id.xm_login)
     ImageView xmLogin;
 
     public static Tencent mTencent;
@@ -92,15 +86,33 @@ public class LoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
         EventBus.getDefault().register(this);
         Toolbar toolbar = getActionBarToolbar();
         if (toolbar != null) {
             toolbar.setNavigationIcon(R.mipmap.ic_up);
         }
-        setupData();
-
         channelId = CheckUtil.getAppMetaData(this, "UMENG_CHANNEL");
+
+        setupView();
+        setupEvent();
+        setupData();
+    }
+
+    private void setupView() {
+        loginAccount = (EditText) findViewById(R.id.login_account);
+        loginPwd = (EditText) findViewById(R.id.login_pwd);
+        btnLogin = (FancyButton) findViewById(R.id.btn_login);
+        forgetPwd = (TextView) findViewById(R.id.forget_pwd);
+        weiXinLogin = (ImageView) findViewById(R.id.weixin_login);
+        qqLogin = (ImageView) findViewById(R.id.qq_login);
+
+    }
+
+    private void setupEvent() {
+        btnLogin.setOnClickListener(this);
+        forgetPwd.setOnClickListener(this);
+        qqLogin.setOnClickListener(this);
+        weiXinLogin.setOnClickListener(this);
     }
 
     private void setupData(){
@@ -117,7 +129,7 @@ public class LoginActivity extends BaseActivity {
         curLon = getIntent().getStringExtra(ValueKey.LONGITUDE);
     }
 
-    @OnClick({R.id.btn_login, R.id.forget_pwd, R.id.qq_login, R.id.weixin_login, R.id.xm_login})
+    @Override
     public void onClick(View view) {
         Intent intent = new Intent();
         switch (view.getId()) {
@@ -149,7 +161,11 @@ public class LoginActivity extends BaseActivity {
                 SendAuth.Req req = new SendAuth.Req();
                 req.scope = "snsapi_userinfo";
                 req.state = "wechat_sdk_demo_test";
-                CSApplication.api.sendReq(req);
+                if (null != AppManager.getIWXAPI()) {
+                    AppManager.getIWXAPI().sendReq(req);
+                } else {
+                    CSApplication.api.sendReq(req);
+                }
                 break;
             case R.id.xm_login :
                 XiaomiOAuthFuture<XiaomiOAuthResults> future = new XiaomiOAuthorize()

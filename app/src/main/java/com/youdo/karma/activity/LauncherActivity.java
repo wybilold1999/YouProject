@@ -7,7 +7,10 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 
+import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.config.ValueKey;
+import com.youdo.karma.entity.AllKeys;
 import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.helper.IMChattingHelper;
 import com.youdo.karma.manager.AppManager;
@@ -76,7 +79,7 @@ public class LauncherActivity extends Activity {
     };
 
     private void init() {
-        new GetIDKeyRequest().request();
+        new GetIdKeysTask().request();
         if (AppManager.isLogin()) {//是否已经登录
             login();
         } else {
@@ -88,6 +91,31 @@ public class LauncherActivity extends Activity {
 			}
 
         }
+    }
+
+    class GetIdKeysTask extends GetIDKeyRequest {
+        @Override
+        public void onPostExecute(AllKeys allKeys) {
+            AppConstants.WEIXIN_ID = allKeys.weChatId;
+            AppConstants.WEIXIN_PAY_ID = allKeys.weChatPayId;
+            AppConstants.YUNTONGXUN_ID = allKeys.ytxId;
+            AppConstants.YUNTONGXUN_TOKEN = allKeys.ytxKey;
+            AppConstants.MI_PUSH_APP_ID = allKeys.xmId;
+            AppConstants.MI_PUSH_APP_KEY = allKeys.xmKey;
+            AppConstants.mAppid = allKeys.qqId;
+            registerWeiXin();
+        }
+
+        @Override
+        public void onErrorExecute(String error) {
+            registerWeiXin();
+        }
+    }
+
+    private void registerWeiXin() {
+        // 通过WXAPIFactory工厂，获取IWXAPI的实例
+        AppManager.setIWXAPI(WXAPIFactory.createWXAPI(this, AppConstants.WEIXIN_ID, true));
+        AppManager.getIWXAPI().registerApp(AppConstants.WEIXIN_ID);
     }
 
 	/**

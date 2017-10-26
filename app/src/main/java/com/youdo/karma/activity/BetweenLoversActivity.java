@@ -212,7 +212,7 @@ public class BetweenLoversActivity extends BaseActivity {
 		@Override
 		public void onPostExecute(WeChatPay weChatPay) {
 			PayReq payReq = new PayReq();
-			payReq.appId = AppConstants.WEIXIN_ID;
+			payReq.appId = AppConstants.WEIXIN_PAY_ID;
 			payReq.partnerId = weChatPay.mch_id;
 			payReq.prepayId = weChatPay.prepay_id;
 			payReq.packageValue = "Sign=WXPay";

@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.db.base.DBManager;
-import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.entity.Conversation;
 import com.youdo.karma.greendao.ConversationDao;
 import com.youdo.karma.listener.MessageChangedListener;
@@ -156,27 +155,25 @@ public class ConversationSqlManager extends DBManager {
 	 * @param ecMessage
 	 * @return
 	 */
-	public long insertConversation(ClientUser clientUser, ECMessage ecMessage) {
+	public long insertConversation(ECMessage ecMessage) {
 		String talker = "";
 		String sender = "";
 		String talkerName = "";
 		String portraitUrl = "";
 		boolean isSend = false;
+		String[] userInfo = ecMessage.getUserData().split(";");
 		if (ecMessage.getDirection() == ECMessage.Direction.SEND) {
 			isSend = true;
 		}
 		if (isSend) {
-			talker = ecMessage.getTo();
-			sender = ecMessage.getForm();
-			talkerName = clientUser.user_name;
-			portraitUrl = clientUser.face_url;
+			talker = userInfo[3];
+			talkerName = userInfo[4];
+			portraitUrl = userInfo[5];
 		} else {
-			talker = ecMessage.getForm();
-			sender = ecMessage.getTo();
-			String[] userInfo = ecMessage.getUserData().split(";");
 			if (userInfo.length > 1) {
-				portraitUrl = userInfo[1];
-				talkerName = userInfo[0];
+				talker = userInfo[0];
+				talkerName = userInfo[1];
+				portraitUrl = userInfo[2];
 			}
 		}
 		//根据talker去查询有没有对应的会话
@@ -187,7 +184,8 @@ public class ConversationSqlManager extends DBManager {
 		conversation.talker = talker;
 		conversation.talkerName = talkerName;
 		conversation.createTime = ecMessage.getMsgTime();
-		if (!isSend && !"com.youdo.karma.activity.ChatActivity".equals(AppManager.getTopActivity(mContext))) {
+		conversation.faceUrl = portraitUrl;
+		if (!isSend && !"com.cyanbirds.tanlove.activity.ChatActivity".equals(AppManager.getTopActivity(mContext))) {
 			conversation.unreadCount++;
 		}
 		if (ecMessage.getType() == ECMessage.Type.TXT) {

@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.youdo.karma.config.AppConstants;
+import com.youdo.karma.entity.AllKeys;
 import com.youdo.karma.entity.IDKey;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.base.ResultPostExecute;
@@ -24,7 +25,7 @@ import retrofit2.Callback;
  * 描述：获取微信id
  */
 
-public class GetIDKeyRequest extends ResultPostExecute<List<IDKey>> {
+public class GetIDKeyRequest extends ResultPostExecute<AllKeys> {
 
     public void request() {
         Call<ResponseBody> call = AppManager.getUserService().getIdKey();
@@ -53,24 +54,18 @@ public class GetIDKeyRequest extends ResultPostExecute<List<IDKey>> {
         try {
             String decryptData = AESOperator.getInstance().decrypt(json);
             if (!TextUtils.isEmpty(decryptData)) {
-                Type listType = new TypeToken<ArrayList<IDKey>>() {
-                }.getType();
                 Gson gson = new Gson();
-                ArrayList<IDKey> idKeys = gson.fromJson(decryptData, listType);
-                if (idKeys != null && idKeys.size() > 0) {
-                    for (IDKey idKey : idKeys) {
-                        if ("xiaomi".equals(idKey.platform)) {
-                            AppConstants.MI_PUSH_APP_ID = idKey.appId;
-                            AppConstants.MI_PUSH_APP_KEY = idKey.appKey;
-                        } else if ("wechat".equals(idKey.platform)) {
-                            AppConstants.WEIXIN_ID = idKey.appId;
-                        } else if ("qq".equals(idKey.platform)) {
-                            AppConstants.mAppid = idKey.appId;
-                        }
-                    }
+                AllKeys keys = gson.fromJson(decryptData, AllKeys.class);
+                if (null != keys) {
+                    onPostExecute(keys);
+                } else {
+                    onErrorExecute("");
                 }
+            } else {
+                onErrorExecute("");
             }
         } catch (Exception e) {
+            onErrorExecute("");
         }
     }
 

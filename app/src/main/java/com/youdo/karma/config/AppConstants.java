@@ -14,7 +14,7 @@ public class AppConstants {
 	
 	public static final String BASE_URL = "http://112.74.85.193/YouLoveServer/";
 //	public static final String BASE_URL = "http://192.168.1.100/YouLoveServer/";
-//	public static final String BASE_URL = "http://10.0.108.135:8080/YouLoveServer/";
+//	public static final String BASE_URL = "http://10.0.108.198:8080/YouLoveServer/";
 
 	/**
 	 * 密码加密密匙
@@ -29,8 +29,8 @@ public class AppConstants {
 	/**
 	 *容联云IM
 	 */
-	public static final String YUNTONGXUN_ID = "8aaf07085dcad420015dcb8739920097";
-	public static final String YUNTONGXUN_TOKEN = "aaa7d3c2510dfeb27e8f13b45fc93f5b";
+	public static String YUNTONGXUN_ID = "8aaf07085dcad420015dcb8739920097";
+	public static String YUNTONGXUN_TOKEN = "aaa7d3c2510dfeb27e8f13b45fc93f5b";
 
 	/**
 	 * QQ登录的appid和appkey
@@ -41,6 +41,11 @@ public class AppConstants {
 	 * 微信登录
 	 */
 	public static String WEIXIN_ID = "wxf6c70fcd5522d4d3";
+
+	/**
+	 * 微信登录
+	 */
+	public static String WEIXIN_PAY_ID = "wxf6c70fcd5522d4d3";
 
 	/**
 	 * 短信

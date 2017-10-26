@@ -1,7 +1,6 @@
 package com.youdo.karma.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -11,16 +10,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.youdo.karma.R;
-import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.db.MyGoldDaoManager;
 import com.youdo.karma.entity.ApkInfo;
 import com.youdo.karma.entity.Gold;
 import com.youdo.karma.eventtype.MakeMoneyEvent;
 import com.youdo.karma.eventtype.SnackBarEvent;
 import com.youdo.karma.manager.AppManager;
-import com.youdo.karma.service.DownloadAppService;
-import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -126,13 +123,6 @@ public class DownloadAppAdapter extends
                     gold.downloadTime = System.currentTimeMillis();
                     MyGoldDaoManager.getInstance(mContext).updateGold(gold);
                     EventBus.getDefault().post(new SnackBarEvent());
-
-					/**
-					 * 开启服务下载app
-                     */
-                    Intent intent = new Intent(mContext, DownloadAppService.class);
-                    intent.putExtra(ValueKey.DATA, mApkInfos.get(getAdapterPosition()));
-                    mContext.startService(intent);
                 }
             } else {//不是赚钱会员，每天只允许点一次；点第二次的时候提示不是赚钱会员
                 if (System.currentTimeMillis() > gold.downloadTime + daySpan) {
@@ -140,10 +130,6 @@ public class DownloadAppAdapter extends
                     gold.downloadTime = System.currentTimeMillis();
                     MyGoldDaoManager.getInstance(mContext).updateGold(gold);
                     EventBus.getDefault().post(new SnackBarEvent());
-
-                    Intent intent = new Intent(mContext, DownloadAppService.class);
-                    intent.putExtra(ValueKey.DATA, mApkInfos.get(getAdapterPosition()));
-                    mContext.startService(intent);
                 } else {
                     EventBus.getDefault().post(new MakeMoneyEvent());
                 }
