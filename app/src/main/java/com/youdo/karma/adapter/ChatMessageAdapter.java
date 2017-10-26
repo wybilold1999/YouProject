@@ -32,6 +32,7 @@ import com.youdo.karma.activity.PersonalInfoActivity;
 import com.youdo.karma.activity.PhotoViewActivity;
 import com.youdo.karma.activity.VipCenterActivity;
 import com.youdo.karma.config.ValueKey;
+import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.entity.Conversation;
 import com.youdo.karma.entity.IMessage;
@@ -120,6 +121,12 @@ public class ChatMessageAdapter extends
                         if (mConversation.localPortrait.startsWith("res")) {
                             textHolder.portrait.setImageURI(Uri.parse(mConversation.localPortrait));
                         } else {
+                            textHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
+                        }
+                    } else {
+                        mConversation = ConversationSqlManager.getInstance(mContext)
+                                .queryConversationForById(message.conversationId);
+                        if (null != mConversation) {
                             textHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
                         }
                     }
@@ -233,6 +240,12 @@ public class ChatMessageAdapter extends
                         } else {
                             imageHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
                         }
+                    } else {
+                        mConversation = ConversationSqlManager.getInstance(mContext)
+                                .queryConversationForById(message.conversationId);
+                        if (null != mConversation) {
+                            imageHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
+                        }
                     }
                     RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) imageHolder.portrait
                             .getLayoutParams();
@@ -295,6 +308,12 @@ public class ChatMessageAdapter extends
                         if (mConversation.localPortrait.startsWith("res")) {
                             locationHolder.portrait.setImageURI(Uri.parse(mConversation.localPortrait));
                         } else {
+                            locationHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
+                        }
+                    } else {
+                        mConversation = ConversationSqlManager.getInstance(mContext)
+                                .queryConversationForById(message.conversationId);
+                        if (null != mConversation) {
                             locationHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
                         }
                     }
@@ -371,6 +390,12 @@ public class ChatMessageAdapter extends
                         } else {
                             voipViewHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
                         }
+                    } else {
+                        mConversation = ConversationSqlManager.getInstance(mContext)
+                                .queryConversationForById(message.conversationId);
+                        if (null != mConversation) {
+                            voipViewHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
+                        }
                     }
 
                     RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) voipViewHolder.portrait
@@ -435,6 +460,12 @@ public class ChatMessageAdapter extends
                         if (mConversation.localPortrait.startsWith("res")) {
                             redViewHolder.portrait.setImageURI(Uri.parse(mConversation.localPortrait));
                         } else {
+                            redViewHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
+                        }
+                    } else {
+                        mConversation = ConversationSqlManager.getInstance(mContext)
+                                .queryConversationForById(message.conversationId);
+                        if (null != mConversation) {
                             redViewHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
                         }
                     }
@@ -997,6 +1028,10 @@ public class ChatMessageAdapter extends
             }
         });
         builder.show();
+    }
+
+    public void setmConversation(Conversation conversation) {
+        mConversation = conversation;
     }
 
     public void onDestroy() {

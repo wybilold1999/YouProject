@@ -93,8 +93,10 @@ public class ConversationSqlManager extends DBManager {
 	 * 根据id查询会话
 	 * @return
 	 */
-	public Conversation queryConversationForById(String conversationId) {
-		return null;
+	public Conversation queryConversationForById(long conversationId) {
+		QueryBuilder<Conversation> qb = conversationDao.queryBuilder();
+		qb.where(ConversationDao.Properties.Id.eq(conversationId));
+		return qb.unique();
 	}
 
 	/**
