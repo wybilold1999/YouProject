@@ -111,7 +111,7 @@ public class ChatMessageAdapter extends
                             .setBackgroundResource(R.drawable.left_bubble_selector);
                     textHolder.message_text.setTextColor(Color.BLACK);
 
-                    if(!TextUtils.isEmpty(mConversation.localPortrait)){
+                    if(null != mConversation && !TextUtils.isEmpty(mConversation.localPortrait)){
                         if (mConversation.localPortrait.startsWith("res")) {
                             textHolder.portrait.setImageURI(Uri.parse(mConversation.localPortrait));
                         } else {
@@ -222,7 +222,7 @@ public class ChatMessageAdapter extends
                             }
                         }
                     }
-                    if(!TextUtils.isEmpty(mConversation.localPortrait)){
+                    if(null != mConversation && !TextUtils.isEmpty(mConversation.localPortrait)){
                         if (mConversation.localPortrait.startsWith("res")) {
                             imageHolder.portrait.setImageURI(Uri.parse(mConversation.localPortrait));
                         } else {
@@ -286,7 +286,7 @@ public class ChatMessageAdapter extends
                 locationHolder.message_send_fail.setVisibility(View.GONE);
                 if (message.isSend == IMessage.MessageIsSend.RECEIVING) {
 
-                    if(!TextUtils.isEmpty(mConversation.localPortrait)){
+                    if(null != mConversation && !TextUtils.isEmpty(mConversation.localPortrait)){
                         if (mConversation.localPortrait.startsWith("res")) {
                             locationHolder.portrait.setImageURI(Uri.parse(mConversation.localPortrait));
                         } else {
@@ -360,7 +360,7 @@ public class ChatMessageAdapter extends
                             .setBackgroundResource(R.drawable.left_bubble_selector);
                     voipViewHolder.message_text.setTextColor(Color.BLACK);
 
-                    if(!TextUtils.isEmpty(mConversation.localPortrait)){
+                    if(null != mConversation && !TextUtils.isEmpty(mConversation.localPortrait)){
                         if (mConversation.localPortrait.startsWith("res")) {
                             voipViewHolder.portrait.setImageURI(Uri.parse(mConversation.localPortrait));
                         } else {
@@ -426,7 +426,7 @@ public class ChatMessageAdapter extends
                 redViewHolder.message_send_fail.setVisibility(View.GONE);
                 redViewHolder.progress_bar.setVisibility(View.GONE);
                 if (message.isSend == IMessage.MessageIsSend.RECEIVING) {
-                    if(!TextUtils.isEmpty(mConversation.localPortrait)){
+                    if(null != mConversation && !TextUtils.isEmpty(mConversation.localPortrait)){
                         if (mConversation.localPortrait.startsWith("res")) {
                             redViewHolder.portrait.setImageURI(Uri.parse(mConversation.localPortrait));
                         } else {
