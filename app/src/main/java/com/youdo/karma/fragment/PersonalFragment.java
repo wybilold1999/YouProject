@@ -21,6 +21,7 @@ import com.youdo.karma.activity.BetweenLoversActivity;
 import com.youdo.karma.activity.IdentifyActivity;
 import com.youdo.karma.activity.LoveFormeActivity;
 import com.youdo.karma.activity.MakeMoneyActivity;
+import com.youdo.karma.activity.MoneyPacketActivity;
 import com.youdo.karma.activity.MyAttentionActivity;
 import com.youdo.karma.activity.MyGiftsActivity;
 import com.youdo.karma.activity.MyGoldActivity;
@@ -127,6 +128,10 @@ public class PersonalFragment extends Fragment {
 	ImageView mAttentionRedPoint;
 	@BindView(R.id.love_red_point)
 	ImageView mLoveRedPoint;
+	@BindView(R.id.money_card)
+	CardView mMoneyCard;
+	@BindView(R.id.money_lay)
+	RelativeLayout mMoneyLay;
 	Unbinder unbinder;
 
 	private View rootView;
@@ -239,6 +244,11 @@ public class PersonalFragment extends Fragment {
 			} else {
 				mLoversCard.setVisibility(View.GONE);
 			}
+			if (clientUser.isShowRpt) {
+				mMoneyCard.setVisibility(View.VISIBLE);
+			} else {
+				mMoneyCard.setVisibility(View.GONE);
+			}
 		}
 	}
 
@@ -263,7 +273,7 @@ public class PersonalFragment extends Fragment {
 			R.id.head_portrait_lay, R.id.vip_lay, R.id.my_attention,
 			R.id.attentioned_user, R.id.good_user, R.id.setting, R.id.about, R.id.my_gold,
 			R.id.download_layout, R.id.lovers_lay, R.id.success_case,
-			R.id.near_party, R.id.identify_lay, R.id.my_gifts})
+			R.id.near_party, R.id.identify_lay, R.id.my_gifts, R.id.money_lay})
 	public void onClick(View view) {
 		Intent intent = new Intent();
 		switch (view.getId()) {
@@ -325,6 +335,10 @@ public class PersonalFragment extends Fragment {
 				break;
 			case R.id.identify_lay:
 				intent.setClass(getActivity(), IdentifyActivity.class);
+				startActivity(intent);
+				break;
+			case R.id.money_lay:
+				intent.setClass(getActivity(), MoneyPacketActivity.class);
 				startActivity(intent);
 				break;
 		}

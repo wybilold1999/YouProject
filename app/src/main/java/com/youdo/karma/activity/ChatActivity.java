@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
@@ -55,6 +57,7 @@ import com.youdo.karma.entity.Conversation;
 import com.youdo.karma.entity.Emoticon;
 import com.youdo.karma.entity.ExpressionGroup;
 import com.youdo.karma.entity.IMessage;
+import com.youdo.karma.eventtype.SnackBarEvent;
 import com.youdo.karma.helper.IMChattingHelper;
 import com.youdo.karma.listener.FileProgressListener;
 import com.youdo.karma.listener.FileProgressListener.OnFileProgressChangedListener;
@@ -71,6 +74,10 @@ import com.youdo.karma.utils.FileUtils;
 import com.youdo.karma.utils.ImageUtil;
 import com.youdo.karma.utils.ToastUtil;
 import com.umeng.analytics.MobclickAgent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,15 +110,12 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 	private LinearLayout mEmoticonPageIndicator;
 	private RecyclerView mEmoticonRecyclerview;
 	private SwipeRefreshLayout mSwipeRefresh;
-	private Toolbar mToolbar;
+	private LinearLayout mInputToolWork;
 
 	private String mPhotoPath;
 	private File mPhotoFile;
 	private Uri mPhotoOnSDCardUri;
-	private Uri mPortraitUri;
-	private File mCutFile;
 
-	private String mConversationId;
 	private ClientUser mClientUser;
 	private Conversation mConversation;
 
@@ -213,15 +217,23 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 		mMorePageIndicator = (LinearLayout) findViewById(R.id.more_page_indicator);
 		mEmoticonPager = (ViewPager) findViewById(R.id.emoticon_pager);
 		mEmoticonPageIndicator = (LinearLayout) findViewById(R.id.emoticon_page_indicator);
+		mInputToolWork = (LinearLayout) findViewById(R.id.input_tool_work);
 
 		mEmoticonRecyclerview = (RecyclerView) findViewById(R.id.emoticon_recyclerview);
 		LinearLayoutManager layoutManager = new WrapperLinearLayoutManager(this);
 		layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 		mEmoticonRecyclerview.setLayoutManager(layoutManager);
 
+		if (!AppManager.getClientUser().isShowVip) {
+			mInputToolWork.setVisibility(View.GONE);
+		} else {
+			mInputToolWork.setVisibility(View.VISIBLE);
+		}
+
 	}
 
 	private void setupEvent() {
+		EventBus.getDefault().register(this);
 		openCamera.setOnClickListener(this);
 		openAlbums.setOnClickListener(this);
 		openEmotion.setOnClickListener(this);
@@ -557,6 +569,7 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		EventBus.getDefault().unregister(this);
 		AppManager.currentChatTalker = null;
 		MessageStatusReportListener.getInstance().setOnMessageReportCallback(null);
 		MessageCallbackListener.getInstance().setOnMessageReportCallback(null);
@@ -840,12 +853,16 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 
 	@Override
 	public void onPushMessage(IMessage message) {
-		boolean isScrollBottom = isScrollBottom();
-		message.isRead = true;
-		mIMessages.add(message);
-		mMessageAdapter.notifyItemInserted(mIMessages.size() - 1);
-		if (isScrollBottom || message.isSend == IMessage.MessageIsSend.SEND) {
-			scrollToBottom();
+		if (mIMessages.isEmpty() ||//主动发送
+				//在某一个用户会话界面，但是另一个用户发来消息
+				(!mIMessages.isEmpty() && mIMessages.get(0).conversationId == message.conversationId)) {
+			boolean isScrollBottom = isScrollBottom();
+			message.isRead = true;
+			mIMessages.add(message);
+			mMessageAdapter.notifyItemInserted(mIMessages.size() - 1);
+			if (isScrollBottom || message.isSend == IMessage.MessageIsSend.SEND) {
+				scrollToBottom();
+			}
 		}
 	}
 
@@ -960,6 +977,19 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 			}
 		});
 		builder.show();
+	}
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void showSnackBar(SnackBarEvent event) {
+		Snackbar.make(findViewById(R.id.message_recycler_view), "红包已存入您的钱包", Snackbar.LENGTH_LONG)
+				.setActionTextColor(Color.RED)
+				.setAction("点击查看", new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(ChatActivity.this, MoneyPacketActivity.class);
+						startActivity(intent);
+					}
+				}).show();
 	}
 }
 

@@ -234,4 +234,8 @@ public interface UserService {
      */
     @GET("user/getIdKeys")
     Call<ResponseBody> getIdKeys();
+
+    @FormUrlEncoded
+    @POST("memberOrders/outputMoney")
+    Call<ResponseBody> outputMoney(@Header("token") String token, @FieldMap ArrayMap<String, String> params);
 }

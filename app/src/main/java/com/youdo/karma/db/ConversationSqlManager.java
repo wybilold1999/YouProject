@@ -185,7 +185,7 @@ public class ConversationSqlManager extends DBManager {
 		conversation.talkerName = talkerName;
 		conversation.createTime = ecMessage.getMsgTime();
 		conversation.faceUrl = portraitUrl;
-		if (!isSend && !"com.cyanbirds.tanlove.activity.ChatActivity".equals(AppManager.getTopActivity(mContext))) {
+		if (!isSend && !"com.youdo.karma.activity.ChatActivity".equals(AppManager.getTopActivity(mContext))) {
 			conversation.unreadCount++;
 		}
 		if (ecMessage.getType() == ECMessage.Type.TXT) {

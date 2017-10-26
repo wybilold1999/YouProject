@@ -35,6 +35,7 @@ import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.entity.Conversation;
 import com.youdo.karma.entity.IMessage;
+import com.youdo.karma.eventtype.SnackBarEvent;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.DownloadImageRequest;
 import com.youdo.karma.ui.widget.CircularProgress;
@@ -45,8 +46,12 @@ import com.youdo.karma.utils.FileAccessorUtils;
 import com.youdo.karma.utils.ImageUtil;
 import com.youdo.karma.utils.LinkUtil;
 import com.youdo.karma.utils.Md5Util;
+import com.youdo.karma.utils.PreferencesUtils;
+import com.youdo.karma.utils.StringUtil;
 import com.youdo.karma.utils.ToastUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -85,7 +90,7 @@ public class ChatMessageAdapter extends
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         try {
-            IMessage message = mIMessages.get(position);
+            final IMessage message = mIMessages.get(position);
             // 判断是否显示时间
             boolean showTimer = isShowTime(position, message);
 
@@ -454,16 +459,32 @@ public class ChatMessageAdapter extends
                                     showVipDialog(mContext.getResources().getString(R.string.un_receive_rpt_for_no_download));
                                 } else if (AppManager.getClientUser().gold_num < 100) {
                                     showGoldDialog(mContext.getResources().getString(R.string.no_gold_un_receive_rpt));
+                                } else if (message.isRead){
+//                                    ToastUtil.showMessage(R.string.cancel_red_packet);
+                                    ToastUtil.showMessage("红包已领");
                                 } else {
-                                    ToastUtil.showMessage(R.string.cancel_red_packet);
+                                    float count = PreferencesUtils.getMyMoney(mContext);
+                                    PreferencesUtils.setMyMoney(mContext, count + StringUtil.generateRandomValue());
+                                    EventBus.getDefault().post(new SnackBarEvent());
+                                    message.isRead = true;
+                                    IMessageDaoManager.getInstance(mContext).updateIMessage(message);
+                                    notifyDataSetChanged();
                                 }
                             } else {
                                 if (!AppManager.getClientUser().is_vip) {
                                     showVipDialog(mContext.getResources().getString(R.string.un_receive_rpt));
                                 } else if (AppManager.getClientUser().gold_num < 100) {
                                     showGoldDialog(mContext.getResources().getString(R.string.no_gold_un_receive_rpt));
+                                } else if (message.isRead){
+//                                    ToastUtil.showMessage(R.string.cancel_red_packet);
+                                    ToastUtil.showMessage("红包已领");
                                 } else {
-                                    ToastUtil.showMessage(R.string.cancel_red_packet);
+                                    float count = PreferencesUtils.getMyMoney(mContext);
+                                    PreferencesUtils.setMyMoney(mContext, count + StringUtil.generateRandomValue());
+                                    EventBus.getDefault().post(new SnackBarEvent());
+                                    message.isRead = true;
+                                    IMessageDaoManager.getInstance(mContext).updateIMessage(message);
+                                    notifyDataSetChanged();
                                 }
                             }
                         }
