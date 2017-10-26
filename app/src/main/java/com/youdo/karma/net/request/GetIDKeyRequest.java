@@ -28,7 +28,7 @@ import retrofit2.Callback;
 public class GetIDKeyRequest extends ResultPostExecute<AllKeys> {
 
     public void request() {
-        Call<ResponseBody> call = AppManager.getUserService().getIdKey();
+        Call<ResponseBody> call = AppManager.getUserService().getIdKeys();
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
@@ -37,15 +37,18 @@ public class GetIDKeyRequest extends ResultPostExecute<AllKeys> {
                         parseJson(response.body().string());
                     } catch (IOException e) {
                         e.printStackTrace();
+                        onErrorExecute("");
                     } finally {
                         response.body().close();
                     }
                 } else {
+                    onErrorExecute("");
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                onErrorExecute("");
             }
         });
     }
