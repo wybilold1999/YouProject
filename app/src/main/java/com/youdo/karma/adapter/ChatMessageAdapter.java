@@ -48,7 +48,6 @@ import com.youdo.karma.utils.ImageUtil;
 import com.youdo.karma.utils.LinkUtil;
 import com.youdo.karma.utils.Md5Util;
 import com.youdo.karma.utils.PreferencesUtils;
-import com.youdo.karma.utils.StringUtil;
 import com.youdo.karma.utils.ToastUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -75,6 +74,7 @@ public class ChatMessageAdapter extends
      */
     private ArrayList<String> mShowTimePosition;
     private static Context mContext;
+    private String redPkt[] = null;//红包数据结构:祝福语;金额
 
     public ChatMessageAdapter(Context context, List<IMessage> messages, Conversation mConversation) {
         mContext = context;
@@ -247,6 +247,7 @@ public class ChatMessageAdapter extends
                             imageHolder.portrait.setImageURI(Uri.parse("file://" + mConversation.localPortrait));
                         }
                     }
+
                     RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) imageHolder.portrait
                             .getLayoutParams();
                     lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT,
@@ -450,7 +451,10 @@ public class ChatMessageAdapter extends
                 // 红包消息
                 RedViewHolder redViewHolder = (RedViewHolder) holder;
                 if (!TextUtils.isEmpty(message.content)) {
-                    redViewHolder.message_text.setText(message.content);
+                    redPkt = message.content.split(";");
+                    if (redPkt != null && redPkt.length == 2) {
+                        redViewHolder.message_text.setText(redPkt[0]);
+                    }
                 }
                 redViewHolder.nickname.setVisibility(View.GONE);
                 redViewHolder.message_send_fail.setVisibility(View.GONE);
@@ -495,8 +499,9 @@ public class ChatMessageAdapter extends
                                     ToastUtil.showMessage("红包已领");
                                 } else {
                                     float count = PreferencesUtils.getMyMoney(mContext);
-                                    PreferencesUtils.setMyMoney(mContext, count + StringUtil.generateRandomValue());
-                                    EventBus.getDefault().post(new SnackBarEvent());
+                                    float moneyPkt = Float.parseFloat(redPkt[1]);
+                                    PreferencesUtils.setMyMoney(mContext, count + moneyPkt);
+                                    EventBus.getDefault().post(new SnackBarEvent(moneyPkt + "元红包已存入您的钱包"));
                                     message.isRead = true;
                                     IMessageDaoManager.getInstance(mContext).updateIMessage(message);
                                     notifyDataSetChanged();
@@ -511,8 +516,9 @@ public class ChatMessageAdapter extends
                                     ToastUtil.showMessage("红包已领");
                                 } else {
                                     float count = PreferencesUtils.getMyMoney(mContext);
-                                    PreferencesUtils.setMyMoney(mContext, count + StringUtil.generateRandomValue());
-                                    EventBus.getDefault().post(new SnackBarEvent());
+                                    float moneyPkt = Float.parseFloat(redPkt[1]);
+                                    PreferencesUtils.setMyMoney(mContext, count + moneyPkt);
+                                    EventBus.getDefault().post(new SnackBarEvent(moneyPkt + "元红包已存入您的钱包"));
                                     message.isRead = true;
                                     IMessageDaoManager.getInstance(mContext).updateIMessage(message);
                                     notifyDataSetChanged();
@@ -559,16 +565,20 @@ public class ChatMessageAdapter extends
                                     showVipDialog(mContext.getResources().getString(R.string.un_cancel_red_packet_for_td));
                                 } else if (AppManager.getClientUser().gold_num < 100) {
                                     showGoldDialog(mContext.getResources().getString(R.string.no_gold_un_cancel_red_packet));
-                                } else {
+                                } else if (message.isRead) {
                                     ToastUtil.showMessage(R.string.cancel_red_packet_tips);
+                                } else {
+                                    showRevokePkt(message);//撤销红包对话框
                                 }
                             } else {
                                 if (!AppManager.getClientUser().is_vip) {
                                     showVipDialog(mContext.getResources().getString(R.string.un_cancel_red_packet));
                                 } else if (AppManager.getClientUser().gold_num < 100) {
                                     showGoldDialog(mContext.getResources().getString(R.string.no_gold_un_cancel_red_packet));
-                                } else {
+                                } else if (message.isRead) {
                                     ToastUtil.showMessage(R.string.cancel_red_packet_tips);
+                                } else {
+                                    showRevokePkt(message);//撤销红包对话框
                                 }
                             }
                         }
@@ -1030,8 +1040,31 @@ public class ChatMessageAdapter extends
         builder.show();
     }
 
-    public void setmConversation(Conversation conversation) {
-        mConversation = conversation;
+    /**
+     * 撤销红包对话框
+     */
+    private void showRevokePkt(final IMessage message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setMessage(mContext.getResources().getString(R.string.revoke_pkt));
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                float count = PreferencesUtils.getMyMoney(mContext);
+                PreferencesUtils.setMyMoney(mContext, count + Float.parseFloat(redPkt[1]));
+                EventBus.getDefault().post(new SnackBarEvent("撤回的红包已存入您的钱包"));
+                message.isRead = true;
+                IMessageDaoManager.getInstance(mContext).updateIMessage(message);
+                notifyDataSetChanged();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
     }
 
     public void onDestroy() {

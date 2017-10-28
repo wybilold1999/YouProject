@@ -49,6 +49,7 @@ import com.youdo.karma.adapter.ChatEmoticonsAdapter;
 import com.youdo.karma.adapter.ChatEmoticonsAdapter.OnEmojiItemClickListener;
 import com.youdo.karma.adapter.ChatMessageAdapter;
 import com.youdo.karma.adapter.PagerGridAdapter;
+import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
@@ -309,6 +310,9 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 			mConversation = ConversationSqlManager.getInstance(this)
 					.queryConversationForByTalkerId(mClientUser.userId);
 		}
+		if (null == mConversation) {
+			mConversation = new Conversation();
+		}
 		initEmoticon();
 		initEmotionUI();
 		mIMessages = new ArrayList<>();
@@ -465,32 +469,40 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 				break;
 			case R.id.tool_view_input_text:
 				if (AppManager.getClientUser().isShowVip) {
-					if (AppManager.getClientUser().is_vip) {
-						if (AppManager.getClientUser().gold_num  < 101) {
-							showGoldDialog();
-						} else {
-							if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
-								if (null != IMChattingHelper.getInstance().getChatManager()) {
-									IMChattingHelper.getInstance().sendTextMsg(
-											mClientUser, mContentInput.getText().toString());
-									mContentInput.setText("");
+					if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
+						if (null != IMChattingHelper.getInstance().getChatManager()) {
+							if (mConversation.chatLimit < AppConstants.CHAT_LIMIT) {
+								sendTextMsg();
+							} else {
+								if (AppManager.getClientUser().is_vip) {
+									if (AppManager.getClientUser().gold_num  < 101) {
+										showGoldDialog();
+									} else {
+										sendTextMsg();
+									}
+								} else {
+									showBeyondChatLimitDialog();
 								}
 							}
 						}
-					} else {
-						showVipDialog();
 					}
 				} else {
 					if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
-						if (null != IMChattingHelper.getInstance().getChatManager()) {
-							IMChattingHelper.getInstance().sendTextMsg(
-									mClientUser, mContentInput.getText().toString());
-							mContentInput.setText("");
-						}
+						sendTextMsg();
 					}
 				}
 				break;
 		}
+	}
+
+	private void sendTextMsg() {
+		long conversationId = IMChattingHelper.getInstance().sendTextMsg(
+				mClientUser, mContentInput.getText().toString());
+		if (TextUtils.isEmpty(mConversation.localPortrait)) {
+			mConversation = ConversationSqlManager.getInstance(this)
+					.queryConversationForById(conversationId);
+		}
+		mContentInput.setText("");
 	}
 
 	private void showVipDialog() {
@@ -857,7 +869,6 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 				//在某一个用户会话界面，但是另一个用户发来消息
 				(!mIMessages.isEmpty() && mIMessages.get(0).conversationId == message.conversationId)) {
 			boolean isScrollBottom = isScrollBottom();
-			message.isRead = true;
 			mIMessages.add(message);
 			mMessageAdapter.notifyItemInserted(mIMessages.size() - 1);
 			if (isScrollBottom || message.isSend == IMessage.MessageIsSend.SEND) {
@@ -979,9 +990,29 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 		builder.show();
 	}
 
+	private void showBeyondChatLimitDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("您的免费聊天次数已经用完，会员可无限畅聊，立即开通会员？");
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				Intent intent = new Intent(ChatActivity.this, VipCenterActivity.class);
+				startActivity(intent);
+			}
+		});
+		builder.setNegativeButton(R.string.until_single, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		builder.show();
+	}
+
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void showSnackBar(SnackBarEvent event) {
-		Snackbar.make(findViewById(R.id.message_recycler_view), "红包已存入您的钱包", Snackbar.LENGTH_LONG)
+		Snackbar.make(findViewById(R.id.message_recycler_view), event.content, Snackbar.LENGTH_LONG)
 				.setActionTextColor(Color.RED)
 				.setAction("点击查看", new OnClickListener() {
 					@Override

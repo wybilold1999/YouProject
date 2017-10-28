@@ -190,6 +190,9 @@ public class ConversationSqlManager extends DBManager {
 		if (!isSend && !"com.youdo.karma.activity.ChatActivity".equals(AppManager.getTopActivity(mContext))) {
 			conversation.unreadCount++;
 		}
+		if (isSend) {
+			conversation.chatLimit++;
+		}
 		if (ecMessage.getType() == ECMessage.Type.TXT) {
 			ECTextMessageBody body = (ECTextMessageBody)ecMessage.getBody();
 			if (body != null) {
@@ -204,7 +207,7 @@ public class ConversationSqlManager extends DBManager {
 			conversation.type = ECMessage.Type.LOCATION.ordinal();
 		} else if (ecMessage.getType() == ECMessage.Type.FILE) {
 
-		} else if (ecMessage.getType() == ECMessage.Type.RICH_TEXT) {
+		} else if (ecMessage.getType() == ECMessage.Type.STATE) {
 			conversation.content = CSApplication.getInstance().getResources().getString(R.string.rpt_symbol);
 			conversation.type = ECMessage.Type.RICH_TEXT.ordinal();
 		}

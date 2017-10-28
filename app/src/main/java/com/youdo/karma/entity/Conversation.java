@@ -58,11 +58,16 @@ public class Conversation implements Serializable{
 	/** 头像地址 */
 	@Property
 	public String faceUrl;
+
+	/** 免费聊天次数限制 */
+	@Property
+	public int chatLimit;
 	
-	@Generated(hash = 1491216450)
+	@Generated(hash = 571823557)
 	public Conversation(Long id, @NotNull String talker,
 			@NotNull String talkerName, @NotNull String content, int unreadCount,
-			long createTime, int type, String localPortrait, String faceUrl) {
+			long createTime, int type, String localPortrait, String faceUrl,
+			int chatLimit) {
 		this.id = id;
 		this.talker = talker;
 		this.talkerName = talkerName;
@@ -72,6 +77,7 @@ public class Conversation implements Serializable{
 		this.type = type;
 		this.localPortrait = localPortrait;
 		this.faceUrl = faceUrl;
+		this.chatLimit = chatLimit;
 	}
 	@Generated(hash = 1893991898)
 	public Conversation() {
@@ -129,6 +135,12 @@ public class Conversation implements Serializable{
 	}
 	public void setFaceUrl(String faceUrl) {
 		this.faceUrl = faceUrl;
+	}
+	public int getChatLimit() {
+		return this.chatLimit;
+	}
+	public void setChatLimit(int chatLimit) {
+		this.chatLimit = chatLimit;
 	}
 
 

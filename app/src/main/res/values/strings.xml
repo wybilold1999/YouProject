@@ -266,6 +266,7 @@
     <string name="un_receive_rpt">您还不是会员,不能领取红包,立即开通会员领取红包？</string>
     <string name="un_receive_rpt_for_no_download">您还不是赚钱会员,不能领取红包,立即开通赚钱会员领取红包？</string>
     <string name="no_gold_un_receive_rpt">领取红包需账户中金币数量大于100，您账户中金币数量暂时不足，立即购买金币来领取红包？</string>
+    <string name="revoke_pkt">确定撤销该红包吗？</string>
 
     <string name="errcode_success">发送成功</string>
     <string name="errcode_cancel">发送取消</string>

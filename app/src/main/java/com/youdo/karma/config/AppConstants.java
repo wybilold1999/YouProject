@@ -75,7 +75,6 @@ public class AppConstants {
 
 	public static final String ALI_PAY_PLATFORM = "alipay";
 
-	public static final String MZ_APP_ID = "110446";
-	public static final String MZ_APP_KEY = "0e29617af61244ae9ac57c19083d7bc7";
+	public static final int CHAT_LIMIT = 3;
 
 }
