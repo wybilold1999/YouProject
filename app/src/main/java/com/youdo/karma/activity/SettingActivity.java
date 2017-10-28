@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.ValueKey;
+import com.youdo.karma.db.ChatLimitDaoManager;
 import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.db.MyGoldDaoManager;
@@ -211,6 +212,7 @@ public class SettingActivity extends BaseActivity {
         IMessageDaoManager.reset();
         ConversationSqlManager.reset();
         MyGoldDaoManager.reset();
+        ChatLimitDaoManager.reset();
     }
 
     @Override

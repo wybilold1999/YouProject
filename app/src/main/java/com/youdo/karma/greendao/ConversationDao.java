@@ -33,7 +33,6 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
         public final static Property Type = new Property(6, int.class, "type", false, "TYPE");
         public final static Property LocalPortrait = new Property(7, String.class, "localPortrait", false, "LOCAL_PORTRAIT");
         public final static Property FaceUrl = new Property(8, String.class, "faceUrl", false, "FACE_URL");
-        public final static Property ChatLimit = new Property(9, int.class, "chatLimit", false, "CHAT_LIMIT");
     }
 
 
@@ -57,8 +56,7 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
                 "\"CREATE_TIME\" INTEGER NOT NULL ," + // 5: createTime
                 "\"TYPE\" INTEGER NOT NULL ," + // 6: type
                 "\"LOCAL_PORTRAIT\" TEXT," + // 7: localPortrait
-                "\"FACE_URL\" TEXT," + // 8: faceUrl
-                "\"CHAT_LIMIT\" INTEGER NOT NULL );"); // 9: chatLimit
+                "\"FACE_URL\" TEXT);"); // 8: faceUrl
     }
 
     /** Drops the underlying database table. */
@@ -91,7 +89,6 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
         if (faceUrl != null) {
             stmt.bindString(9, faceUrl);
         }
-        stmt.bindLong(10, entity.getChatLimit());
     }
 
     @Override
@@ -118,7 +115,6 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
         if (faceUrl != null) {
             stmt.bindString(9, faceUrl);
         }
-        stmt.bindLong(10, entity.getChatLimit());
     }
 
     @Override
@@ -137,8 +133,7 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
             cursor.getLong(offset + 5), // createTime
             cursor.getInt(offset + 6), // type
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // localPortrait
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // faceUrl
-            cursor.getInt(offset + 9) // chatLimit
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // faceUrl
         );
         return entity;
     }
@@ -154,7 +149,6 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
         entity.setType(cursor.getInt(offset + 6));
         entity.setLocalPortrait(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setFaceUrl(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setChatLimit(cursor.getInt(offset + 9));
      }
     
     @Override

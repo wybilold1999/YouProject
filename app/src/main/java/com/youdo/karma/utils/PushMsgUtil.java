@@ -134,6 +134,7 @@ public class PushMsgUtil {
 			conversation.talker = pushMsgModel.sender;
 			conversation.talkerName = pushMsgModel.senderName;
 			conversation.createTime = pushMsgModel.serverTime;
+			conversation.faceUrl = pushMsgModel.faceUrl;
 			conversation.unreadCount++;
 			long conversationId = ConversationSqlManager.getInstance(
 					CSApplication.getInstance()).inserConversation(conversation);

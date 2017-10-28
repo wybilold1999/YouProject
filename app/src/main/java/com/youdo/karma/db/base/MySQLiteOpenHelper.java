@@ -3,6 +3,8 @@ package com.youdo.karma.db.base;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.youdo.karma.entity.ChatLimit;
+import com.youdo.karma.greendao.ChatLimitDao;
 import com.youdo.karma.greendao.ConversationDao;
 import com.youdo.karma.greendao.DaoMaster;
 import com.youdo.karma.greendao.DynamicDao;
@@ -30,6 +32,7 @@ public class MySQLiteOpenHelper extends DaoMaster.OpenHelper {
 				DynamicDao.class,
 				GoldDao.class,
 				IMessageDao.class,
-				NameListDao.class);
+				NameListDao.class,
+				ChatLimitDao.class);
 	}
 }

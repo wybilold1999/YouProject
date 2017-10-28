@@ -72,7 +72,7 @@ public class IMChattingHelper implements OnChatReceiveListener {
 		mChatManager = SDKCoreHelper.getECChatManager();
 	}
 
-	public long sendTextMsg(final ClientUser clientUser, final String msgContent) {
+	public void sendTextMsg(final ClientUser clientUser, final String msgContent) {
 		// 组建一个待发送的ECMessage
 		ECMessage ecMessagee = ECMessage.createECMessage(ECMessage.Type.TXT);
 		ecMessagee.setDirection(ECMessage.Direction.SEND);
@@ -164,7 +164,6 @@ public class IMChattingHelper implements OnChatReceiveListener {
 				CSApplication.getInstance(),
 				Uri.parse("android.resource://" + AppManager.getPackageName()
 						+ "/" + R.raw.sound_send)).play();
-		return convsId;
 	}
 
 	/**

@@ -51,8 +51,10 @@ import com.youdo.karma.adapter.ChatMessageAdapter;
 import com.youdo.karma.adapter.PagerGridAdapter;
 import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.config.ValueKey;
+import com.youdo.karma.db.ChatLimitDaoManager;
 import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
+import com.youdo.karma.entity.ChatLimit;
 import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.entity.Conversation;
 import com.youdo.karma.entity.Emoticon;
@@ -123,7 +125,8 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 	private List<IMessage> mIMessages;
 	private List<GridView> mChatEmoticonsGridView;
 	private LinearLayoutManager mLinearLayoutManager;
-	private List<ExpressionGroup> mExpressionGroups;
+
+	private ChatLimit mChatLimit;
 
 	/**
 	 * 消息分页条数
@@ -309,10 +312,14 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 		if (mClientUser != null) {
 			mConversation = ConversationSqlManager.getInstance(this)
 					.queryConversationForByTalkerId(mClientUser.userId);
+			mChatLimit = ChatLimitDaoManager.getInstance(this).getChatLimitByUid(mClientUser.userId);
+			if (mChatLimit == null) {
+				mChatLimit = new ChatLimit();
+				mChatLimit.userId = mClientUser.userId;
+				mChatLimit.count = 0;
+			}
 		}
-		if (null == mConversation) {
-			mConversation = new Conversation();
-		}
+
 		initEmoticon();
 		initEmotionUI();
 		mIMessages = new ArrayList<>();
@@ -471,7 +478,8 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 				if (AppManager.getClientUser().isShowVip) {
 					if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
 						if (null != IMChattingHelper.getInstance().getChatManager()) {
-							if (mConversation.chatLimit < AppConstants.CHAT_LIMIT) {
+							if (mChatLimit.count < AppConstants.CHAT_LIMIT) {
+								++mChatLimit.count;
 								sendTextMsg();
 							} else {
 								if (AppManager.getClientUser().is_vip) {
@@ -496,13 +504,12 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 	}
 
 	private void sendTextMsg() {
-		long conversationId = IMChattingHelper.getInstance().sendTextMsg(
+		IMChattingHelper.getInstance().sendTextMsg(
 				mClientUser, mContentInput.getText().toString());
-		if (TextUtils.isEmpty(mConversation.localPortrait)) {
-			mConversation = ConversationSqlManager.getInstance(this)
-					.queryConversationForById(conversationId);
-		}
 		mContentInput.setText("");
+		if (mChatLimit.count < AppConstants.CHAT_LIMIT) {
+			ChatLimitDaoManager.getInstance(this).insertOrReplace(mChatLimit);
+		}
 	}
 
 	private void showVipDialog() {
