@@ -8,6 +8,7 @@ import android.util.Log;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.eventtype.PayEvent;
+import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.utils.ToastUtil;
 import com.tencent.mm.sdk.constants.ConstantsAPI;
 import com.tencent.mm.sdk.modelbase.BaseReq;
@@ -31,7 +32,11 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 	}
 
 	private void handleIntent(Intent paramIntent) {
-		CSApplication.api.handleIntent(paramIntent, this);
+		if (null != AppManager.getIWX_PAY_API()) {
+			AppManager.getIWX_PAY_API().handleIntent(paramIntent, this);
+		} else {
+			CSApplication.api.handleIntent(paramIntent, this);
+		}
 	}
 
 	@Override

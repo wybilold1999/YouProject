@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.eventtype.WeinXinEvent;
+import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.utils.ToastUtil;
 import com.tencent.mm.sdk.constants.ConstantsAPI;
 import com.tencent.mm.sdk.modelbase.BaseReq;
@@ -33,7 +34,11 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler{
 	}
 
 	private void handleIntent(Intent paramIntent) {
-		CSApplication.api.handleIntent(paramIntent, this);
+		if (null != AppManager.getIWXAPI()) {
+			AppManager.getIWXAPI().handleIntent(paramIntent, this);
+		} else {
+			CSApplication.api.handleIntent(paramIntent, this);
+		}
 	}
 
 	@Override
