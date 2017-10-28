@@ -1012,15 +1012,17 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void showSnackBar(SnackBarEvent event) {
-		Snackbar.make(findViewById(R.id.message_recycler_view), event.content, Snackbar.LENGTH_LONG)
-				.setActionTextColor(Color.RED)
-				.setAction("点击查看", new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						Intent intent = new Intent(ChatActivity.this, MoneyPacketActivity.class);
-						startActivity(intent);
-					}
-				}).show();
+		if (!TextUtils.isEmpty(event.content)) {
+			Snackbar.make(findViewById(R.id.message_recycler_view), event.content, Snackbar.LENGTH_LONG)
+					.setActionTextColor(Color.RED)
+					.setAction("点击查看", new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Intent intent = new Intent(ChatActivity.this, MoneyPacketActivity.class);
+							startActivity(intent);
+						}
+					}).show();
+		}
 	}
 }
 

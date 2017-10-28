@@ -146,8 +146,8 @@
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
 		android:background="@android:color/white"
-		android:layout_marginBottom="15dp"
-		android:layout_marginTop="30dp">
+		android:layout_marginTop="30dp"
+		android:visibility="gone">
 
 		<View
 			android:layout_width="match_parent"
@@ -267,7 +267,8 @@
 		android:layout_gravity="bottom|center_horizontal"
 		android:textColor="@color/gray_text"
 		android:textSize="12sp"
-		android:text="@string/send_red_packet_success"/>
+		android:text="@string/send_red_packet_success"
+		android:layout_marginTop="30dp"/>
 
 	<TextView
 		android:layout_width="wrap_content"

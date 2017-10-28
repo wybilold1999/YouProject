@@ -495,8 +495,7 @@ public class ChatMessageAdapter extends
                                 } else if (AppManager.getClientUser().gold_num < 100) {
                                     showGoldDialog(mContext.getResources().getString(R.string.no_gold_un_receive_rpt));
                                 } else if (message.isRead){
-//                                    ToastUtil.showMessage(R.string.cancel_red_packet);
-                                    ToastUtil.showMessage("红包已领");
+                                    ToastUtil.showMessage(R.string.receive_pkt);
                                 } else {
                                     float count = PreferencesUtils.getMyMoney(mContext);
                                     float moneyPkt = Float.parseFloat(redPkt[1]);
@@ -512,8 +511,7 @@ public class ChatMessageAdapter extends
                                 } else if (AppManager.getClientUser().gold_num < 100) {
                                     showGoldDialog(mContext.getResources().getString(R.string.no_gold_un_receive_rpt));
                                 } else if (message.isRead){
-//                                    ToastUtil.showMessage(R.string.cancel_red_packet);
-                                    ToastUtil.showMessage("红包已领");
+                                    ToastUtil.showMessage(R.string.receive_pkt);
                                 } else {
                                     float count = PreferencesUtils.getMyMoney(mContext);
                                     float moneyPkt = Float.parseFloat(redPkt[1]);
@@ -566,7 +564,7 @@ public class ChatMessageAdapter extends
                                 } else if (AppManager.getClientUser().gold_num < 100) {
                                     showGoldDialog(mContext.getResources().getString(R.string.no_gold_un_cancel_red_packet));
                                 } else if (message.isRead) {
-                                    ToastUtil.showMessage(R.string.cancel_red_packet_tips);
+                                    ToastUtil.showMessage(R.string.revoked_pkt);
                                 } else {
                                     showRevokePkt(message);//撤销红包对话框
                                 }
@@ -576,7 +574,7 @@ public class ChatMessageAdapter extends
                                 } else if (AppManager.getClientUser().gold_num < 100) {
                                     showGoldDialog(mContext.getResources().getString(R.string.no_gold_un_cancel_red_packet));
                                 } else if (message.isRead) {
-                                    ToastUtil.showMessage(R.string.cancel_red_packet_tips);
+                                    ToastUtil.showMessage(R.string.revoked_pkt);
                                 } else {
                                     showRevokePkt(message);//撤销红包对话框
                                 }
