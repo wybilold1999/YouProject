@@ -51,14 +51,11 @@ import com.youdo.karma.adapter.ChatMessageAdapter;
 import com.youdo.karma.adapter.PagerGridAdapter;
 import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.config.ValueKey;
-import com.youdo.karma.db.ChatLimitDaoManager;
 import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
-import com.youdo.karma.entity.ChatLimit;
 import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.entity.Conversation;
 import com.youdo.karma.entity.Emoticon;
-import com.youdo.karma.entity.ExpressionGroup;
 import com.youdo.karma.entity.IMessage;
 import com.youdo.karma.eventtype.SnackBarEvent;
 import com.youdo.karma.helper.IMChattingHelper;
@@ -75,6 +72,7 @@ import com.youdo.karma.utils.EmoticonUtil;
 import com.youdo.karma.utils.FileAccessorUtils;
 import com.youdo.karma.utils.FileUtils;
 import com.youdo.karma.utils.ImageUtil;
+import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.ToastUtil;
 import com.umeng.analytics.MobclickAgent;
 
@@ -125,8 +123,6 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 	private List<IMessage> mIMessages;
 	private List<GridView> mChatEmoticonsGridView;
 	private LinearLayoutManager mLinearLayoutManager;
-
-	private ChatLimit mChatLimit;
 
 	/**
 	 * 消息分页条数
@@ -312,12 +308,6 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 		if (mClientUser != null) {
 			mConversation = ConversationSqlManager.getInstance(this)
 					.queryConversationForByTalkerId(mClientUser.userId);
-			mChatLimit = ChatLimitDaoManager.getInstance(this).getChatLimitByUid(mClientUser.userId);
-			if (mChatLimit == null) {
-				mChatLimit = new ChatLimit();
-				mChatLimit.userId = mClientUser.userId;
-				mChatLimit.count = 0;
-			}
 		}
 
 		initEmoticon();
@@ -478,9 +468,14 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 				if (AppManager.getClientUser().isShowVip) {
 					if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
 						if (null != IMChattingHelper.getInstance().getChatManager()) {
-							if (mChatLimit.count < AppConstants.CHAT_LIMIT) {
-								++mChatLimit.count;
+							int count = PreferencesUtils.getChatLimit(this);
+							if (count < AppConstants.CHAT_LIMIT) {
+								count = count + 1;
+								PreferencesUtils.setChatLimit(this, count);
 								sendTextMsg();
+								if (AppConstants.CHAT_LIMIT - count == 3) {
+									ToastUtil.showMessage(R.string.chat_count_three);
+								}
 							} else {
 								if (AppManager.getClientUser().is_vip) {
 									if (AppManager.getClientUser().gold_num  < 101) {
@@ -507,9 +502,6 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 		IMChattingHelper.getInstance().sendTextMsg(
 				mClientUser, mContentInput.getText().toString());
 		mContentInput.setText("");
-		if (mChatLimit.count < AppConstants.CHAT_LIMIT) {
-			ChatLimitDaoManager.getInstance(this).insertOrReplace(mChatLimit);
-		}
 	}
 
 	private void showVipDialog() {
@@ -998,8 +990,9 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 	}
 
 	private void showBeyondChatLimitDialog() {
+		String message = getResources().getString(R.string.chat_count_zero_bak);
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("您的免费聊天次数已经用完，会员可无限畅聊，立即开通会员？");
+		builder.setMessage(message);
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {

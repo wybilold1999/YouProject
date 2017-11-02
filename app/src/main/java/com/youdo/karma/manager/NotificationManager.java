@@ -89,7 +89,7 @@ public class NotificationManager {
             title = message.sender_name;
         }
         content = getTickerText(message);
-        builder.setTicker(title + "\n" + message.content);
+        builder.setTicker(title + "\n" + content);
         // 设置通知内容的标题
         builder.setContentTitle(title);
         builder.setContentText(content);

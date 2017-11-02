@@ -9,10 +9,10 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.ValueKey;
-import com.youdo.karma.db.ChatLimitDaoManager;
 import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.db.MyGoldDaoManager;
@@ -22,7 +22,6 @@ import com.youdo.karma.net.request.LogoutRequest;
 import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
-import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -212,7 +211,6 @@ public class SettingActivity extends BaseActivity {
         IMessageDaoManager.reset();
         ConversationSqlManager.reset();
         MyGoldDaoManager.reset();
-        ChatLimitDaoManager.reset();
     }
 
     @Override

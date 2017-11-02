@@ -103,6 +103,7 @@ public class LauncherActivity extends Activity {
             AppConstants.MI_PUSH_APP_ID = allKeys.xmId;
             AppConstants.MI_PUSH_APP_KEY = allKeys.xmKey;
             AppConstants.mAppid = allKeys.qqId;
+            AppConstants.CHAT_LIMIT = allKeys.chatLimit;
             registerWeiXin();
         }
 
