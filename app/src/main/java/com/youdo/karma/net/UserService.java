@@ -238,4 +238,21 @@ public interface UserService {
     @FormUrlEncoded
     @POST("memberOrders/outputMoney")
     Call<ResponseBody> outputMoney(@Header("token") String token, @FieldMap ArrayMap<String, String> params);
+
+    /**
+     * 获取通讯录
+     * @param token
+     * @param params
+     * @return
+     */
+    @FormUrlEncoded
+    @POST("user/contactList")
+    Call<ResponseBody> getContactList(@Header("token") String token, @FieldMap ArrayMap<String, String> params);
+
+    /**
+     * 获取表情组
+     * @return
+     */
+    @GET("expression/getExpressionGroup")
+    Call<ResponseBody> getExpressionGroup();
 }

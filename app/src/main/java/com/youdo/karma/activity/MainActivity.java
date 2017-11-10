@@ -43,9 +43,12 @@ import com.youdo.karma.entity.FederationToken;
 import com.youdo.karma.entity.FollowModel;
 import com.youdo.karma.entity.LoveModel;
 import com.youdo.karma.entity.ReceiveGiftModel;
+import com.youdo.karma.fragment.ContactsFragment;
 import com.youdo.karma.fragment.FoundFragment;
+import com.youdo.karma.fragment.FoundNewFragment;
 import com.youdo.karma.fragment.HomeLoveFragment;
 import com.youdo.karma.fragment.MessageFragment;
+import com.youdo.karma.fragment.MyPersonalFragment;
 import com.youdo.karma.fragment.PersonalFragment;
 import com.youdo.karma.fragment.VideoShowFragment;
 import com.youdo.karma.helper.SDKCoreHelper;
@@ -132,6 +135,16 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 					R.drawable.tab_my_message_selector),
 			new TableConfig(R.string.tab_personal, PersonalFragment.class,
 					R.drawable.tab_personal_selector) };
+
+	private static final TableConfig[] tableConfigBak = new TableConfig[] {
+			new TableConfig(R.string.tab_message, MessageFragment.class,
+					R.drawable.tab_message_selector),
+			new TableConfig(R.string.tab_contacts, ContactsFragment.class,
+					R.drawable.tab_contacts_selector),
+			new TableConfig(R.string.tab_found, FoundNewFragment.class,
+					R.drawable.tab_secret_friends_selector),
+			new TableConfig(R.string.tab_personal, MyPersonalFragment.class,
+					R.drawable.tab_more_selector) };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

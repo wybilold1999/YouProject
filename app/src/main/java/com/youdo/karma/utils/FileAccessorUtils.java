@@ -2,7 +2,6 @@ package com.youdo.karma.utils;
 
 import android.os.Environment;
 
-
 import com.youdo.karma.R;
 
 import java.io.File;
@@ -44,6 +43,9 @@ public class FileAccessorUtils {
 	/** APK文件暂时存放的路径 */
 	public static final String APK_PATH = getExternalStorePath()
 			+ "/youlove/.apk";
+	/** 在线表情存储路径 */
+	public static final String EXPRESSION_FILE = getExternalStorePath()
+			+ "/youlove/.expression";
 
 	/**
 	 * 外置存储卡的路径
@@ -69,6 +71,24 @@ public class FileAccessorUtils {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * 获取在线表情存放目录
+	 * @return
+	 */
+	public static File getExpressionPathName(){
+		if (!isExistExternalStore()) {
+			ToastUtil.showMessage(R.string.media_ejected);
+			return null;
+		}
+
+		File directory = new File(EXPRESSION_FILE);
+		if (!directory.exists() && !directory.mkdirs()) {
+			ToastUtil.showMessage("Path to file could not be created");
+			return null;
+		}
+		return directory;
 	}
 
 
