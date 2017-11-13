@@ -30,12 +30,8 @@ import retrofit2.Callback;
  */
 public class ContactsRequest extends ResultPostExecute<List<Contact>> {
 
-	public void request(final int pageNo, final int pageSize,
-						final String gender, final String mUserScopeType) {
+	public void request(String mUserScopeType) {
 		ArrayMap<String, String> params = new ArrayMap<>();
-		params.put("pageNo", String.valueOf(pageNo));
-		params.put("pageSize", String.valueOf(pageSize));
-		params.put("gender", gender);
 		params.put("user_scope_type", mUserScopeType);
 		Call<ResponseBody> call = AppManager.getUserService().getContactList(AppManager.getClientUser().sessionId, params);
 		call.enqueue(new Callback<ResponseBody>() {

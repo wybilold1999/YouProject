@@ -42,6 +42,7 @@ import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.DownloadFileRequest;
 import com.youdo.karma.net.request.GetCityInfoRequest;
 import com.youdo.karma.net.request.QqLoginRequest;
+import com.youdo.karma.net.request.UploadCityInfoRequest;
 import com.youdo.karma.net.request.UserLoginRequest;
 import com.youdo.karma.net.request.WXLoginRequest;
 import com.youdo.karma.utils.AESEncryptorUtil;
@@ -53,6 +54,7 @@ import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
 import com.youdo.karma.utils.Util;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
@@ -136,9 +138,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             loginAccount.setText(mPhoneNum);
             loginAccount.setSelection(mPhoneNum.length());
         }
-        mCurrrentCity = getIntent().getStringExtra(ValueKey.LOCATION);
-        curLat = getIntent().getStringExtra(ValueKey.LATITUDE);
-        curLon = getIntent().getStringExtra(ValueKey.LONGITUDE);
     }
 
     @Override
@@ -167,10 +166,42 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             mCityInfo = cityInfo;
             mCurrrentCity = cityInfo.city;
             PreferencesUtils.setCurrentCity(LoginActivity.this, mCurrrentCity);
+            EventBus.getDefault().post(new LocationEvent(mCurrrentCity));
         }
 
         @Override
         public void onErrorExecute(String error) {
+        }
+    }
+
+    class UploadCityInfoTask extends UploadCityInfoRequest {
+
+        @Override
+        public void onPostExecute(String isShow) {
+            if ("0".equals(isShow)) {
+                AppManager.getClientUser().isShowDownloadVip = false;
+                AppManager.getClientUser().isShowGold = false;
+                AppManager.getClientUser().isShowLovers = false;
+                AppManager.getClientUser().isShowMap = false;
+                AppManager.getClientUser().isShowVideo = false;
+                AppManager.getClientUser().isShowVip = false;
+                AppManager.getClientUser().isShowRpt = false;
+                AppManager.getClientUser().isShowNormal = false;
+            } else {
+                AppManager.getClientUser().isShowNormal = true;
+            }
+        }
+
+        @Override
+        public void onErrorExecute(String error) {
+            AppManager.getClientUser().isShowDownloadVip = false;
+            AppManager.getClientUser().isShowGold = false;
+            AppManager.getClientUser().isShowLovers = false;
+            AppManager.getClientUser().isShowMap = false;
+            AppManager.getClientUser().isShowVideo = false;
+            AppManager.getClientUser().isShowVip = false;
+            AppManager.getClientUser().isShowRpt = false;
+            AppManager.getClientUser().isShowNormal = false;
         }
     }
 
@@ -196,10 +227,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     @Override
     public void onLocationChanged(AMapLocation aMapLocation) {
         if (aMapLocation != null && !TextUtils.isEmpty(aMapLocation.getCity())) {
-            AppManager.getClientUser().latitude = String.valueOf(aMapLocation.getLatitude());
-            AppManager.getClientUser().longitude = String.valueOf(aMapLocation.getLongitude());
+            curLat = String.valueOf(aMapLocation.getLatitude());
+            curLon = String.valueOf(aMapLocation.getLongitude());
             mCurrrentCity = aMapLocation.getCity();
+            EventBus.getDefault().post(new LocationEvent(mCurrrentCity));
             PreferencesUtils.setCurrentCity(this, mCurrrentCity);
+            new UploadCityInfoTask().request(mCurrrentCity, curLat, curLon);
         } else {
             if (mCityInfo != null) {
                 try {
@@ -212,6 +245,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
 
                     double lon = Double.parseDouble(leftBottom[0]) + (Double.parseDouble(rightTop[0]) - Double.parseDouble(leftBottom[0])) / 5;
                     curLon = String.valueOf(lon);
+
+                    new UploadCityInfoTask().request(mCurrrentCity, curLat, curLon);
                 } catch (Exception e) {
 
                 }
@@ -259,14 +294,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                 break;
             case R.id.phone_register:
                 intent.setClass(this, RegisterActivity.class);
+                intent.putExtra(ValueKey.LOCATION, mCurrrentCity);
+                intent.putExtra(ValueKey.LATITUDE, curLat);
+                intent.putExtra(ValueKey.LONGITUDE, curLon);
                 startActivity(intent);
                 break;
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getCity(LocationEvent event) {
-        mCurrrentCity = event.city;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -278,14 +311,18 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     class WXLoginTask extends WXLoginRequest {
         @Override
         public void onPostExecute(ClientUser clientUser) {
+            ProgressDialogUtils.getInstance(LoginActivity.this).dismiss();
             MobclickAgent.onProfileSignIn(String.valueOf(AppManager
                     .getClientUser().userId));
-            if(!new File(FileAccessorUtils.FACE_IMAGE,
-                    Md5Util.md5(clientUser.face_url) + ".jpg").exists()
+            File faceLocalFile = new File(FileAccessorUtils.FACE_IMAGE,
+                    Md5Util.md5(clientUser.face_url) + ".jpg");
+            if(!faceLocalFile.exists()
                     && !TextUtils.isEmpty(clientUser.face_url)){
                 new DownloadPortraitTask().request(clientUser.face_url,
                         FileAccessorUtils.FACE_IMAGE,
                         Md5Util.md5(clientUser.face_url) + ".jpg");
+            } else {
+                clientUser.face_local = faceLocalFile.getAbsolutePath();
             }
             clientUser.currentCity = mCurrrentCity;
             clientUser.latitude = curLat;
@@ -296,7 +333,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             PreferencesUtils.setLoginTime(LoginActivity.this, System.currentTimeMillis());
             IMChattingHelper.getInstance().sendInitLoginMsg();
             Intent intent = new Intent();
-            intent.setClass(LoginActivity.this, MainActivity.class);
+            if (AppManager.getClientUser().isShowNormal) {
+                intent.setClass(LoginActivity.this, MainActivity.class);
+            } else {
+                intent.setClass(LoginActivity.this, MainNewActivity.class);
+            }
             startActivity(intent);
             finishAll();
         }
@@ -312,14 +353,18 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         @Override
         public void onPostExecute(ClientUser clientUser) {
             hideSoftKeyboard();
+            ProgressDialogUtils.getInstance(LoginActivity.this).dismiss();
             MobclickAgent.onProfileSignIn(String.valueOf(AppManager
                     .getClientUser().userId));
-            if(!new File(FileAccessorUtils.FACE_IMAGE,
-                    Md5Util.md5(clientUser.face_url) + ".jpg").exists()
+            File faceLocalFile = new File(FileAccessorUtils.FACE_IMAGE,
+                    Md5Util.md5(clientUser.face_url) + ".jpg");
+            if(!faceLocalFile.exists()
                     && !TextUtils.isEmpty(clientUser.face_url)){
                 new DownloadPortraitTask().request(clientUser.face_url,
                         FileAccessorUtils.FACE_IMAGE,
                         Md5Util.md5(clientUser.face_url) + ".jpg");
+            } else {
+                clientUser.face_local = faceLocalFile.getAbsolutePath();
             }
             clientUser.currentCity = mCurrrentCity;
             clientUser.latitude = curLat;
@@ -330,7 +375,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             PreferencesUtils.setLoginTime(LoginActivity.this, System.currentTimeMillis());
             IMChattingHelper.getInstance().sendInitLoginMsg();
             Intent intent = new Intent();
-            intent.setClass(LoginActivity.this, MainActivity.class);
+            if (AppManager.getClientUser().isShowNormal) {
+                intent.setClass(LoginActivity.this, MainActivity.class);
+            } else {
+                intent.setClass(LoginActivity.this, MainNewActivity.class);
+            }
             startActivity(intent);
             finishAll();
         }
@@ -424,14 +473,18 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     class QqLoginTask extends QqLoginRequest {
         @Override
         public void onPostExecute(ClientUser clientUser) {
+            ProgressDialogUtils.getInstance(LoginActivity.this).dismiss();
             MobclickAgent.onProfileSignIn(String.valueOf(AppManager
                     .getClientUser().userId));
-            if(!new File(FileAccessorUtils.FACE_IMAGE,
-                    Md5Util.md5(clientUser.face_url) + ".jpg").exists()
+            File faceLocalFile = new File(FileAccessorUtils.FACE_IMAGE,
+                    Md5Util.md5(clientUser.face_url) + ".jpg");
+            if(!faceLocalFile.exists()
                     && !TextUtils.isEmpty(clientUser.face_url)){
                 new DownloadPortraitTask().request(clientUser.face_url,
                         FileAccessorUtils.FACE_IMAGE,
                         Md5Util.md5(clientUser.face_url) + ".jpg");
+            } else {
+                clientUser.face_local = faceLocalFile.getAbsolutePath();
             }
             clientUser.currentCity = mCurrrentCity;
             clientUser.latitude = curLat;
@@ -441,7 +494,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             AppManager.getClientUser().loginTime = System.currentTimeMillis();
             PreferencesUtils.setLoginTime(LoginActivity.this, System.currentTimeMillis());
             IMChattingHelper.getInstance().sendInitLoginMsg();
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            Intent intent = new Intent();
+            if (AppManager.getClientUser().isShowNormal) {
+                intent.setClass(LoginActivity.this, MainActivity.class);
+            } else {
+                intent.setClass(LoginActivity.this, MainNewActivity.class);
+            }
             startActivity(intent);
             finishAll();
         }
@@ -495,16 +553,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     protected void onResume() {
         super.onResume();
         activityIsRunning = true;
-        ProgressDialogUtils.getInstance(this).dismiss();
         MobclickAgent.onPageStart(this.getClass().getName());
         MobclickAgent.onResume(this);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        ProgressDialogUtils.getInstance(this).dismiss();
-    }
 
     @Override
     protected void onPause() {

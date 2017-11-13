@@ -10,6 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.eowise.recyclerview.stickyheaders.OnHeaderClickListener;
+import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
+import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
+import com.lb.recyclerview_fast_scroller.RecyclerViewFastScroller;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.adapter.BigramHeaderAdapter;
 import com.youdo.karma.adapter.ContactsAdapter;
@@ -22,11 +27,6 @@ import com.youdo.karma.ui.widget.CircularProgress;
 import com.youdo.karma.utils.PinYinUtil;
 import com.youdo.karma.utils.StringUtil;
 import com.youdo.karma.utils.ToastUtil;
-import com.eowise.recyclerview.stickyheaders.OnHeaderClickListener;
-import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
-import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
-import com.lb.recyclerview_fast_scroller.RecyclerViewFastScroller;
-import com.umeng.analytics.MobclickAgent;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -57,9 +57,6 @@ public class ContactsFragment extends Fragment implements OnHeaderClickListener,
 	private BigramHeaderAdapter mBigramHeaderAdapter;
 	private StickyHeadersItemDecoration top;
 
-	private int pageIndex = 1;
-	private int pageSize = 30;
-	private String GENDER = ""; //空表示查询和自己性别相反的用户
 	/**
 	 * 0:同城 1：缘分 2：颜值  -1:就是全国
 	 */
@@ -134,7 +131,7 @@ public class ContactsFragment extends Fragment implements OnHeaderClickListener,
 		if (contactList != null && contactList.size() > 0) {
 			getNotifyContact(contactList);
 		} else {
-			new ContactsTask().request(pageIndex, pageSize, GENDER, mUserScopeType);
+			new ContactsTask().request(mUserScopeType);
 		}
 	}
 
