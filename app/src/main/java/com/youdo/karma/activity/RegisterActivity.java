@@ -10,6 +10,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.tencent.connect.UserInfo;
+import com.tencent.connect.common.Constants;
+import com.tencent.mm.sdk.modelmsg.SendAuth;
+import com.tencent.tauth.IUiListener;
+import com.tencent.tauth.Tencent;
+import com.tencent.tauth.UiError;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
@@ -18,15 +25,12 @@ import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.eventtype.LocationEvent;
 import com.youdo.karma.eventtype.WeinXinEvent;
-import com.youdo.karma.eventtype.XMEvent;
 import com.youdo.karma.helper.IMChattingHelper;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.CheckIsRegisterByPhoneRequest;
 import com.youdo.karma.net.request.DownloadFileRequest;
-import com.youdo.karma.net.request.GetMiAccessTokenRequest;
 import com.youdo.karma.net.request.QqLoginRequest;
 import com.youdo.karma.net.request.WXLoginRequest;
-import com.youdo.karma.net.request.XMLoginRequest;
 import com.youdo.karma.utils.CheckUtil;
 import com.youdo.karma.utils.FileAccessorUtils;
 import com.youdo.karma.utils.Md5Util;
@@ -34,16 +38,6 @@ import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
 import com.youdo.karma.utils.Util;
-import com.tencent.connect.UserInfo;
-import com.tencent.connect.common.Constants;
-import com.tencent.mm.sdk.modelmsg.SendAuth;
-import com.tencent.tauth.IUiListener;
-import com.tencent.tauth.Tencent;
-import com.tencent.tauth.UiError;
-import com.umeng.analytics.MobclickAgent;
-import com.xiaomi.account.openauth.XiaomiOAuthFuture;
-import com.xiaomi.account.openauth.XiaomiOAuthResults;
-import com.xiaomi.account.openauth.XiaomiOAuthorize;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -52,9 +46,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import cn.smssdk.SMSSDK;
 import mehdi.sakout.fancybuttons.FancyButton;
 
@@ -69,7 +60,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     ImageView weiXinLogin;
     ImageView mSelectMan;
     ImageView mSelectLady;
-    ImageView xmLogin;
 
     /**
      * 相册返回
@@ -166,57 +156,10 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     CSApplication.api.sendReq(req);
                 }
                 break;
-            case R.id.xm_login:
-                XiaomiOAuthFuture<XiaomiOAuthResults> future = new XiaomiOAuthorize()
-                        .setAppId(Long.parseLong(AppConstants.MI_PUSH_APP_ID))
-                        .setRedirectUrl(AppConstants.MI_ACCOUNT_REDIRECT_URI)
-                        .setScope(AppConstants.MI_SCOPE)
-                        .startGetAccessToken(this);
-                new GetMiAccessTokenRequest(this, future).execute();
-                break;
         }
     }
 
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void xmLogin(XMEvent event) {
-        ProgressDialogUtils.getInstance(RegisterActivity.this).show(R.string.dialog_request_login);
-        new XMLoginTask().request(event.xmOAuthResults, channelId, mCurrrentCity);
-    }
-
-    public class XMLoginTask extends XMLoginRequest {
-        @Override
-        public void onPostExecute(ClientUser clientUser) {
-            MobclickAgent.onProfileSignIn(String.valueOf(AppManager
-                    .getClientUser().userId));
-            if(!new File(FileAccessorUtils.FACE_IMAGE,
-                    Md5Util.md5(clientUser.face_url) + ".jpg").exists()
-                    && !TextUtils.isEmpty(clientUser.face_url)){
-                new DownloadPortraitTask().request(clientUser.face_url,
-                        FileAccessorUtils.FACE_IMAGE,
-                        Md5Util.md5(clientUser.face_url) + ".jpg");
-            }
-            clientUser.currentCity = mCurrrentCity;
-            clientUser.latitude = curLat;
-            clientUser.longitude = curLon;
-            AppManager.setClientUser(clientUser);
-            AppManager.saveUserInfo();
-            AppManager.getClientUser().loginTime = System.currentTimeMillis();
-            PreferencesUtils.setLoginTime(RegisterActivity.this, System.currentTimeMillis());
-            IMChattingHelper.getInstance().sendInitLoginMsg();
-            Intent intent = new Intent();
-            intent.setClass(RegisterActivity.this, MainActivity.class);
-            startActivity(intent);
-            finishAll();
-        }
-
-        @Override
-        public void onErrorExecute(String error) {
-            ProgressDialogUtils.getInstance(RegisterActivity.this).dismiss();
-            ToastUtil.showMessage(error);
-        }
-    }
-    
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void weiXinLogin(WeinXinEvent event) {
         ProgressDialogUtils.getInstance(RegisterActivity.this).show(R.string.dialog_request_login);

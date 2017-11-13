@@ -1,6 +1,7 @@
 package com.youdo.karma.activity;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
+import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
 
 import butterknife.BindView;
@@ -84,8 +86,15 @@ public class FeedBackActivity extends BaseActivity {
         if (TextUtils.isEmpty(mContent.getText().toString())) {
             ToastUtil.showMessage(R.string.please_input_suggestion);
         } else {
-            ToastUtil.showMessage(R.string.submit_success);
-            finish();
+            ProgressDialogUtils.getInstance(this).show(R.string.wait);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ProgressDialogUtils.getInstance(FeedBackActivity.this).dismiss();
+                    ToastUtil.showMessage(R.string.submit_success);
+                    finish();
+                }
+            }, 800);
         }
     }
 }

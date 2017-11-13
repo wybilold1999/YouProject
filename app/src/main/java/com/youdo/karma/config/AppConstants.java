@@ -1,7 +1,5 @@
 package com.youdo.karma.config;
 
-import com.xiaomi.account.openauth.XiaomiOAuthConstants;
-
 /**
  * 
  * @ClassName:Constants
@@ -14,7 +12,7 @@ public class AppConstants {
 	
 //	public static final String BASE_URL = "http://112.74.85.193/YouLoveServer/";
 //	public static final String BASE_URL = "http://192.168.1.100/YouLoveServer/";
-	public static final String BASE_URL = "http://10.0.108.198:8080/YouLoveServer/";
+	public static final String BASE_URL = "http://10.0.108.206:8080/YouLoveServer/";
 
 	/**
 	 * 密码加密密匙
@@ -61,10 +59,6 @@ public class AppConstants {
 	 * 小米推送appkey
 	 */
 	public static String MI_PUSH_APP_KEY = "5731760661814";
-
-	public static final String MI_ACCOUNT_REDIRECT_URI = "http://www.cyanbirds.cn";
-
-	public static final int[] MI_SCOPE = new int[]{XiaomiOAuthConstants.SCOPE_PROFILE, XiaomiOAuthConstants.SCOPE_OPEN_ID};
 
 	/**
 	 * 阿里图片节点

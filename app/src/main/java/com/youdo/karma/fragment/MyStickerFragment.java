@@ -95,6 +95,7 @@ public class MyStickerFragment extends Fragment {
 	private void updateMyExpressionGroups() {
 		List<ExpressionGroup> list = ExpressionGroupSqlManager.getInstance(getActivity()).getExpressionGroup();
 		if (list != null) {
+			mExpressionGroups.clear();
 			mExpressionGroups.addAll(list);
 			if (mAdapter != null) {
 				mAdapter.notifyDataSetChanged();

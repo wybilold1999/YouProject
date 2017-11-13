@@ -33,53 +33,32 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.AppConstants;
-import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.entity.CityInfo;
 import com.youdo.karma.entity.FederationToken;
-import com.youdo.karma.entity.FollowModel;
-import com.youdo.karma.entity.LoveModel;
-import com.youdo.karma.entity.ReceiveGiftModel;
 import com.youdo.karma.fragment.ContactsFragment;
-import com.youdo.karma.fragment.FoundFragment;
 import com.youdo.karma.fragment.FoundNewFragment;
-import com.youdo.karma.fragment.HomeLoveFragment;
 import com.youdo.karma.fragment.MessageFragment;
 import com.youdo.karma.fragment.MyPersonalFragment;
-import com.youdo.karma.fragment.PersonalFragment;
-import com.youdo.karma.fragment.VideoShowFragment;
 import com.youdo.karma.helper.SDKCoreHelper;
 import com.youdo.karma.listener.MessageUnReadListener;
 import com.youdo.karma.manager.AppManager;
-import com.youdo.karma.manager.NotificationManager;
-import com.youdo.karma.net.request.FollowListRequest;
 import com.youdo.karma.net.request.GetCityInfoRequest;
-import com.youdo.karma.net.request.GetLoveFormeListRequest;
 import com.youdo.karma.net.request.GetOSSTokenRequest;
-import com.youdo.karma.net.request.GiftsListRequest;
 import com.youdo.karma.net.request.UploadCityInfoRequest;
-import com.youdo.karma.service.MyIntentService;
-import com.youdo.karma.service.MyPushService;
-import com.youdo.karma.utils.MsgUtil;
 import com.youdo.karma.utils.PreferencesUtils;
-import com.youdo.karma.utils.PushMsgUtil;
-import com.youdo.karma.utils.ToastUtil;
-import com.igexin.sdk.PushManager;
-import com.umeng.analytics.MobclickAgent;
-import com.xiaomi.mipush.sdk.MiPushClient;
 import com.yuntongxun.ecsdk.ECInitParams;
 
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
 
-public class MainActivity extends BaseActivity implements MessageUnReadListener.OnMessageUnReadListener, AMapLocationListener {
+public class MainNewActivity extends BaseActivity implements MessageUnReadListener.OnMessageUnReadListener, AMapLocationListener {
 
 	private FragmentTabHost mTabHost;
 	private int mCurrentTab;
@@ -126,15 +105,16 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 	public int mOSSTokenRetryCount = 0;
 
 	public final static String CURRENT_TAB = "current_tab";
+
 	private static final TableConfig[] tableConfig = new TableConfig[] {
-			new TableConfig(R.string.tab_find_love, HomeLoveFragment.class,
-					R.drawable.tab_tao_love_selector),
-			new TableConfig(R.string.tab_found, FoundFragment.class,
-					R.drawable.tab_found_selector),
 			new TableConfig(R.string.tab_message, MessageFragment.class,
-					R.drawable.tab_my_message_selector),
-			new TableConfig(R.string.tab_personal, PersonalFragment.class,
-					R.drawable.tab_personal_selector) };
+					R.drawable.tab_message_selector),
+			new TableConfig(R.string.tab_contacts, ContactsFragment.class,
+					R.drawable.tab_contacts_selector),
+			new TableConfig(R.string.tab_found, FoundNewFragment.class,
+					R.drawable.tab_secret_friends_selector),
+			new TableConfig(R.string.tab_personal, MyPersonalFragment.class,
+					R.drawable.tab_more_selector) };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -149,51 +129,11 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 		updateConversationUnRead();
 
 
-		AppManager.getExecutorService().execute(new Runnable() {
-			@Override
-			public void run() {
-				/**
-				 * 注册小米推送
-				 */
-				MiPushClient.registerPush(MainActivity.this, AppConstants.MI_PUSH_APP_ID, AppConstants.MI_PUSH_APP_KEY);
-
-				//个推
-				initGeTuiPush();
-
-				initJPush();
-
-				loadData();
-
-				initLocationClient();
-
-			}
-		});
+		initLocationClient();
 
 		AppManager.requestLocationPermission(this);
 		requestPermission();
 
-		if (AppManager.getClientUser().isShowVip) {
-			mHandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					new GetLoveFormeListTask().request(1, 1);
-				}
-			}, 9000 * 10);
-
-			mHandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					new MyGiftListTask().request(1, 1);
-				}
-			}, 1500 * 10);
-
-			mHandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					new FollowListTask().request("followFormeList", 1, 1);
-				}
-			}, 5000 * 10);
-		}
 		registerWeiXin();
 	}
 
@@ -229,7 +169,7 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 		PackageManager pkgManager = getPackageManager();
 		// 读写 sd card 权限非常重要, android6.0默认禁止的, 建议初始化之前就弹窗让用户赋予该权限
 		boolean sdCardWritePermission =
-				pkgManager.checkPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, getPackageName()) == PackageManager.PERMISSION_GRANTED;
+				pkgManager.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, getPackageName()) == PackageManager.PERMISSION_GRANTED;
 		if (Build.VERSION.SDK_INT >= 23 && !sdCardWritePermission) {
 			//请求权限
 			ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
@@ -244,18 +184,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 					REQUEST_PERMISSION);
 		}
 
-	}
-
-	/**
-	 * 点击通知栏的消息，将消息入库
-	 */
-	private void loadData() {
-		String msg = getIntent().getStringExtra(ValueKey.DATA);
-		if (!TextUtils.isEmpty(msg)) {
-			PushMsgUtil.getInstance().handlePushMsg(false, msg);
-			NotificationManager.getInstance().cancelNotification();
-			AppManager.isMsgClick = true;
-		}
 	}
 
 	/**
@@ -310,34 +238,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 				new GetFederationTokenTask().request();
 				mOSSTokenRetryCount++;
 			}
-		}
-	}
-
-	/**
-	 * 个推注册
-	 */
-	private void initGeTuiPush() {
-		// SDK初始化，第三方程序启动时，都要进行SDK初始化工作
-		PushManager.getInstance().initialize(this.getApplicationContext(), MyPushService.class);
-		PushManager.getInstance().registerPushIntentService(this.getApplicationContext(), MyIntentService.class);
-	}
-
-	private void initJPush() {
-		// 初始化 JPush
-		JPushInterface.init(this);
-//		JPushInterface.setDebugMode(true);
-
-		if (!PreferencesUtils.getJpushSetAliasState(this)) {
-			//调用JPush API设置Alias
-			mHandler.sendMessage(mHandler.obtainMessage(MSG_SET_ALIAS, AppManager.getClientUser().userId));
-			//调用JPush API设置Tag
-			Set<String> tag = new LinkedHashSet<>(1);
-			if ("男".equals(AppManager.getClientUser().sex)) {
-				tag.add("female");
-			} else {
-				tag.add("male");
-			}
-			mHandler.sendMessage(mHandler.obtainMessage(MSG_SET_TAGS, tag));
 		}
 	}
 
@@ -409,72 +309,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 				AppManager.getClientUser().isShowVideo = false;
 				AppManager.getClientUser().isShowVip = false;
 				AppManager.getClientUser().isShowRpt = false;
-			}
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-		}
-	}
-
-	/**
-	 * 获取最近喜欢我的那个人
-	 */
-	class GetLoveFormeListTask extends GetLoveFormeListRequest {
-		@Override
-		public void onPostExecute(List<LoveModel> loveModels) {
-			if(loveModels != null && loveModels.size() > 0) {
-				String lastUserId = PreferencesUtils.getLoveMeUserId(MainActivity.this);
-				if (!lastUserId.equals(String.valueOf(loveModels.get(0).userId))) {
-
-					PreferencesUtils.setLoveMeUserId(
-							MainActivity.this, String.valueOf(loveModels.get(0).userId));
-					Intent intent = new Intent(MainActivity.this, PopupLoveActivity.class);
-					intent.putExtra(ValueKey.DATA, loveModels.get(0));
-					startActivity(intent);
-				}
-			}
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-		}
-	}
-
-	class MyGiftListTask extends GiftsListRequest {
-		@Override
-		public void onPostExecute(List<ReceiveGiftModel> receiveGiftModels) {
-			if(null != receiveGiftModels && receiveGiftModels.size() > 0){
-				ReceiveGiftModel model = receiveGiftModels.get(0);
-				String lastUserId = PreferencesUtils.getGiftMeUserId(MainActivity.this);
-				if (!lastUserId.equals(String.valueOf(model.userId))) {
-					PreferencesUtils.setGiftMeUserId(
-							MainActivity.this, String.valueOf(model.userId));
-					MsgUtil.sendAttentionOrGiftMsg(String.valueOf(model.userId), model.nickname, model.faceUrl,
-							model.nickname + "给您送了一件礼物");
-				}
-			}
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-			ToastUtil.showMessage(error);
-		}
-	}
-
-	class FollowListTask extends FollowListRequest {
-		@Override
-		public void onPostExecute(List<FollowModel> followModels) {
-			if(followModels != null && followModels.size() > 0){
-				FollowModel followModel = followModels.get(0);
-				String lastUserId = PreferencesUtils.getAttentionMeUserId(MainActivity.this);
-				if (!lastUserId.equals(String.valueOf(followModel.userId))) {
-					PreferencesUtils.setAttentionMeUserId(
-							MainActivity.this, String.valueOf(followModel.userId));
-					MsgUtil.sendAttentionOrGiftMsg(String.valueOf(followModel.userId),
-							followModel.nickname, followModel.faceUrl,
-							followModel.nickname + "关注了您");
-				}
 			}
 		}
 
@@ -622,7 +456,7 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 				dialog.dismiss();
 				isSecondAccess = true;
 				if (Build.VERSION.SDK_INT >= 23) {
-					ActivityCompat.requestPermissions(MainActivity.this, new String[] {android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION},
+					ActivityCompat.requestPermissions(MainNewActivity.this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
 							REQUEST_LOCATION_PERMISSION);
 				}
 
@@ -640,7 +474,7 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 				dialog.dismiss();
 				isSecondRead = true;
 				if (Build.VERSION.SDK_INT >= 23) {
-					ActivityCompat.requestPermissions(MainActivity.this, new String[] {android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION},
+					ActivityCompat.requestPermissions(MainNewActivity.this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
 							REQUEST_LOCATION_PERMISSION);
 				}
 
@@ -659,7 +493,7 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 			switch (code) {
 				case 0:
 					//Set tag and alias success
-					PreferencesUtils.setJpushSetAliasState(MainActivity.this, true);
+					PreferencesUtils.setJpushSetAliasState(MainNewActivity.this, true);
 					break;
 
 				case 6002:

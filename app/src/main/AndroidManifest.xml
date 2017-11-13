@@ -127,8 +127,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.xiaomi.account.openauth.AuthorizeActivity" />
-
         <activity
             android:name="com.tencent.tauth.AuthActivity"
             android:launchMode="singleTask"
@@ -203,11 +201,17 @@
         <activity
             android:name=".activity.LoginActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
-            android:label="@string/login"
+            android:label="@string/login_register"
             android:screenOrientation="portrait"/>
 
         <activity
             android:name=".activity.MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:label="@string/login_register"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.MainNewActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:label="@string/login_register"
             android:screenOrientation="portrait"/>
@@ -464,6 +468,40 @@
             android:label="@string/money_output"
             android:screenOrientation="portrait">
         </activity>
+
+        <activity
+            android:name=".activity.ContactInfoActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:label="@string/personal_info"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity
+            android:name=".activity.FeedBackActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:windowSoftInputMode="adjustResize"
+            android:label="@string/feed_back"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity
+            android:name=".activity.ModifyUserInfoNewActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:label="@string/modify_info"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.DownloadExpressionActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:label="@string/sticker_market"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.ExpressionActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:label="@string/sticker_market"
+            android:screenOrientation="portrait"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
