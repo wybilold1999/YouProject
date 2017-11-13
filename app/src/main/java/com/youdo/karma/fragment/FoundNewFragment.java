@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.adapter.FoundNewAdapter;
 import com.youdo.karma.db.ContactSqlManager;
@@ -22,6 +21,7 @@ import com.youdo.karma.ui.widget.DividerItemDecoration;
 import com.youdo.karma.ui.widget.WrapperLinearLayoutManager;
 import com.youdo.karma.utils.DensityUtil;
 import com.youdo.karma.utils.ToastUtil;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +40,13 @@ public class FoundNewFragment extends Fragment implements ModifyContactsListener
     private LinearLayoutManager layoutManager;
     private List<Contact> mNetContacts;//网络请求的联系人
     private List<Contact> mContacts;//通讯录已存在的好友
+    private int pageIndex = 1;
+    private int pageSize = 50;
+    private String GENDER = ""; //空表示查询和自己性别相反的用户
     /**
      * 0:同城 1：缘分 2：颜值  -1:就是全国
      */
-    private String mUserScopeType = "1";
+    private String mUserScopeType = "0";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -89,7 +92,7 @@ public class FoundNewFragment extends Fragment implements ModifyContactsListener
         mAdapter = new FoundNewAdapter(mNetContacts, getActivity());
         mRecyclerView.setAdapter(mAdapter);
         mProgressBar.setVisibility(View.VISIBLE);
-        new ContactsTask().request(mUserScopeType);
+        new ContactsTask().request(pageIndex, pageSize, GENDER, mUserScopeType);
 
         mContacts = ContactSqlManager.getInstance(getActivity()).queryAllContactsByFrom(true);
     }
@@ -112,7 +115,7 @@ public class FoundNewFragment extends Fragment implements ModifyContactsListener
                     && mAdapter.isShowFooter()) {
                 //加载更多
                 //请求数据
-                new ContactsTask().request(mUserScopeType);
+                new ContactsTask().request(++pageIndex, pageSize, GENDER, mUserScopeType);
             }
         }
     };
@@ -156,6 +159,9 @@ public class FoundNewFragment extends Fragment implements ModifyContactsListener
             }
 
             mProgressBar.setVisibility(View.GONE);
+            if (pageIndex == 1) {//进行筛选的时候，滑动到顶部
+                layoutManager.scrollToPositionWithOffset(0, 0);
+            }
             if(result == null || result.size() == 0){
                 mAdapter.setIsShowFooter(false);
                 mAdapter.notifyDataSetChanged();
