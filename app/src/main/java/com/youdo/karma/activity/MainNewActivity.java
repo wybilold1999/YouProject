@@ -378,7 +378,7 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 	 */
 	private void updateConversationUnRead() {
 		View view;
-		view = mTabHost.getTabWidget().getChildTabViewAt(2);
+		view = mTabHost.getTabWidget().getChildTabViewAt(0);
 		TextView unread_message_num = (TextView) view
 				.findViewById(R.id.unread_message_num);
 

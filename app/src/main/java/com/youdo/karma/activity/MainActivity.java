@@ -458,7 +458,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 
 		@Override
 		public void onErrorExecute(String error) {
-			ToastUtil.showMessage(error);
 		}
 	}
 
@@ -544,7 +543,7 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 	 */
 	private void updateConversationUnRead() {
 		View view;
-		view = mTabHost.getTabWidget().getChildTabViewAt(0);
+		view = mTabHost.getTabWidget().getChildTabViewAt(2);
 		TextView unread_message_num = (TextView) view
 				.findViewById(R.id.unread_message_num);
 

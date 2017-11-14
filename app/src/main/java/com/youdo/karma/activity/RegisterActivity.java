@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.tencent.connect.UserInfo;
 import com.tencent.connect.common.Constants;
@@ -54,12 +55,13 @@ import mehdi.sakout.fancybuttons.FancyButton;
  */
 public class RegisterActivity extends BaseActivity implements View.OnClickListener{
 
-    EditText phoneNum;
-    FancyButton next;
-    ImageView qqLogin;
-    ImageView weiXinLogin;
-    ImageView mSelectMan;
-    ImageView mSelectLady;
+    private EditText phoneNum;
+    private FancyButton next;
+    private ImageView qqLogin;
+    private ImageView weiXinLogin;
+    private ImageView mSelectMan;
+    private ImageView mSelectLady;
+    private LinearLayout mSexLay;
 
     /**
      * 相册返回
@@ -108,7 +110,12 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         qqLogin = (ImageView) findViewById(R.id.qq_login);
         mSelectMan = (ImageView) findViewById(R.id.select_man);
         mSelectLady = (ImageView) findViewById(R.id.select_lady);
-
+        mSexLay = (LinearLayout) findViewById(R.id.sex_img_layout);
+        if (!AppManager.getClientUser().isShowNormal) {
+            mSexLay.setVisibility(View.GONE);
+        } else {
+            mSexLay.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setupEvent() {
@@ -124,9 +131,16 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.next:
-                if(checkInput()){
-                    new CheckPhoneIsRegisterTask().request(
-                            phoneNum.getText().toString().trim());
+                if (AppManager.getClientUser().isShowNormal) {
+                    if(checkInput()){
+                        new CheckPhoneIsRegisterTask().request(
+                                phoneNum.getText().toString().trim());
+                    }
+                } else {
+                    if (checkInputNoSex()) {
+                        new CheckPhoneIsRegisterTask().request(
+                                phoneNum.getText().toString().trim());
+                    }
                 }
                 break;
             case R.id.portrait :
@@ -190,6 +204,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             clientUser.currentCity = mCurrrentCity;
             clientUser.latitude = curLat;
             clientUser.longitude = curLon;
+            clientUser.isShowNormal = AppManager.getClientUser().isShowNormal;
             AppManager.setClientUser(clientUser);
             AppManager.saveUserInfo();
             AppManager.getClientUser().loginTime = System.currentTimeMillis();
@@ -218,6 +233,11 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             if(s){
                 ToastUtil.showMessage(R.string.phone_already_register);
             } else {
+                if (mClientUser == null) {
+                    mClientUser = new ClientUser();
+                    mClientUser.sex = "男";
+                    mClientUser.age = 20;
+                }
                 //获取验证码
                 String phone_num = phoneNum.getText().toString().trim();
                 mClientUser.mobile = phone_num;
@@ -343,6 +363,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             clientUser.currentCity = mCurrrentCity;
             clientUser.latitude = curLat;
             clientUser.longitude = curLon;
+            clientUser.isShowNormal = AppManager.getClientUser().isShowNormal;
             AppManager.setClientUser(clientUser);
             AppManager.saveUserInfo();
             AppManager.getClientUser().loginTime = System.currentTimeMillis();
@@ -432,6 +453,22 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             message = getResources().getString(R.string.please_select_sex);
             bool = false;
         } else if (TextUtils.isEmpty(phoneNum.getText().toString())) {
+            message = getResources().getString(R.string.input_phone);
+            bool = false;
+        } else if (!CheckUtil.isMobileNO(phoneNum.getText().toString())) {
+            message = getResources().getString(
+                    R.string.input_phone_number_error);
+            bool = false;
+        }
+        if (!bool)
+            ToastUtil.showMessage(message);
+        return bool;
+    }
+
+    private boolean checkInputNoSex() {
+        String message = "";
+        boolean bool = true;
+        if (TextUtils.isEmpty(phoneNum.getText().toString())) {
             message = getResources().getString(R.string.input_phone);
             bool = false;
         } else if (!CheckUtil.isMobileNO(phoneNum.getText().toString())) {

@@ -212,7 +212,7 @@
     <string name="search">筛选</string>
     <string name="search_option">筛选条件</string>
     <string name="notification_tips">%1$d个联系人发来%2$d条消息</string>
-    <string name="init_official_message">在匆忙的城市里，每天都有无数人在擦肩而过，却又没有方法彼此相识，这是一种全新的相遇方式，简单、心动、惊喜,相遇本该如此美好。</string>
+    <string name="init_official_message">如今您的气质里，藏着您走过的路，读过的书和爱过的人，在这里遇见您可爱的TA</string>
     <string name="weibosdk_demo_toast_auth_success">授权成功</string>
     <string name="weibosdk_demo_toast_auth_failed">授权失败</string>
     <string name="weibosdk_demo_toast_auth_canceled">取消授权</string>

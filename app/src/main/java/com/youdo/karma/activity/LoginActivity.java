@@ -122,6 +122,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private void setupEvent() {
+        EventBus.getDefault().register(this);
         btnLogin.setOnClickListener(this);
         forgetPwd.setOnClickListener(this);
         qqLogin.setOnClickListener(this);
@@ -327,6 +328,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             clientUser.currentCity = mCurrrentCity;
             clientUser.latitude = curLat;
             clientUser.longitude = curLon;
+            clientUser.isShowNormal = AppManager.getClientUser().isShowNormal;
             AppManager.setClientUser(clientUser);
             AppManager.saveUserInfo();
             AppManager.getClientUser().loginTime = System.currentTimeMillis();
@@ -369,6 +371,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             clientUser.currentCity = mCurrrentCity;
             clientUser.latitude = curLat;
             clientUser.longitude = curLon;
+            clientUser.isShowNormal = AppManager.getClientUser().isShowNormal;
             AppManager.setClientUser(clientUser);
             AppManager.saveUserInfo();
             AppManager.getClientUser().loginTime = System.currentTimeMillis();
@@ -489,6 +492,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             clientUser.currentCity = mCurrrentCity;
             clientUser.latitude = curLat;
             clientUser.longitude = curLon;
+            clientUser.isShowNormal = AppManager.getClientUser().isShowNormal;
             AppManager.setClientUser(clientUser);
             AppManager.saveUserInfo();
             AppManager.getClientUser().loginTime = System.currentTimeMillis();
@@ -564,6 +568,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         activityIsRunning = false;
         MobclickAgent.onPageEnd(this.getClass().getName());
         MobclickAgent.onPause(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
