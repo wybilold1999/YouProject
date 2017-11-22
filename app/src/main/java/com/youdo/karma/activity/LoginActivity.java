@@ -191,6 +191,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             } else {
                 AppManager.getClientUser().isShowNormal = true;
             }
+            EventBus.getDefault().post(new LocationEvent(mCurrrentCity));
         }
 
         @Override
@@ -203,6 +204,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             AppManager.getClientUser().isShowVip = false;
             AppManager.getClientUser().isShowRpt = false;
             AppManager.getClientUser().isShowNormal = false;
+            EventBus.getDefault().post(new LocationEvent(mCurrrentCity));
         }
     }
 

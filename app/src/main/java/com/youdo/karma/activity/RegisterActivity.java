@@ -183,6 +183,11 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getCity(LocationEvent event) {
         mCurrrentCity = event.city;
+        if (!AppManager.getClientUser().isShowNormal) {
+            mSexLay.setVisibility(View.GONE);
+        } else {
+            mSexLay.setVisibility(View.VISIBLE);
+        }
     }
     
     class WXLoginTask extends WXLoginRequest {
