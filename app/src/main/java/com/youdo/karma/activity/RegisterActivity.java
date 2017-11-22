@@ -498,6 +498,12 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        ProgressDialogUtils.getInstance(this).dismiss();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
