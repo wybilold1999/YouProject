@@ -1,16 +1,12 @@
 package com.youdo.karma.activity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
@@ -22,12 +18,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.alibaba.sdk.android.oss.ClientConfiguration;
-import com.alibaba.sdk.android.oss.OSS;
-import com.alibaba.sdk.android.oss.OSSClient;
-import com.alibaba.sdk.android.oss.common.OSSLog;
-import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
-import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
@@ -39,7 +29,6 @@ import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.entity.CityInfo;
-import com.youdo.karma.entity.FederationToken;
 import com.youdo.karma.fragment.ContactsFragment;
 import com.youdo.karma.fragment.FoundNewFragment;
 import com.youdo.karma.fragment.MessageFragment;
@@ -48,30 +37,17 @@ import com.youdo.karma.helper.SDKCoreHelper;
 import com.youdo.karma.listener.MessageUnReadListener;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.GetCityInfoRequest;
-import com.youdo.karma.net.request.GetOSSTokenRequest;
 import com.youdo.karma.net.request.UploadCityInfoRequest;
-import com.youdo.karma.utils.PreferencesUtils;
 import com.yuntongxun.ecsdk.ECInitParams;
-
-import java.util.Set;
-
-import cn.jpush.android.api.JPushInterface;
-import cn.jpush.android.api.TagAliasCallback;
 
 public class MainNewActivity extends BaseActivity implements MessageUnReadListener.OnMessageUnReadListener, AMapLocationListener {
 
 	private FragmentTabHost mTabHost;
 	private int mCurrentTab;
-	private ClientConfiguration mOSSConf;
 
 	private static final int REQUEST_PERMISSION = 0;
 	private final int REQUEST_LOCATION_PERMISSION = 1000;
 	private final int REQUEST_PERMISSION_SETTING = 10001;
-
-	private static final int MSG_SET_ALIAS = 1001;//极光推送设置别名
-	private static final int MSG_SET_TAGS = 1002;//极光推送设置tag
-
-	private long clickTime = 0; //记录第一次点击的时间
 
 	private AMapLocationClientOption mLocationOption;
 	private AMapLocationClient mlocationClient;
@@ -81,28 +57,6 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 	private String curLat;
 	private String curLon;
 	private String currentCity;
-
-	private final Handler mHandler = new Handler() {
-		@Override
-		public void handleMessage(android.os.Message msg) {
-			super.handleMessage(msg);
-			switch (msg.what) {
-				case MSG_SET_ALIAS:
-					JPushInterface.setAliasAndTags(getApplicationContext(), null, null, mAliasCallback);
-					JPushInterface.setAliasAndTags(getApplicationContext(), (String) msg.obj, null, mAliasCallback);
-					break;
-				case MSG_SET_TAGS:
-					JPushInterface.setAliasAndTags(getApplicationContext(), null, null, mAliasCallback);
-					JPushInterface.setAliasAndTags(getApplicationContext(), null, (Set<String>) msg.obj, mAliasCallback);
-					break;
-			}
-		}
-	};
-
-	/**
-	 * oss鉴权获取失败重试次数
-	 */
-	public int mOSSTokenRetryCount = 0;
 
 	public final static String CURRENT_TAB = "current_tab";
 
@@ -124,10 +78,8 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 		new GetCityInfoTask().request();
 		setupViews();
 		setupEvent();
-		initOSS();
 		SDKCoreHelper.init(this, ECInitParams.LoginMode.FORCE_LOGIN);
 		updateConversationUnRead();
-
 
 		initLocationClient();
 
@@ -186,61 +138,6 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 
 	}
 
-	/**
-	 * 初始化oss
-	 */
-	private void initOSS() {
-		mOSSConf = new ClientConfiguration();
-		mOSSConf.setConnectionTimeout(30 * 1000); // 连接超时，默认15秒
-		mOSSConf.setSocketTimeout(30 * 1000); // socket超时，默认15秒
-		mOSSConf.setMaxConcurrentRequest(50); // 最大并发请求书，默认5个
-		mOSSConf.setMaxErrorRetry(2); // 失败后最大重试次数，默认2次
-		OSSLog.enableLog();
-
-		final Handler handler = new Handler();
-		// 每30分钟请求一次鉴权
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				new GetFederationTokenTask().request();
-				handler.postDelayed(this, 60 * 30 * 1000);
-			}
-		};
-
-		handler.postDelayed(runnable, 0);
-	}
-
-	class GetFederationTokenTask extends GetOSSTokenRequest {
-
-		@Override
-		public void onPostExecute(FederationToken result) {
-			try {
-				if (result != null) {
-					AppManager.setFederationToken(result);
-					OSSCredentialProvider credentialProvider = new OSSStsTokenCredentialProvider(result.accessKeyId, result.accessKeySecret, result.securityToken);
-					OSS oss = new OSSClient(getApplicationContext(), result.endpoint, credentialProvider, mOSSConf);
-					AppManager.setOSS(oss);
-					mOSSTokenRetryCount = 0;
-				} else {
-					if (mOSSTokenRetryCount < 5) {
-						new GetFederationTokenTask().request();
-						mOSSTokenRetryCount++;
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-			if (mOSSTokenRetryCount < 5) {
-				new GetFederationTokenTask().request();
-				mOSSTokenRetryCount++;
-			}
-		}
-	}
-
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
@@ -254,10 +151,10 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 		if (aMapLocation != null && !TextUtils.isEmpty(aMapLocation.getCity())) {
 			AppManager.getClientUser().latitude = String.valueOf(aMapLocation.getLatitude());
 			AppManager.getClientUser().longitude = String.valueOf(aMapLocation.getLongitude());
-			new UploadCityInfoTask().request(aMapLocation.getCity(),
+			new UploadCityInfoRequest().request(aMapLocation.getCity(),
 					AppManager.getClientUser().latitude, AppManager.getClientUser().longitude);
 		} else {
-			new UploadCityInfoTask().request(currentCity, curLat, curLon);
+			new UploadCityInfoRequest().request(currentCity, curLat, curLon);
 		}
 	}
 
@@ -286,29 +183,6 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 				} catch (Exception e) {
 
 				}
-			}
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-		}
-	}
-
-	/**
-	 * 上传城市信息，用于控制区域显示
-	 */
-	class UploadCityInfoTask extends UploadCityInfoRequest {
-
-		@Override
-		public void onPostExecute(String isShow) {
-			if ("0".equals(isShow)) {
-				AppManager.getClientUser().isShowDownloadVip = false;
-				AppManager.getClientUser().isShowGold = false;
-				AppManager.getClientUser().isShowLovers = false;
-				AppManager.getClientUser().isShowMap = false;
-				AppManager.getClientUser().isShowVideo = false;
-				AppManager.getClientUser().isShowVip = false;
-				AppManager.getClientUser().isShowRpt = false;
 			}
 		}
 
@@ -482,32 +356,6 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 		});
 		builder.show();
 	}
-
-	/**
-	 * 极光推送设置别名后的回调
-	 */
-	private final TagAliasCallback mAliasCallback = new TagAliasCallback() {
-
-		@Override
-		public void gotResult(int code, String alias, Set<String> tags) {
-			switch (code) {
-				case 0:
-					//Set tag and alias success
-					PreferencesUtils.setJpushSetAliasState(MainNewActivity.this, true);
-					break;
-
-				case 6002:
-					//"Failed to set alias and tags due to timeout. Try again after 60s.";
-					ConnectivityManager conn = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-					NetworkInfo info = conn.getActiveNetworkInfo();
-					if (info != null && info.isConnected()) {
-						mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_SET_ALIAS, alias), 1000 * 60);
-						mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_SET_TAGS, tags), 1000 * 60);
-					}
-					break;
-			}
-		}
-	};
 
 
 	@Override
