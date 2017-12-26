@@ -13,6 +13,7 @@ import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.ValueKey;
+import com.youdo.karma.db.ContactSqlManager;
 import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.db.MyGoldDaoManager;
@@ -211,6 +212,7 @@ public class SettingActivity extends BaseActivity {
         IMessageDaoManager.reset();
         ConversationSqlManager.reset();
         MyGoldDaoManager.reset();
+        ContactSqlManager.reset();
     }
 
     @Override

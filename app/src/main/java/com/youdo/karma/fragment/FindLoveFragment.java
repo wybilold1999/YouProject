@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
@@ -78,7 +79,7 @@ public class FindLoveFragment extends Fragment implements OnRefreshListener, Vie
 
     private static final String FRAGMENT_INDEX = "fragment_index";
     private int mCurIndex = -1;
-    private boolean isNewData = false;
+    private boolean mIsRefreshing = false;
 
     public static FindLoveFragment newInstance(int index) {
         Bundle bundle = new Bundle();
@@ -127,6 +128,15 @@ public class FindLoveFragment extends Fragment implements OnRefreshListener, Vie
                 getActivity(), LinearLayoutManager.VERTICAL, DensityUtil
                 .dip2px(getActivity(), 12), DensityUtil.dip2px(
                 getActivity(), 12)));
+        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (mIsRefreshing) {
+                    return true;
+                }
+                return false;
+            }
+        });
 
     }
 
@@ -239,6 +249,7 @@ public class FindLoveFragment extends Fragment implements OnRefreshListener, Vie
             freshTime = System.currentTimeMillis();
             mProgress.setVisibility(View.GONE);
             mSwipeRefresh.setRefreshing(false);
+            mIsRefreshing = false;
             if (pageIndex == 1) {//进行筛选的时候，滑动到顶部
                 layoutManager.scrollToPositionWithOffset(0, 0);
             }
@@ -259,6 +270,7 @@ public class FindLoveFragment extends Fragment implements OnRefreshListener, Vie
             mProgress.setVisibility(View.GONE);
             mSwipeRefresh.setRefreshing(false);
             mAdapter.setIsShowFooter(false);
+            mIsRefreshing = false;
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -313,6 +325,7 @@ public class FindLoveFragment extends Fragment implements OnRefreshListener, Vie
                             new GetFindLoveTask().request(pageIndex, pageSize, GENDER, mUserScopeType);
                         }
                         mProgress.setVisibility(View.VISIBLE);
+                        mIsRefreshing = true;
                     }
                 });
         builder.setNegativeButton(getResources().getString(R.string.cancel),
