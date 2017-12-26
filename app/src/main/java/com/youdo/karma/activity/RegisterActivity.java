@@ -113,6 +113,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         mSexLay = (LinearLayout) findViewById(R.id.sex_img_layout);
         if (!AppManager.getClientUser().isShowNormal) {
             mSexLay.setVisibility(View.GONE);
+            mClientUser = new ClientUser();
+            mClientUser.sex = "男";
+            mClientUser.age = 20;
         } else {
             mSexLay.setVisibility(View.VISIBLE);
         }
@@ -185,6 +188,11 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         mCurrrentCity = event.city;
         if (!AppManager.getClientUser().isShowNormal) {
             mSexLay.setVisibility(View.GONE);
+            if (mClientUser == null) {
+                mClientUser = new ClientUser();
+            }
+            mClientUser.sex = "男";
+            mClientUser.age = 20;
         } else {
             mSexLay.setVisibility(View.VISIBLE);
         }
