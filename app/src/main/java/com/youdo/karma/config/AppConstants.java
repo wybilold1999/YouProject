@@ -69,6 +69,6 @@ public class AppConstants {
 
 	public static final String ALI_PAY_PLATFORM = "alipay";
 
-	public static int CHAT_LIMIT = 5;
+	public static int CHAT_LIMIT = 0;
 
 }
