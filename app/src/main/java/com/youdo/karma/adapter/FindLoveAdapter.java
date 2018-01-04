@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.youdo.karma.R;
 import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.manager.AppManager;
+import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.StringUtil;
 import com.dl7.tag.TagLayout;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -39,11 +40,15 @@ public class FindLoveAdapter extends
 
     private OnItemClickListener mOnItemClickListener;
     private DecimalFormat mFormat;
+    private String mCurCity;
+    private int mCurIndex;
 
-    public FindLoveAdapter(List<ClientUser> clientUsers, Context mContext) {
+    public FindLoveAdapter(List<ClientUser> clientUsers, Context mContext, int index) {
         this.mClientUsers = clientUsers;
         this.mContext = mContext;
         mFormat = new DecimalFormat("#.00");
+        mCurCity = PreferencesUtils.getCity(mContext);
+        mCurIndex = index;
     }
 
     @Override
@@ -93,7 +98,9 @@ public class FindLoveAdapter extends
             }
             itemViewHolder.marrayState.setText(clientUser.state_marry);
             itemViewHolder.constellation.setText(clientUser.constellation);
-            if (null == clientUser.distance || Double.parseDouble(clientUser.distance) == 0.0) {
+            if (!TextUtils.isEmpty(mCurCity) && mCurIndex == 1) {
+                itemViewHolder.distance.setText("来自" + mCurCity);
+            } else if (null == clientUser.distance || Double.parseDouble(clientUser.distance) == 0.0) {
                 itemViewHolder.distance.setText("来自" + clientUser.city);
             } else {
                 itemViewHolder.distance.setText(mFormat.format(Double.parseDouble(clientUser.distance)) + " km");
