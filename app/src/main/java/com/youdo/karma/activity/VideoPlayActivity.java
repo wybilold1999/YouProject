@@ -18,7 +18,6 @@ import android.widget.VideoView;
 
 import com.youdo.karma.R;
 import com.youdo.karma.config.ValueKey;
-import com.youdo.karma.utils.ToastUtil;
 import com.umeng.analytics.MobclickAgent;
 
 public class VideoPlayActivity extends Activity implements OnClickListener, OnPreparedListener, OnCompletionListener {

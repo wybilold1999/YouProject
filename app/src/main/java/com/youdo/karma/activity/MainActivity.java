@@ -15,8 +15,10 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,44 +34,41 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.igexin.sdk.PushManager;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import com.umeng.analytics.MobclickAgent;
+import com.xiaomi.mipush.sdk.MiPushClient;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.db.ConversationSqlManager;
+import com.youdo.karma.entity.AppointmentModel;
 import com.youdo.karma.entity.CityInfo;
 import com.youdo.karma.entity.FederationToken;
 import com.youdo.karma.entity.FollowModel;
 import com.youdo.karma.entity.LoveModel;
 import com.youdo.karma.entity.ReceiveGiftModel;
-import com.youdo.karma.fragment.ContactsFragment;
 import com.youdo.karma.fragment.FoundFragment;
-import com.youdo.karma.fragment.FoundNewFragment;
 import com.youdo.karma.fragment.HomeLoveFragment;
 import com.youdo.karma.fragment.MessageFragment;
-import com.youdo.karma.fragment.MyPersonalFragment;
 import com.youdo.karma.fragment.PersonalFragment;
-import com.youdo.karma.fragment.VideoShowFragment;
 import com.youdo.karma.helper.SDKCoreHelper;
 import com.youdo.karma.listener.MessageUnReadListener;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.manager.NotificationManager;
 import com.youdo.karma.net.request.FollowListRequest;
+import com.youdo.karma.net.request.GetAppointmentListRequest;
 import com.youdo.karma.net.request.GetCityInfoRequest;
 import com.youdo.karma.net.request.GetLoveFormeListRequest;
 import com.youdo.karma.net.request.GetOSSTokenRequest;
 import com.youdo.karma.net.request.GiftsListRequest;
-import com.youdo.karma.net.request.UploadCityInfoRequest;
 import com.youdo.karma.service.MyIntentService;
 import com.youdo.karma.service.MyPushService;
 import com.youdo.karma.utils.MsgUtil;
 import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.PushMsgUtil;
-import com.youdo.karma.utils.ToastUtil;
-import com.igexin.sdk.PushManager;
-import com.umeng.analytics.MobclickAgent;
-import com.xiaomi.mipush.sdk.MiPushClient;
 import com.yuntongxun.ecsdk.ECInitParams;
 
 import java.util.LinkedHashSet;
@@ -78,6 +77,10 @@ import java.util.Set;
 
 import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
+
+import static com.youdo.karma.entity.AppointmentModel.AppointStatus.ACCEPT;
+import static com.youdo.karma.entity.AppointmentModel.AppointStatus.DECLINE;
+import static com.youdo.karma.entity.AppointmentModel.AppointStatus.MY_WAIT_CALL_BACK;
 
 public class MainActivity extends BaseActivity implements MessageUnReadListener.OnMessageUnReadListener, AMapLocationListener {
 
@@ -193,6 +196,12 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 					new FollowListTask().request("followFormeList", 1, 1);
 				}
 			}, 5000 * 10);
+		}
+		if (AppManager.getClientUser().isShowVip && AppManager.getClientUser().isShowAppointment) {
+			//我约的
+			new GetIAppointmentListTask().request(1, 1, AppManager.getClientUser().userId, 0);
+			//约我的
+			new GetAppointmeListTask().request(1, 1, AppManager.getClientUser().userId, 1);
 		}
 		registerWeiXin();
 	}
@@ -354,11 +363,15 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 		if (aMapLocation != null && !TextUtils.isEmpty(aMapLocation.getCity())) {
 			AppManager.getClientUser().latitude = String.valueOf(aMapLocation.getLatitude());
 			AppManager.getClientUser().longitude = String.valueOf(aMapLocation.getLongitude());
-			new UploadCityInfoTask().request(aMapLocation.getCity(),
-					AppManager.getClientUser().latitude, AppManager.getClientUser().longitude);
-		} else {
-			new UploadCityInfoTask().request(currentCity, curLat, curLon);
+			curLat = String.valueOf(aMapLocation.getLatitude());
+			curLon = String.valueOf(aMapLocation.getLongitude());
+
+			if (TextUtils.isEmpty(PreferencesUtils.getCurrentProvince(this))) {
+				PreferencesUtils.setCurrentProvince(this, aMapLocation.getProvince());
+			}
 		}
+		PreferencesUtils.setLatitude(this, curLat);
+		PreferencesUtils.setLongitude(this, curLon);
 	}
 
 	/**
@@ -386,29 +399,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 				} catch (Exception e) {
 
 				}
-			}
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-		}
-	}
-
-	/**
-	 * 上传城市信息，用于控制区域显示
-	 */
-	class UploadCityInfoTask extends UploadCityInfoRequest {
-
-		@Override
-		public void onPostExecute(String isShow) {
-			if ("0".equals(isShow)) {
-				AppManager.getClientUser().isShowDownloadVip = false;
-				AppManager.getClientUser().isShowGold = false;
-				AppManager.getClientUser().isShowLovers = false;
-				AppManager.getClientUser().isShowMap = false;
-				AppManager.getClientUser().isShowVideo = false;
-				AppManager.getClientUser().isShowVip = false;
-				AppManager.getClientUser().isShowRpt = false;
 			}
 		}
 
@@ -480,6 +470,108 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 		@Override
 		public void onErrorExecute(String error) {
 		}
+	}
+
+	/**
+	 * 我约的
+	 */
+	class GetIAppointmentListTask extends GetAppointmentListRequest {
+
+		@Override
+		public void onPostExecute(List<AppointmentModel> appointmentModels) {
+			if(appointmentModels != null && appointmentModels.size() > 0){
+				final AppointmentModel model = appointmentModels.get(0);
+				if(model.status == ACCEPT || model.status == DECLINE) {
+					String lastUserId = PreferencesUtils.getIAppointUserId(MainActivity.this);
+					if (!lastUserId.equals(String.valueOf(model.userById))) {
+						PreferencesUtils.setIAppointUserId(
+								MainActivity.this, String.valueOf(model.userById));
+						String status = "";
+						if (model.status == ACCEPT) {
+							status = model.userByName + "同意了你的约会请求";
+						} else {
+							status = model.userByName + "拒绝了你的约会请求";
+						}
+						MsgUtil.sendAttentionOrGiftMsg(String.valueOf(model.userById),
+								model.userName, model.faceUrl, status);
+					}
+				}
+			}
+		}
+
+		@Override
+		public void onErrorExecute(String error) {
+		}
+	}
+
+	/**
+	 * 约我的
+	 */
+	class GetAppointmeListTask extends GetAppointmentListRequest {
+
+		@Override
+		public void onPostExecute(List<AppointmentModel> appointmentModels) {
+			if(appointmentModels != null && appointmentModels.size() > 0){
+				AppointmentModel model = appointmentModels.get(0);
+				if(model.status == MY_WAIT_CALL_BACK) {
+					String lastUserId = PreferencesUtils.getAppointMeUserId(MainActivity.this);
+					if (!lastUserId.equals(String.valueOf(model.userById))) {
+						PreferencesUtils.setAppointMeUserId(
+								MainActivity.this, String.valueOf(model.userById));
+						//向你发起了约会申请
+						showAppointmentInfoDialog(model);
+					}
+				}
+			}
+		}
+
+		@Override
+		public void onErrorExecute(String error) {
+		}
+	}
+
+	private void showAppointmentInfoDialog(final AppointmentModel model) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.appointment_invite);
+		builder.setView(initAppointmentUserInfoView(model));
+		builder.setPositiveButton(R.string.check_appointment_invite_info, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				Intent intent = new Intent(MainActivity.this, AppointmentInfoActivity.class);
+				intent.putExtra(ValueKey.DATA, model);
+				intent.putExtra(ValueKey.FROM_ACTIVITY, MainActivity.this.getClass().getSimpleName());
+				startActivity(intent);
+			}
+		});
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		builder.setCancelable(false);
+		builder.show();
+	}
+
+	private View initAppointmentUserInfoView(final AppointmentModel model) {
+		View view = LayoutInflater.from(this).inflate(R.layout.dialog_appointment, null);
+		SimpleDraweeView portrait = (SimpleDraweeView) view.findViewById(R.id.portrait);
+		TextView inviteInfo = (TextView) view.findViewById(R.id.appointment_info);
+		if (!TextUtils.isEmpty(model.faceUrl)) {
+			portrait.setImageURI(Uri.parse(model.faceUrl));
+		}
+		portrait.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Intent intent = new Intent(MainActivity.this, PersonalInfoActivity.class);
+				intent.putExtra(ValueKey.USER_ID, model.userId);
+				startActivity(intent);
+			}
+		});
+		inviteInfo.setText(Html.fromHtml(String.format(
+				getResources().getString(R.string.appointment_invite_info), model.userName)));
+		return view;
 	}
 
 	/**

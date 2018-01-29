@@ -1,8 +1,6 @@
 package com.youdo.karma.activity;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +13,6 @@ import com.youdo.karma.entity.SuccessCase;
 import com.youdo.karma.net.request.GetSuccessCaseListRequest;
 import com.youdo.karma.ui.widget.WrapperLinearLayoutManager;
 import com.youdo.karma.utils.ToastUtil;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.List;
@@ -30,12 +27,8 @@ import butterknife.ButterKnife;
  */
 public class SuccessCaseActivity extends BaseActivity {
 
-	@BindView(R.id.image)
-	SimpleDraweeView mImage;
 	@BindView(R.id.recyclerview)
-	RecyclerView mRecyclerView;
-	@BindView(R.id.scrollView)
-	NestedScrollView mScrollView;
+    RecyclerView mRecyclerView;
 
 	private SuccessCaseAdapter mAdapter;
 	private LinearLayoutManager layoutManager;
@@ -54,9 +47,6 @@ public class SuccessCaseActivity extends BaseActivity {
 	}
 
 	private void setupView() {
-		mImage.setImageURI(Uri.parse("http://cdn.wmlover.cn/style/assets/wap/ID11/banner.jpg"));
-		mScrollView.smoothScrollTo(0, 0);
-
 		layoutManager = new WrapperLinearLayoutManager(
 				this, LinearLayoutManager.VERTICAL, false);
 		layoutManager.setOrientation(LinearLayoutManager.VERTICAL);

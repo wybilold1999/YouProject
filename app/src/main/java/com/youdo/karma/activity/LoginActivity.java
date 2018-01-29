@@ -42,7 +42,6 @@ import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.DownloadFileRequest;
 import com.youdo.karma.net.request.GetCityInfoRequest;
 import com.youdo.karma.net.request.QqLoginRequest;
-import com.youdo.karma.net.request.UploadCityInfoRequest;
 import com.youdo.karma.net.request.UserLoginRequest;
 import com.youdo.karma.net.request.WXLoginRequest;
 import com.youdo.karma.utils.AESEncryptorUtil;
@@ -175,39 +174,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         }
     }
 
-    class UploadCityInfoTask extends UploadCityInfoRequest {
-
-        @Override
-        public void onPostExecute(String isShow) {
-            if ("0".equals(isShow)) {
-                AppManager.getClientUser().isShowDownloadVip = false;
-                AppManager.getClientUser().isShowGold = false;
-                AppManager.getClientUser().isShowLovers = false;
-                AppManager.getClientUser().isShowMap = false;
-                AppManager.getClientUser().isShowVideo = false;
-                AppManager.getClientUser().isShowVip = false;
-                AppManager.getClientUser().isShowRpt = false;
-                AppManager.getClientUser().isShowNormal = false;
-            } else {
-                AppManager.getClientUser().isShowNormal = true;
-            }
-            EventBus.getDefault().post(new LocationEvent(mCurrrentCity));
-        }
-
-        @Override
-        public void onErrorExecute(String error) {
-            AppManager.getClientUser().isShowDownloadVip = false;
-            AppManager.getClientUser().isShowGold = false;
-            AppManager.getClientUser().isShowLovers = false;
-            AppManager.getClientUser().isShowMap = false;
-            AppManager.getClientUser().isShowVideo = false;
-            AppManager.getClientUser().isShowVip = false;
-            AppManager.getClientUser().isShowRpt = false;
-            AppManager.getClientUser().isShowNormal = false;
-            EventBus.getDefault().post(new LocationEvent(mCurrrentCity));
-        }
-    }
-
     /**
      * 初始化定位
      */
@@ -235,7 +201,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             mCurrrentCity = aMapLocation.getCity();
             EventBus.getDefault().post(new LocationEvent(mCurrrentCity));
             PreferencesUtils.setCurrentCity(this, mCurrrentCity);
-            new UploadCityInfoTask().request(mCurrrentCity, curLat, curLon);
+            PreferencesUtils.setCurrentProvince(this, aMapLocation.getProvince());
         } else {
             if (mCityInfo != null) {
                 try {
@@ -249,12 +215,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     double lon = Double.parseDouble(leftBottom[0]) + (Double.parseDouble(rightTop[0]) - Double.parseDouble(leftBottom[0])) / 5;
                     curLon = String.valueOf(lon);
 
-                    new UploadCityInfoTask().request(mCurrrentCity, curLat, curLon);
                 } catch (Exception e) {
 
                 }
             }
         }
+        PreferencesUtils.setLatitude(this, curLat);
+        PreferencesUtils.setLongitude(this, curLon);
     }
 
     @Override

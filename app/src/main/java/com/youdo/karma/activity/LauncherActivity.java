@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.entity.AllKeys;
@@ -16,14 +17,12 @@ import com.youdo.karma.helper.IMChattingHelper;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.DownloadFileRequest;
 import com.youdo.karma.net.request.GetIDKeyRequest;
-import com.youdo.karma.net.request.UploadCityInfoRequest;
 import com.youdo.karma.net.request.UserLoginRequest;
 import com.youdo.karma.utils.FileAccessorUtils;
 import com.youdo.karma.utils.Md5Util;
 import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.PushMsgUtil;
 import com.youdo.karma.utils.ToastUtil;
-import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 
@@ -102,9 +101,6 @@ public class LauncherActivity extends Activity {
 
     private void init() {
         new GetIdKeysTask().request();
-        if (!TextUtils.isEmpty(PreferencesUtils.getCurrentCity(this))) {
-            new UploadCityInfoTask().request(PreferencesUtils.getCurrentCity(this), "", "");
-        }
         if (AppManager.isLogin()) {//是否已经登录
             login();
         } else {
@@ -142,37 +138,6 @@ public class LauncherActivity extends Activity {
         // 通过WXAPIFactory工厂，获取IWXAPI的实例
         AppManager.setIWXAPI(WXAPIFactory.createWXAPI(this, AppConstants.WEIXIN_ID, true));
         AppManager.getIWXAPI().registerApp(AppConstants.WEIXIN_ID);
-    }
-
-    class UploadCityInfoTask extends UploadCityInfoRequest {
-
-        @Override
-        public void onPostExecute(String isShow) {
-            if ("0".equals(isShow)) {
-                AppManager.getClientUser().isShowDownloadVip = false;
-                AppManager.getClientUser().isShowGold = false;
-                AppManager.getClientUser().isShowLovers = false;
-                AppManager.getClientUser().isShowMap = false;
-                AppManager.getClientUser().isShowVideo = false;
-                AppManager.getClientUser().isShowVip = false;
-                AppManager.getClientUser().isShowRpt = false;
-                AppManager.getClientUser().isShowNormal = false;
-            } else {
-                AppManager.getClientUser().isShowNormal = true;
-            }
-        }
-
-        @Override
-        public void onErrorExecute(String error) {
-            AppManager.getClientUser().isShowDownloadVip = false;
-            AppManager.getClientUser().isShowGold = false;
-            AppManager.getClientUser().isShowLovers = false;
-            AppManager.getClientUser().isShowMap = false;
-            AppManager.getClientUser().isShowVideo = false;
-            AppManager.getClientUser().isShowVip = false;
-            AppManager.getClientUser().isShowRpt = false;
-            AppManager.getClientUser().isShowNormal = false;
-        }
     }
 
 	/**

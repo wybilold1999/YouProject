@@ -37,7 +37,7 @@ import com.youdo.karma.helper.SDKCoreHelper;
 import com.youdo.karma.listener.MessageUnReadListener;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.GetCityInfoRequest;
-import com.youdo.karma.net.request.UploadCityInfoRequest;
+import com.youdo.karma.utils.PreferencesUtils;
 import com.yuntongxun.ecsdk.ECInitParams;
 
 public class MainNewActivity extends BaseActivity implements MessageUnReadListener.OnMessageUnReadListener, AMapLocationListener {
@@ -151,11 +151,15 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 		if (aMapLocation != null && !TextUtils.isEmpty(aMapLocation.getCity())) {
 			AppManager.getClientUser().latitude = String.valueOf(aMapLocation.getLatitude());
 			AppManager.getClientUser().longitude = String.valueOf(aMapLocation.getLongitude());
-			new UploadCityInfoRequest().request(aMapLocation.getCity(),
-					AppManager.getClientUser().latitude, AppManager.getClientUser().longitude);
+			curLat = String.valueOf(aMapLocation.getLatitude());
+			curLon = String.valueOf(aMapLocation.getLongitude());
+			PreferencesUtils.setCurrentCity(this, aMapLocation.getCity());
+			PreferencesUtils.setCurrentProvince(this, aMapLocation.getProvince());
 		} else {
-			new UploadCityInfoRequest().request(currentCity, curLat, curLon);
+			PreferencesUtils.setCurrentCity(this, currentCity);
 		}
+		PreferencesUtils.setLatitude(this, curLat);
+		PreferencesUtils.setLongitude(this, curLon);
 	}
 
 	/**

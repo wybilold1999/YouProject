@@ -34,6 +34,8 @@ import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
+import com.dl7.tag.TagLayout;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.MakeMoneyActivity;
 import com.youdo.karma.activity.MyGoldActivity;
@@ -46,9 +48,6 @@ import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.UpdateGoldRequest;
 import com.youdo.karma.ui.widget.WrapperLinearLayoutManager;
 import com.youdo.karma.utils.StringUtil;
-import com.dl7.tag.TagLayout;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -309,13 +308,6 @@ public class TabPersonalFragment extends Fragment implements GeocodeSearch.OnGeo
 				} else {
 					mGiftText.setVisibility(View.GONE);
 					mGiftCard.setVisibility(View.GONE);
-				}
-				if (AppManager.getClientUser().isShowLovers) {
-					mCardFriend.setVisibility(View.VISIBLE);
-					mTvFriend.setVisibility(View.VISIBLE);
-				} else {
-					mCardFriend.setVisibility(View.GONE);
-					mTvFriend.setVisibility(View.GONE);
 				}
 			}
 		}

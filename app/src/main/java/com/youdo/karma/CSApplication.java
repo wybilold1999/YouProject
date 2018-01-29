@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.support.multidex.MultiDexApplication;
 import android.util.SparseIntArray;
 
+import com.mob.MobSDK;
 import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.helper.AppActivityLifecycleCallbacks;
 import com.youdo.karma.helper.CrashHandler;
@@ -66,7 +67,8 @@ public class CSApplication extends MultiDexApplication {
 		AppManager.setContext(sApplication);
 		AppManager.setUserInfo();
 		//初始化短信sdk
-		SMSSDK.initSDK(this, AppConstants.SMS_INIT_KEY, AppConstants.SMS_INIT_SECRET);
+//		SMSSDK.initSDK(this, AppConstants.SMS_INIT_KEY, AppConstants.SMS_INIT_SECRET);
+		MobSDK.init(this);
 		initFresco();
 
 		FileDownloader.init(sApplication, new FileDownloadHelper.OkHttpClientCustomMaker() {
