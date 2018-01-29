@@ -105,6 +105,10 @@ public class FindLoveAdapter extends
             } else {
                 itemViewHolder.distance.setText(mFormat.format(Double.parseDouble(clientUser.distance)) + " km");
             }
+            if (mCurIndex == 2 && !TextUtils.isEmpty(mCurCity) && !TextUtils.isEmpty(clientUser.distance)
+                    && Double.parseDouble(clientUser.distance) > 0.0) {
+                itemViewHolder.distance.setText("来自" + mCurCity);
+            }
             itemViewHolder.signature.setText(clientUser.signature);
             if(clientUser.is_vip && AppManager.getClientUser().isShowVip){
                 itemViewHolder.isVip.setVisibility(View.VISIBLE);
