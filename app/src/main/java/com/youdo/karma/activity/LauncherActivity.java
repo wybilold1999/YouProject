@@ -45,19 +45,10 @@ public class LauncherActivity extends Activity {
                 case LONG_SCUESS:
                     long loadingTime = System.currentTimeMillis() - mStartTime;// 计算一下总共花费的时间
                     if (loadingTime < SHOW_TIME_MIN) {// 如果比最小显示时间还短，就延时进入MainActivity，否则直接进入
-                        if (AppManager.getClientUser().isShowNormal) {
-                            mHandler.postDelayed(mainActivity, SHOW_TIME_MIN
-                                    - loadingTime);
-                        } else {
-                            mHandler.postDelayed(mainNewActivity, SHOW_TIME_MIN
-                                    - loadingTime);
-                        }
+                        mHandler.postDelayed(mainActivity, SHOW_TIME_MIN
+                                - loadingTime);
                     } else {
-                        if (AppManager.getClientUser().isShowNormal) {
-                            mHandler.postDelayed(mainActivity, 0);
-                        } else {
-                            mHandler.postDelayed(mainNewActivity, 0);
-                        }
+                        mHandler.postDelayed(mainActivity, 0);
                     }
                     break;
                 case LONG_FAIURE:

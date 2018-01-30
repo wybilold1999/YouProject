@@ -303,11 +303,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             PreferencesUtils.setLoginTime(LoginActivity.this, System.currentTimeMillis());
             IMChattingHelper.getInstance().sendInitLoginMsg();
             Intent intent = new Intent();
-            if (AppManager.getClientUser().isShowNormal) {
-                intent.setClass(LoginActivity.this, MainActivity.class);
-            } else {
-                intent.setClass(LoginActivity.this, MainNewActivity.class);
-            }
+            intent.setClass(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finishAll();
         }
@@ -345,11 +341,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             PreferencesUtils.setLoginTime(LoginActivity.this, System.currentTimeMillis());
             IMChattingHelper.getInstance().sendInitLoginMsg();
             Intent intent = new Intent();
-            if (AppManager.getClientUser().isShowNormal) {
-                intent.setClass(LoginActivity.this, MainActivity.class);
-            } else {
-                intent.setClass(LoginActivity.this, MainNewActivity.class);
-            }
+            intent.setClass(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finishAll();
         }
@@ -465,11 +457,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             PreferencesUtils.setLoginTime(LoginActivity.this, System.currentTimeMillis());
             IMChattingHelper.getInstance().sendInitLoginMsg();
             Intent intent = new Intent();
-            if (AppManager.getClientUser().isShowNormal) {
-                intent.setClass(LoginActivity.this, MainActivity.class);
-            } else {
-                intent.setClass(LoginActivity.this, MainNewActivity.class);
-            }
+            intent.setClass(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finishAll();
         }

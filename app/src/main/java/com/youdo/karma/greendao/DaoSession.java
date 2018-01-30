@@ -13,6 +13,7 @@ import com.youdo.karma.entity.Dynamic;
 import com.youdo.karma.entity.Gold;
 import com.youdo.karma.entity.IMessage;
 import com.youdo.karma.entity.NameList;
+import com.youdo.karma.entity.FConversation;
 import com.youdo.karma.entity.Contact;
 import com.youdo.karma.entity.ExpressionGroup;
 import com.youdo.karma.entity.Expression;
@@ -22,6 +23,7 @@ import com.youdo.karma.greendao.DynamicDao;
 import com.youdo.karma.greendao.GoldDao;
 import com.youdo.karma.greendao.IMessageDao;
 import com.youdo.karma.greendao.NameListDao;
+import com.youdo.karma.greendao.FConversationDao;
 import com.youdo.karma.greendao.ContactDao;
 import com.youdo.karma.greendao.ExpressionGroupDao;
 import com.youdo.karma.greendao.ExpressionDao;
@@ -40,6 +42,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig goldDaoConfig;
     private final DaoConfig iMessageDaoConfig;
     private final DaoConfig nameListDaoConfig;
+    private final DaoConfig fConversationDaoConfig;
     private final DaoConfig contactDaoConfig;
     private final DaoConfig expressionGroupDaoConfig;
     private final DaoConfig expressionDaoConfig;
@@ -49,6 +52,7 @@ public class DaoSession extends AbstractDaoSession {
     private final GoldDao goldDao;
     private final IMessageDao iMessageDao;
     private final NameListDao nameListDao;
+    private final FConversationDao fConversationDao;
     private final ContactDao contactDao;
     private final ExpressionGroupDao expressionGroupDao;
     private final ExpressionDao expressionDao;
@@ -72,6 +76,9 @@ public class DaoSession extends AbstractDaoSession {
         nameListDaoConfig = daoConfigMap.get(NameListDao.class).clone();
         nameListDaoConfig.initIdentityScope(type);
 
+        fConversationDaoConfig = daoConfigMap.get(FConversationDao.class).clone();
+        fConversationDaoConfig.initIdentityScope(type);
+
         contactDaoConfig = daoConfigMap.get(ContactDao.class).clone();
         contactDaoConfig.initIdentityScope(type);
 
@@ -86,6 +93,7 @@ public class DaoSession extends AbstractDaoSession {
         goldDao = new GoldDao(goldDaoConfig, this);
         iMessageDao = new IMessageDao(iMessageDaoConfig, this);
         nameListDao = new NameListDao(nameListDaoConfig, this);
+        fConversationDao = new FConversationDao(fConversationDaoConfig, this);
         contactDao = new ContactDao(contactDaoConfig, this);
         expressionGroupDao = new ExpressionGroupDao(expressionGroupDaoConfig, this);
         expressionDao = new ExpressionDao(expressionDaoConfig, this);
@@ -95,6 +103,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Gold.class, goldDao);
         registerDao(IMessage.class, iMessageDao);
         registerDao(NameList.class, nameListDao);
+        registerDao(FConversation.class, fConversationDao);
         registerDao(Contact.class, contactDao);
         registerDao(ExpressionGroup.class, expressionGroupDao);
         registerDao(Expression.class, expressionDao);
@@ -106,6 +115,7 @@ public class DaoSession extends AbstractDaoSession {
         goldDaoConfig.clearIdentityScope();
         iMessageDaoConfig.clearIdentityScope();
         nameListDaoConfig.clearIdentityScope();
+        fConversationDaoConfig.clearIdentityScope();
         contactDaoConfig.clearIdentityScope();
         expressionGroupDaoConfig.clearIdentityScope();
         expressionDaoConfig.clearIdentityScope();
@@ -129,6 +139,10 @@ public class DaoSession extends AbstractDaoSession {
 
     public NameListDao getNameListDao() {
         return nameListDao;
+    }
+
+    public FConversationDao getFConversationDao() {
+        return fConversationDao;
     }
 
     public ContactDao getContactDao() {

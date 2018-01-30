@@ -49,13 +49,12 @@ import com.youdo.karma.adapter.ChatEmoticonsAdapter;
 import com.youdo.karma.adapter.ChatEmoticonsAdapter.OnEmojiItemClickListener;
 import com.youdo.karma.adapter.ChatMessageAdapter;
 import com.youdo.karma.adapter.PagerGridAdapter;
-import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.config.ValueKey;
-import com.youdo.karma.db.ConversationSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.entity.ClientUser;
-import com.youdo.karma.entity.Conversation;
 import com.youdo.karma.entity.Emoticon;
+import com.youdo.karma.entity.ExpressionGroup;
+import com.youdo.karma.entity.FConversation;
 import com.youdo.karma.entity.IMessage;
 import com.youdo.karma.eventtype.SnackBarEvent;
 import com.youdo.karma.helper.IMChattingHelper;
@@ -72,7 +71,6 @@ import com.youdo.karma.utils.EmoticonUtil;
 import com.youdo.karma.utils.FileAccessorUtils;
 import com.youdo.karma.utils.FileUtils;
 import com.youdo.karma.utils.ImageUtil;
-import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.ToastUtil;
 import com.umeng.analytics.MobclickAgent;
 
@@ -93,8 +91,8 @@ import java.util.List;
  * @email 395044952@qq.com
  */
 public class ChatActivity extends BaseActivity implements OnMessageReportCallback, OnClickListener,
-		OnEmojiItemClickListener, OnFileProgressChangedListener,
-		OnRefreshListener, OnMessageStatusReport {
+        OnEmojiItemClickListener, OnFileProgressChangedListener,
+        OnRefreshListener, OnMessageStatusReport {
 	private RecyclerView mMessageRecyclerView;
 	private ChatMessageAdapter mMessageAdapter;
 	private ImageView openCamera;
@@ -111,18 +109,19 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 	private LinearLayout mEmoticonPageIndicator;
 	private RecyclerView mEmoticonRecyclerview;
 	private SwipeRefreshLayout mSwipeRefresh;
-	private LinearLayout mInputToolWork;
 
 	private String mPhotoPath;
 	private File mPhotoFile;
 	private Uri mPhotoOnSDCardUri;
 
 	private ClientUser mClientUser;
-	private Conversation mConversation;
+	private FConversation mConversation;
+	private String mRealId;//真实用户的用户id
 
 	private List<IMessage> mIMessages;
 	private List<GridView> mChatEmoticonsGridView;
 	private LinearLayoutManager mLinearLayoutManager;
+	private List<ExpressionGroup> mExpressionGroups;
 
 	/**
 	 * 消息分页条数
@@ -217,18 +216,11 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 		mMorePageIndicator = (LinearLayout) findViewById(R.id.more_page_indicator);
 		mEmoticonPager = (ViewPager) findViewById(R.id.emoticon_pager);
 		mEmoticonPageIndicator = (LinearLayout) findViewById(R.id.emoticon_page_indicator);
-		mInputToolWork = (LinearLayout) findViewById(R.id.input_tool_work);
 
 		mEmoticonRecyclerview = (RecyclerView) findViewById(R.id.emoticon_recyclerview);
 		LinearLayoutManager layoutManager = new WrapperLinearLayoutManager(this);
 		layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 		mEmoticonRecyclerview.setLayoutManager(layoutManager);
-
-		if (!AppManager.getClientUser().isShowVip) {
-			mInputToolWork.setVisibility(View.GONE);
-		} else {
-			mInputToolWork.setVisibility(View.VISIBLE);
-		}
 
 	}
 
@@ -305,11 +297,12 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 			redPacket.setVisibility(View.GONE);
 		}
 		mClientUser = (ClientUser) getIntent().getSerializableExtra(ValueKey.USER);
-		if (mClientUser != null) {
+		mRealId = getIntent().getStringExtra(ValueKey.USER_ID);
+		/*if (mClientUser != null) {
 			mConversation = ConversationSqlManager.getInstance(this)
 					.queryConversationForByTalkerId(mClientUser.userId);
-		}
-
+		}*/
+		mConversation = (FConversation) getIntent().getSerializableExtra(ValueKey.CONVERSATION);
 		initEmoticon();
 		initEmotionUI();
 		mIMessages = new ArrayList<>();
@@ -466,51 +459,32 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 				break;
 			case R.id.tool_view_input_text:
 				if (AppManager.getClientUser().isShowVip) {
-					if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
-						if (null != IMChattingHelper.getInstance().getChatManager()) {
-							if (AppManager.getClientUser().is_vip) {
-								if (AppManager.getClientUser().gold_num  < 101) {
-									showGoldDialog();
-								} else {
-									sendTextMsg();
+					if (AppManager.getClientUser().is_vip) {
+						if (AppManager.getClientUser().gold_num  < 101) {
+							showGoldDialog();
+						} else {
+							if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
+								if (null != IMChattingHelper.getInstance().getChatManager()) {
+									IMChattingHelper.getInstance().sendTextMsg(mConversation.Rid, mRealId,
+											mClientUser, mContentInput.getText().toString());
+									mContentInput.setText("");
 								}
-							} else {
-								showBeyondChatLimitDialog();
 							}
-							/*int count = PreferencesUtils.getChatLimit(this);
-							if (count < AppConstants.CHAT_LIMIT) {
-								count = count + 1;
-								PreferencesUtils.setChatLimit(this, count);
-								sendTextMsg();
-								if (AppConstants.CHAT_LIMIT - count == 3) {
-									ToastUtil.showMessage(R.string.chat_count_three);
-								}
-							} else {
-								if (AppManager.getClientUser().is_vip) {
-									if (AppManager.getClientUser().gold_num  < 101) {
-										showGoldDialog();
-									} else {
-										sendTextMsg();
-									}
-								} else {
-									showBeyondChatLimitDialog();
-								}
-							}*/
 						}
+					} else {
+						showVipDialog();
 					}
 				} else {
 					if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
-						sendTextMsg();
+						if (null != IMChattingHelper.getInstance().getChatManager()) {
+							IMChattingHelper.getInstance().sendTextMsg(mConversation.Rid, mRealId,
+									mClientUser, mContentInput.getText().toString());
+							mContentInput.setText("");
+						}
 					}
 				}
 				break;
 		}
-	}
-
-	private void sendTextMsg() {
-		IMChattingHelper.getInstance().sendTextMsg(
-				mClientUser, mContentInput.getText().toString());
-		mContentInput.setText("");
 	}
 
 	private void showVipDialog() {
@@ -683,7 +657,7 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 								fileUrl = extSdCardPath + File.separator + FileUtils.getPath(this, uri);
 							}
 							if (null != IMChattingHelper.getInstance().getChatManager()) {
-								IMChattingHelper.getInstance().sendImgMsg(mClientUser, fileUrl);
+								IMChattingHelper.getInstance().sendImgMsg(mConversation.Rid, mRealId, mClientUser, fileUrl);
 							}
 						}
 					}
@@ -702,7 +676,7 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 						fileUrl = extSdCardPath + File.separator + FileUtils.getPath(this, uri);
 					}
 					if (null != IMChattingHelper.getInstance().getChatManager()) {
-						IMChattingHelper.getInstance().sendImgMsg(mClientUser, fileUrl);
+						IMChattingHelper.getInstance().sendImgMsg(mConversation.Rid, mRealId, mClientUser, fileUrl);
 					}
 				}
 			}
@@ -710,7 +684,7 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 				&& requestCode == PREVIEW_IMAGE_RESULT) {
 			Uri uri = data.getData();
             String imgUrl = ImageUtil.compressImage(uri.getPath(), FileAccessorUtils.IMESSAGE_IMAGE);
-			IMChattingHelper.getInstance().sendImgMsg(mClientUser, imgUrl);
+			IMChattingHelper.getInstance().sendImgMsg(mConversation.Rid, mRealId, mClientUser, imgUrl);
 		} else if (resultCode == RESULT_OK
 				&& requestCode == SHARE_LOCATION_RESULT) {
 			double latitude = data.getDoubleExtra(ValueKey.LATITUDE, 0);
@@ -718,13 +692,13 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 			String address = data.getStringExtra(ValueKey.ADDRESS);
 			String imagePath = data.getStringExtra(ValueKey.IMAGE_URL);
 			if (null != IMChattingHelper.getInstance().getChatManager()) {
-				IMChattingHelper.getInstance().sendLocationMsg(mClientUser, latitude, longitude,
+				IMChattingHelper.getInstance().sendLocationMsg(mConversation.Rid, mRealId, mClientUser, latitude, longitude,
 						address, imagePath);
 			}
 		} else if (resultCode == RESULT_OK && requestCode == SEND_RED_PACKET) {
 			ToastUtil.showMessage("已发送");
 			if (null != IMChattingHelper.getInstance().getChatManager()) {
-				IMChattingHelper.getInstance().sendRedPacketMsg(
+				IMChattingHelper.getInstance().sendRedPacketMsg(mConversation.Rid, mRealId,
 						mClientUser, data.getStringExtra(ValueKey.DATA));
 			}
 		}
@@ -998,45 +972,17 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 		builder.show();
 	}
 
-	private void showBeyondChatLimitDialog() {
-		String message = "";
-		if (AppConstants.CHAT_LIMIT == 0) {
-			message = getResources().getString(R.string.un_send_msg);
-		} else {
-			message = getResources().getString(R.string.chat_count_zero_bak);
-		}
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(message);
-		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				Intent intent = new Intent(ChatActivity.this, VipCenterActivity.class);
-				startActivity(intent);
-			}
-		});
-		builder.setNegativeButton(R.string.until_single, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-		builder.show();
-	}
-
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void showSnackBar(SnackBarEvent event) {
-		if (!TextUtils.isEmpty(event.content)) {
-			Snackbar.make(findViewById(R.id.message_recycler_view), event.content, Snackbar.LENGTH_LONG)
-					.setActionTextColor(Color.RED)
-					.setAction("点击查看", new OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							Intent intent = new Intent(ChatActivity.this, MoneyPacketActivity.class);
-							startActivity(intent);
-						}
-					}).show();
-		}
+		Snackbar.make(findViewById(R.id.message_recycler_view), event.content, Snackbar.LENGTH_LONG)
+				.setActionTextColor(Color.RED)
+				.setAction("点击查看", new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(ChatActivity.this, MoneyPacketActivity.class);
+						startActivity(intent);
+					}
+				}).show();
 	}
 }
 

@@ -6,9 +6,7 @@ package com.youdo.karma.eventtype;
  * 描述：
  */
 public class DataEvent {
-	public String dynamicContent;
 
-	public DataEvent(String dynamicContent) {
-		this.dynamicContent = dynamicContent;
+	public DataEvent() {
 	}
 }
