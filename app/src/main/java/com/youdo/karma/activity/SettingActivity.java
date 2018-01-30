@@ -15,6 +15,8 @@ import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.db.ContactSqlManager;
 import com.youdo.karma.db.ConversationSqlManager;
+import com.youdo.karma.db.ExpressionGroupSqlManager;
+import com.youdo.karma.db.ExpressionSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.db.MyGoldDaoManager;
 import com.youdo.karma.manager.AppManager;
@@ -213,6 +215,8 @@ public class SettingActivity extends BaseActivity {
         ConversationSqlManager.reset();
         MyGoldDaoManager.reset();
         ContactSqlManager.reset();
+        ExpressionGroupSqlManager.reset();
+        ExpressionSqlManager.reset();
     }
 
     @Override
