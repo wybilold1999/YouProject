@@ -42,6 +42,7 @@ import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.DownloadFileRequest;
 import com.youdo.karma.net.request.GetCityInfoRequest;
 import com.youdo.karma.net.request.QqLoginRequest;
+import com.youdo.karma.net.request.UploadCityInfoRequest;
 import com.youdo.karma.net.request.UserLoginRequest;
 import com.youdo.karma.net.request.WXLoginRequest;
 import com.youdo.karma.utils.AESEncryptorUtil;
@@ -202,6 +203,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             EventBus.getDefault().post(new LocationEvent(mCurrrentCity));
             PreferencesUtils.setCurrentCity(this, mCurrrentCity);
             PreferencesUtils.setCurrentProvince(this, aMapLocation.getProvince());
+            new UploadCityInfoRequest().request(aMapLocation.getCity(), String.valueOf(aMapLocation.getLatitude()),
+                    String.valueOf(aMapLocation.getLongitude()));
         } else {
             if (mCityInfo != null) {
                 try {
