@@ -180,7 +180,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void weiXinLogin(WeinXinEvent event) {
         ProgressDialogUtils.getInstance(RegisterActivity.this).show(R.string.dialog_request_login);
-        new WXLoginTask().request(event.code, channelId, mCurrrentCity);
+        new WXLoginTask().request(event.code, channelId);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -342,7 +342,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     if (activityIsRunning) {
                         ProgressDialogUtils.getInstance(RegisterActivity.this).show(R.string.dialog_request_login);
                     }
-                    new QqLoginTask().request(token, openId, channelId, mCurrrentCity);
+                    new QqLoginTask().request(token, openId, channelId);
                 }
 
                 @Override

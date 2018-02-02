@@ -100,7 +100,7 @@ public class InputNewPwdActivity extends BaseActivity implements
 		public void onPostExecute(String s) {
 			ProgressDialogUtils.getInstance(InputNewPwdActivity.this).dismiss();
 			ProgressDialogUtils.getInstance(InputNewPwdActivity.this).show(R.string.dialog_request_login);
-			new UserLoginTask().request(mPhone, AppManager.getClientUser().userPwd, mCurrrentCity);
+			new UserLoginTask().request(mPhone, AppManager.getClientUser().userPwd);
 		}
 
 		@Override

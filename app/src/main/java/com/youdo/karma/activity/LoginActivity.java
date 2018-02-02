@@ -237,7 +237,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                             AppConstants.SECURITY_KEY);
                     ProgressDialogUtils.getInstance(this).show(R.string.dialog_request_login);
                     new UserLoginTask().request(loginAccount.getText().toString().trim(),
-                            cryptLoginPwd, mCurrrentCity);
+                            cryptLoginPwd);
                 }
                 break;
             case R.id.forget_pwd:
@@ -278,7 +278,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void weiXinLogin(WeinXinEvent event) {
         ProgressDialogUtils.getInstance(LoginActivity.this).show(R.string.dialog_request_login);
-        new WXLoginTask().request(event.code, channelId, mCurrrentCity);
+        new WXLoginTask().request(event.code, channelId);
     }
 
     class WXLoginTask extends WXLoginRequest {
@@ -429,7 +429,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     if (activityIsRunning) {
                         ProgressDialogUtils.getInstance(LoginActivity.this).show(R.string.dialog_request_login);
                     }
-                    new QqLoginTask().request(token, openId, channelId, mCurrrentCity);
+                    new QqLoginTask().request(token, openId, channelId);
                 }
 
                 @Override

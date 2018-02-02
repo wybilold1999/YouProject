@@ -32,7 +32,7 @@ import retrofit2.Callback;
  */
 public class UserLoginRequest extends ResultPostExecute<ClientUser> {
 
-	public void request(final String account, final String pwd, final String city){
+	public void request(final String account, final String pwd){
 		ArrayMap<String, String> params = new ArrayMap<>();
 		params.put("account", account);
 		params.put("pwd", pwd);
@@ -41,11 +41,7 @@ public class UserLoginRequest extends ResultPostExecute<ClientUser> {
 		params.put("systemVersion", AppManager.getDeviceSystemVersion());
 		params.put("deviceId", AppManager.getDeviceId());
 		params.put("channel", CheckUtil.getAppMetaData(CSApplication.getInstance(), "UMENG_CHANNEL"));
-		if (!TextUtils.isEmpty(city)) {
-			params.put("currentCity", city);
-		} else {
-			params.put("currentCity", "");
-		}
+		params.put("currentCity", PreferencesUtils.getCurrentCity(CSApplication.getInstance()));
 		params.put("province", PreferencesUtils.getCurrentProvince(CSApplication.getInstance()));
 		params.put("latitude", PreferencesUtils.getLatitude(CSApplication.getInstance()));
 		params.put("longitude", PreferencesUtils.getLongitude(CSApplication.getInstance()));

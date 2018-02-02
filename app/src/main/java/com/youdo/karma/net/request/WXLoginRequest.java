@@ -30,7 +30,7 @@ import retrofit2.Callback;
  */
 public class WXLoginRequest extends ResultPostExecute<ClientUser> {
 
-	public void request(String code, final String channelId, final String city) {
+	public void request(String code, final String channelId) {
 		ArrayMap<String, String> params = new ArrayMap<>();
 		params.put("code", code);
 		params.put("device_name", AppManager.getDeviceName());
@@ -39,11 +39,7 @@ public class WXLoginRequest extends ResultPostExecute<ClientUser> {
 		params.put("version", String.valueOf(AppManager.getVersionCode()));
 		params.put("os_version", AppManager.getDeviceSystemVersion());
 		params.put("device_id", AppManager.getDeviceId());
-		if (!TextUtils.isEmpty(city)) {
-			params.put("currentCity", city);
-		} else {
-			params.put("currentCity", "");
-		}
+		params.put("currentCity", PreferencesUtils.getCurrentCity(CSApplication.getInstance()));
 		params.put("province", PreferencesUtils.getCurrentProvince(CSApplication.getInstance()));
 		params.put("latitude", PreferencesUtils.getLatitude(CSApplication.getInstance()));
 		params.put("longitude", PreferencesUtils.getLongitude(CSApplication.getInstance()));

@@ -39,11 +39,7 @@ public class RegisterRequest extends ResultPostExecute<ClientUser> {
         params.put("reg_the_way", "0");
         params.put("regSystemVersion", AppManager.getDeviceSystemVersion());
         params.put("deviceId", AppManager.getDeviceId());
-        if (!TextUtils.isEmpty(clientUser.currentCity)) {
-            params.put("currentCity", clientUser.currentCity);
-        } else {
-            params.put("currentCity", "");
-        }
+        params.put("currentCity", PreferencesUtils.getCurrentCity(CSApplication.getInstance()));
         params.put("province", PreferencesUtils.getCurrentProvince(CSApplication.getInstance()));
         params.put("latitude", PreferencesUtils.getLatitude(CSApplication.getInstance()));
         params.put("longitude", PreferencesUtils.getLongitude(CSApplication.getInstance()));
