@@ -43,13 +43,8 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 	private final int REQUEST_LOCATION_PERMISSION = 1000;
 	private final int REQUEST_PERMISSION_SETTING = 10001;
 
-	private AMapLocationClientOption mLocationOption;
-	private AMapLocationClient mlocationClient;
 	private boolean isSecondAccess = false;
 	private boolean isSecondRead = false;
-
-	private String curLat;
-	private String curLon;
 
 	public final static String CURRENT_TAB = "current_tab";
 	private static final TableConfig[] tableConfig = new TableConfig[] {
