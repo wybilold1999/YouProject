@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
@@ -812,5 +813,10 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 		if (requestCode == REQUEST_PERMISSION_SETTING) {
 			initLocationClient();
 		}
+	}
+
+	//解决java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState异常
+	@Override
+	public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
 	}
 }
