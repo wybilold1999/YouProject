@@ -817,6 +817,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 
 	//解决java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState异常
 	@Override
-	public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+	protected void onSaveInstanceState(Bundle outState) {
 	}
 }
