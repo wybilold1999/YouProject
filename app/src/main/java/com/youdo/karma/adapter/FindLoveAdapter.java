@@ -148,7 +148,7 @@ public class FindLoveAdapter extends
     }
 
     public ClientUser getItem(int position){
-        if (mClientUsers == null || mClientUsers.size() < 1) {
+        if (mClientUsers == null || mClientUsers.size() < 1 || position < 0) {
             return null;
         }
         return mClientUsers == null ? null : mClientUsers.get(position);
