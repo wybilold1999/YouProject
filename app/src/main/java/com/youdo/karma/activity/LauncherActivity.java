@@ -214,6 +214,11 @@ public class LauncherActivity extends Activity {
                 AppManager.getClientUser().loginTime = System.currentTimeMillis();
                 PreferencesUtils.setLoginTime(LauncherActivity.this, System.currentTimeMillis());
                 IMChattingHelper.getInstance().sendInitLoginMsg();
+                if (System.currentTimeMillis() - PreferencesUtils.getLoginTime(LauncherActivity.this)
+                        > (24 * 3600 * 1000)) {
+                    int count = PreferencesUtils.getLoginCount(LauncherActivity.this);
+                    PreferencesUtils.setLoginCount(LauncherActivity.this, ++count);
+                }
             }
         }
 
