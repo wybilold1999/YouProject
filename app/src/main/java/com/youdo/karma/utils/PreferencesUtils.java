@@ -1306,7 +1306,7 @@ public class PreferencesUtils {
 	public static boolean getIsCanGetFare(final Context context) {
 		SharedPreferences sp = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		return sp.getBoolean(SETTINGS_IS_CAN_GET_FARE, false);
+		return sp.getBoolean(SETTINGS_IS_CAN_GET_FARE, true);
 	}
 
 	public static void setIsCanGetFare(final Context context,

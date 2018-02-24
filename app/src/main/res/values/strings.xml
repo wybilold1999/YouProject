@@ -409,6 +409,8 @@
     <string name="input_get_fare_tel">请输入您要领取话费的手机号码</string>
     <string name="right_now_get">立即领取</string>
     <string name="get_tel_fare_success">领取话费成功！请在48小时内联系运营商，查询话费是否到账</string>
+    <string name="login_count_less">您在最近两个月内累计登陆未超过20天，不满足领取条件，无法领取话费！</string>
+    <string name="current_month_geted">当月话费已经领取，该月无法再继续领取！</string>
 
 
 </resources>

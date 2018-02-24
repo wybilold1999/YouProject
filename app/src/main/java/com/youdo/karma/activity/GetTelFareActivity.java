@@ -11,6 +11,7 @@ import android.widget.EditText;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.utils.CheckUtil;
+import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
 
@@ -52,9 +53,11 @@ public class GetTelFareActivity extends BaseActivity {
                 @Override
                 public void run() {
                     ProgressDialogUtils.getInstance(GetTelFareActivity.this).dismiss();
+                    PreferencesUtils.setLoginCount(GetTelFareActivity.this, 0);
+                    PreferencesUtils.setIsCanGetFare(GetTelFareActivity.this, false);
                     showDialog();
                 }
-            }, 5000);
+            }, 3000);
         }
     }
 

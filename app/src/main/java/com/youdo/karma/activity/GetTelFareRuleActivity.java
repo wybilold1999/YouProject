@@ -70,8 +70,16 @@ public class GetTelFareRuleActivity extends BaseActivity {
             if (PreferencesUtils.getWhichVip(this) == 0) {
                 showDialog();
             } else {
-                Intent intent = new Intent(GetTelFareRuleActivity.this, GetTelFareActivity.class);
-                startActivity(intent);
+                if (PreferencesUtils.getIsCanGetFare(this)) {//当月是否可以领取
+                    if (PreferencesUtils.getLoginCount(this) > 20) {//登陆次数需超过20天
+                        Intent intent = new Intent(GetTelFareRuleActivity.this, GetTelFareActivity.class);
+                        startActivity(intent);
+                    } else {
+                        showNotSatisfyDialog(getString(R.string.login_count_less));
+                    }
+                } else {
+                    showNotSatisfyDialog(getString(R.string.current_month_geted));
+                }
             }
         } else {
             showDialog();
@@ -90,6 +98,18 @@ public class GetTelFareRuleActivity extends BaseActivity {
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    private void showNotSatisfyDialog(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
