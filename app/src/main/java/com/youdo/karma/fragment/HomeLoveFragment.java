@@ -44,7 +44,6 @@ public class HomeLoveFragment extends Fragment {
 
 	private View rootView;
 	private List<String> tabList;
-	private String channel;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -84,8 +83,7 @@ public class HomeLoveFragment extends Fragment {
 	}
 
 	private void setupData() {
-		channel = CheckUtil.getAppMetaData(getActivity(), "UMENG_CHANNEL");
-		if ("androidmarket".equals(channel) && AppManager.getClientUser().versionCode > AppManager.getVersionCode()) {
+		if (AppManager.getClientUser().versionCode > AppManager.getVersionCode()) {
 			showVersionInfo();
 		}
 	}
