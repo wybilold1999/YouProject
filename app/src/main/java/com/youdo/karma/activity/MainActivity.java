@@ -203,7 +203,8 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 				}
 			}, 5000 * 10);
 		}
-		if (AppManager.getClientUser().isShowVip && AppManager.getClientUser().isShowAppointment) {
+		if (AppManager.getClientUser().versionCode <= AppManager.getVersionCode() &&
+				AppManager.getClientUser().isShowVip && AppManager.getClientUser().isShowAppointment) {
 			//我约的
 			new GetIAppointmentListTask().request(1, 1, AppManager.getClientUser().userId, 0);
 			//约我的

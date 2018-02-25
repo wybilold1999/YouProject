@@ -20,6 +20,7 @@ import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.service.DownloadUpdateService;
 import com.youdo.karma.utils.CheckUtil;
+import com.youdo.karma.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +103,7 @@ public class HomeLoveFragment extends Fragment {
 						Intent intent = new Intent(getActivity(), DownloadUpdateService.class);
 						intent.putExtra(ValueKey.APK_URL, AppManager.getClientUser().apkUrl);
 						getActivity().startService(intent);
+						ToastUtil.showMessage(R.string.bg_downloading);
 //						AppManager.goToMarket(getActivity(), channel);
 					}
 				});
