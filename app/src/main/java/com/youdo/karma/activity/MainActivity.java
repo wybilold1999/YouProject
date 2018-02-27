@@ -175,6 +175,8 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 
 				initLocationClient();
 
+				initFareGetTime();
+
 			}
 		});
 
@@ -211,7 +213,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 			new GetAppointmeListTask().request(1, 1, AppManager.getClientUser().userId, 1);
 		}
 		registerWeiXin();
-		initFareGetTime();
 	}
 
 	private void registerWeiXin() {
