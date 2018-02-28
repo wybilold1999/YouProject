@@ -107,13 +107,15 @@ public class HomeLoveFragment extends Fragment {
 //						AppManager.goToMarket(getActivity(), channel);
 					}
 				});
-		builder.setNegativeButton(getResources().getString(R.string.cancel),
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
+		if (!AppManager.getClientUser().isForceUpdate) {
+			builder.setNegativeButton(getResources().getString(R.string.cancel),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					});
+		}
 		builder.setCancelable(false);
 		builder.show();
 	}

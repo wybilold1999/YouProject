@@ -131,6 +131,7 @@ public class UserLoginRequest extends ResultPostExecute<ClientUser> {
 			clientUser.versionCode = data.get("versionCode").getAsInt();
 			clientUser.apkUrl = data.get("apkUrl").getAsString();
 			clientUser.versionUpdateInfo = data.get("versionUpdateInfo").getAsString();
+			clientUser.isForceUpdate = data.get("isForceUpdate").getAsBoolean();
 			onPostExecute(clientUser);
 		} catch (Exception e) {
 			onErrorExecute(CSApplication.getInstance().getResources()
