@@ -47,7 +47,7 @@ public class FindLoveAdapter extends
         this.mClientUsers = clientUsers;
         this.mContext = mContext;
         mFormat = new DecimalFormat("#.00");
-        mCurCity = PreferencesUtils.getCity(mContext);
+        mCurCity = PreferencesUtils.getCurrentCity(mContext);
         mCurIndex = index;
     }
 
