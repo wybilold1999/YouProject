@@ -1,24 +1,15 @@
 package com.youdo.karma.activity;
 
-import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
-import android.support.v7.app.AlertDialog;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
@@ -66,9 +57,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 		setupEvent();
 		SDKCoreHelper.init(this, ECInitParams.LoginMode.FORCE_LOGIN);
 		updateConversationUnRead();
-
-		AppManager.requestLocationPermission(this);
-		requestPermission();
 		registerWeiXin();
 	}
 
@@ -76,31 +64,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 		// 通过WXAPIFactory工厂，获取IWXAPI的实例
 		AppManager.setIWX_PAY_API(WXAPIFactory.createWXAPI(this, AppConstants.WEIXIN_PAY_ID, true));
 		AppManager.getIWX_PAY_API().registerApp(AppConstants.WEIXIN_PAY_ID);
-	}
-
-
-	/**
-	 * 请求读写文件夹的权限
-	 */
-	private void requestPermission() {
-		PackageManager pkgManager = getPackageManager();
-		// 读写 sd card 权限非常重要, android6.0默认禁止的, 建议初始化之前就弹窗让用户赋予该权限
-		boolean sdCardWritePermission =
-				pkgManager.checkPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, getPackageName()) == PackageManager.PERMISSION_GRANTED;
-		if (Build.VERSION.SDK_INT >= 23 && !sdCardWritePermission) {
-			//请求权限
-			ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					REQUEST_PERMISSION);
-		}
-
-		boolean readPhoneState =
-				pkgManager.checkPermission(Manifest.permission.READ_PHONE_STATE, getPackageName()) == PackageManager.PERMISSION_GRANTED;
-		if (Build.VERSION.SDK_INT >= 23 && !sdCardWritePermission) {
-			//请求权限
-			ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_PHONE_STATE},
-					REQUEST_PERMISSION);
-		}
-
 	}
 
 
@@ -188,93 +151,6 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 			}
 			unread_message_num.setVisibility(View.VISIBLE);
 		}
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		if (requestCode == REQUEST_PERMISSION) {
-			// 拒绝授权
-			if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-				// 勾选了不再提示
-				if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_PHONE_STATE)) {
-//					showOpenLocationDialog();
-				} else {
-					if (!isSecondRead) {
-						showReadPhoneStateDialog();
-					}
-				}
-			}
-		} else if (requestCode == REQUEST_LOCATION_PERMISSION) {
-			// 拒绝授权
-			if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-				// 勾选了不再提示
-				if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION) &&
-						!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-					showOpenLocationDialog();
-				} else {
-					if (!isSecondAccess) {
-						showAccessLocationDialog();
-					}
-				}
-			} else {
-			}
-		} else {
-			super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		}
-	}
-
-	private void showOpenLocationDialog(){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(R.string.open_location);
-		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-				Uri uri = Uri.fromParts("package", getPackageName(), null);
-				intent.setData(uri);
-				startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-
-			}
-		});
-		builder.show();
-	}
-
-
-	private void showAccessLocationDialog(){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(R.string.access_location);
-		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				isSecondAccess = true;
-				if (Build.VERSION.SDK_INT >= 23) {
-					ActivityCompat.requestPermissions(MainActivity.this, new String[] {android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION},
-							REQUEST_LOCATION_PERMISSION);
-				}
-
-			}
-		});
-		builder.show();
-	}
-
-	private void showReadPhoneStateDialog(){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(R.string.get_read_phone_state);
-		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				isSecondRead = true;
-				if (Build.VERSION.SDK_INT >= 23) {
-					ActivityCompat.requestPermissions(MainActivity.this, new String[] {android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION},
-							REQUEST_LOCATION_PERMISSION);
-				}
-
-			}
-		});
-		builder.show();
 	}
 
 	@Override
