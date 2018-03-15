@@ -21,7 +21,10 @@ import com.youdo.karma.activity.ExpressionActivity;
 import com.youdo.karma.activity.FeedBackActivity;
 import com.youdo.karma.activity.ModifyUserInfoNewActivity;
 import com.youdo.karma.activity.SettingActivity;
+import com.youdo.karma.db.ContactSqlManager;
 import com.youdo.karma.db.ConversationSqlManager;
+import com.youdo.karma.db.ExpressionGroupSqlManager;
+import com.youdo.karma.db.ExpressionSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.db.MyGoldDaoManager;
 import com.youdo.karma.entity.ClientUser;
@@ -241,6 +244,9 @@ public class MyPersonalFragment extends Fragment {
 		IMessageDaoManager.reset();
 		ConversationSqlManager.reset();
 		MyGoldDaoManager.reset();
+		ContactSqlManager.reset();
+		ExpressionGroupSqlManager.reset();
+		ExpressionSqlManager.reset();
 	}
 
 
