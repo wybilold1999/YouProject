@@ -27,6 +27,7 @@ import com.youdo.karma.db.ExpressionGroupSqlManager;
 import com.youdo.karma.db.ExpressionSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.db.MyGoldDaoManager;
+import com.youdo.karma.db.NameListDaoManager;
 import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.eventtype.UserEvent;
 import com.youdo.karma.manager.AppManager;
@@ -247,6 +248,7 @@ public class MyPersonalFragment extends Fragment {
 		ContactSqlManager.reset();
 		ExpressionGroupSqlManager.reset();
 		ExpressionSqlManager.reset();
+		NameListDaoManager.reset();
 	}
 
 

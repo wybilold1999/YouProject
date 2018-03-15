@@ -19,6 +19,7 @@ import com.youdo.karma.db.ExpressionGroupSqlManager;
 import com.youdo.karma.db.ExpressionSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.db.MyGoldDaoManager;
+import com.youdo.karma.db.NameListDaoManager;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.manager.NotificationManager;
 import com.youdo.karma.net.request.LogoutRequest;
@@ -229,6 +230,7 @@ public class SettingActivity extends BaseActivity {
         ContactSqlManager.reset();
         ExpressionGroupSqlManager.reset();
         ExpressionSqlManager.reset();
+        NameListDaoManager.reset();
     }
 
     @Override
