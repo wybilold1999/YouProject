@@ -37,6 +37,7 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.igexin.sdk.PushManager;
+import com.tencent.android.tpush.XGPushManager;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.umeng.analytics.MobclickAgent;
 import com.xiaomi.mipush.sdk.MiPushClient;
@@ -161,21 +162,24 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 		AppManager.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
-				/**
-				 * 注册小米推送
-				 */
-				MiPushClient.registerPush(MainActivity.this, AppConstants.MI_PUSH_APP_ID, AppConstants.MI_PUSH_APP_KEY);
-
-				//个推
-				initGeTuiPush();
-
-				initJPush();
-
-				loadData();
 
 				initLocationClient();
 
-				initFareGetTime();
+				if (AppManager.getClientUser().isShowVip) {
+					/**
+					 * 注册小米推送
+					 */
+					MiPushClient.registerPush(MainActivity.this, AppConstants.MI_PUSH_APP_ID, AppConstants.MI_PUSH_APP_KEY);
+
+					//个推
+					initGeTuiPush();
+
+					XGPushManager.registerPush(getApplicationContext());
+
+					loadData();
+
+					initFareGetTime();
+				}
 
 			}
 		});

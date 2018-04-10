@@ -6,8 +6,10 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.youdo.karma.CSApplication;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.UploadTokenRequest;
+import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.PushMsgUtil;
 import com.igexin.sdk.GTIntentService;
 import com.igexin.sdk.PushConsts;
@@ -64,7 +66,9 @@ public class MyIntentService extends GTIntentService {
 		if (!TextUtils.isEmpty(clientid) && !isAlreadyUpload) {
 			isAlreadyUpload = true;
 			PushManager.getInstance().bindAlias(context, AppManager.getClientUser().userId);
-			new UploadTokenRequest().request(clientid);
+			if (TextUtils.isEmpty(PreferencesUtils.getSettingsGtToken(CSApplication.getInstance()))) {
+				new UploadTokenRequest().request(clientid, "");
+			}
 		}
 	}
 

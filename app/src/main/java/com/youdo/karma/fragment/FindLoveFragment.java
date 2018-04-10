@@ -26,7 +26,6 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.CardActivity;
 import com.youdo.karma.activity.PersonalInfoActivity;
-import com.youdo.karma.activity.RadarActivity;
 import com.youdo.karma.adapter.FindLoveAdapter;
 import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.entity.ClientUser;
