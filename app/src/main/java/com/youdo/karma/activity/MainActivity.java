@@ -115,6 +115,7 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 	private static Handler mHandler = new Handler();
 
 	private Badge mBadgeView;
+	private QBadgeView mQBadgeView;
 
 
 	@Override
@@ -585,7 +586,8 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 
 		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bottomNavigationView.getChildAt(0);
 		if (menuView != null) {
-			mBadgeView = new QBadgeView(this).setGravityOffset((float) (DensityUtil.getWidthInPx(this) / 3.2), 2, false)
+			mQBadgeView = new QBadgeView(this);
+			mBadgeView = mQBadgeView.setGravityOffset((float) (DensityUtil.getWidthInPx(this) / 3.2), 2, false)
 					.bindTarget(menuView);
 		}
 	}
@@ -619,11 +621,14 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 			int total = ConversationSqlManager.getInstance(this)
 					.getAnalyticsUnReadConversation();
 			if (total > 0) {
+				mQBadgeView.setVisibility(View.VISIBLE);
 				if (total >= 100) {
 					mBadgeView.setBadgeText("99+");
 				} else {
 					mBadgeView.setBadgeText(String.valueOf(total));
 				}
+			} else {
+				mQBadgeView.setVisibility(View.GONE);
 			}
 		}
 	}
