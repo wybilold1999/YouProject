@@ -39,6 +39,7 @@ import com.tencent.android.tpush.XGPushManager;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.umeng.analytics.MobclickAgent;
 import com.xiaomi.mipush.sdk.MiPushClient;
+import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.adapter.ViewPagerAdapter;
@@ -127,7 +128,9 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 		setupViews();
 		setupEvent();
 		initOSS();
-		SDKCoreHelper.init(this, ECInitParams.LoginMode.FORCE_LOGIN);
+		if (AppManager.getClientUser().is_vip) {
+			SDKCoreHelper.init(CSApplication.getInstance(), ECInitParams.LoginMode.FORCE_LOGIN);
+		}
 		updateConversationUnRead();
 
 
@@ -137,49 +140,46 @@ public class MainActivity extends BaseActivity implements MessageUnReadListener.
 
 				initLocationClient();
 
-				if (AppManager.getClientUser().isShowVip) {
-					/**
-					 * 注册小米推送
-					 */
-					MiPushClient.registerPush(MainActivity.this, AppConstants.MI_PUSH_APP_ID, AppConstants.MI_PUSH_APP_KEY);
+				/**
+				 * 注册小米推送
+				 */
+				MiPushClient.registerPush(MainActivity.this, AppConstants.MI_PUSH_APP_ID, AppConstants.MI_PUSH_APP_KEY);
 
-					//个推
-					initGeTuiPush();
+				//个推
+				initGeTuiPush();
 
-					XGPushManager.registerPush(getApplicationContext());
+				XGPushManager.registerPush(getApplicationContext());
 
-					loadData();
+				loadData();
 
-					initFareGetTime();
-				}
+				initFareGetTime();
 
 			}
 		});
 
-		if (AppManager.getClientUser().isShowVip) {
-			mHandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					new GetLoveFormeListTask().request(1, 1);
-				}
-			}, 9000 * 10);
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				new GetLoveFormeListTask().request(1, 1);
+			}
+		}, 9000 * 10);
 
-			mHandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					new MyGiftListTask().request(1, 1);
-				}
-			}, 1500 * 10);
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				new MyGiftListTask().request(1, 1);
+			}
+		}, 1500 * 10);
 
-			mHandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					new FollowListTask().request("followFormeList", 1, 1);
-				}
-			}, 5000 * 10);
-		}
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				new FollowListTask().request("followFormeList", 1, 1);
+			}
+		}, 5000 * 10);
+
 		if (AppManager.getClientUser().versionCode <= AppManager.getVersionCode() &&
-				AppManager.getClientUser().isShowVip && AppManager.getClientUser().isShowAppointment) {
+				AppManager.getClientUser().isShowAppointment) {
 			//我约的
 			new GetIAppointmentListTask().request(1, 1, AppManager.getClientUser().userId, 0);
 			//约我的

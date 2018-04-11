@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alipay.sdk.app.PayTask;
+import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.adapter.MemberBuyAdapter;
@@ -37,6 +38,7 @@ import com.youdo.karma.entity.PayResult;
 import com.youdo.karma.entity.UserVipModel;
 import com.youdo.karma.entity.WeChatPay;
 import com.youdo.karma.eventtype.PayEvent;
+import com.youdo.karma.helper.SDKCoreHelper;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.CreateOrderRequest;
 import com.youdo.karma.net.request.GetAliPayOrderInfoRequest;
@@ -52,6 +54,7 @@ import com.youdo.karma.utils.ToastUtil;
 import com.sunfusheng.marqueeview.MarqueeView;
 import com.tencent.mm.sdk.modelpay.PayReq;
 import com.umeng.analytics.MobclickAgent;
+import com.yuntongxun.ecsdk.ECInitParams;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -428,6 +431,7 @@ public class VipCenterActivity extends BaseActivity {
 	class GetPayResultTask extends GetPayResultRequest {
 		@Override
 		public void onPostExecute(UserVipModel userVipModel) {
+			SDKCoreHelper.init(CSApplication.getInstance(), ECInitParams.LoginMode.FORCE_LOGIN);
 			AppManager.getClientUser().is_vip = userVipModel.isVip;
 			AppManager.getClientUser().is_download_vip = userVipModel.isDownloadVip;
 			AppManager.getClientUser().gold_num = userVipModel.goldNum;

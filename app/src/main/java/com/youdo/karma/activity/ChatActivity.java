@@ -467,39 +467,21 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 			case R.id.tool_view_input_text:
 				if (AppManager.getClientUser().isShowVip) {
 					if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
-						if (null != IMChattingHelper.getInstance().getChatManager()) {
-							if (AppManager.getClientUser().is_vip) {
-								if (AppManager.getClientUser().isShowGold && AppManager.getClientUser().gold_num  < 101) {
-									showGoldDialog();
-								} else {
+						if (AppManager.getClientUser().is_vip) {
+							if (AppManager.getClientUser().isShowGold && AppManager.getClientUser().gold_num  < 101) {
+								showGoldDialog();
+							} else {
+								if (null != IMChattingHelper.getInstance().getChatManager()) {
 									sendTextMsg();
 								}
-							} else {
-								showBeyondChatLimitDialog();
 							}
-							/*int count = PreferencesUtils.getChatLimit(this);
-							if (count < AppConstants.CHAT_LIMIT) {
-								count = count + 1;
-								PreferencesUtils.setChatLimit(this, count);
-								sendTextMsg();
-								if (AppConstants.CHAT_LIMIT - count == 3) {
-									ToastUtil.showMessage(R.string.chat_count_three);
-								}
-							} else {
-								if (AppManager.getClientUser().is_vip) {
-									if (AppManager.getClientUser().gold_num  < 101) {
-										showGoldDialog();
-									} else {
-										sendTextMsg();
-									}
-								} else {
-									showBeyondChatLimitDialog();
-								}
-							}*/
+						} else {
+							showBeyondChatLimitDialog();
 						}
 					}
 				} else {
-					if (!TextUtils.isEmpty(mContentInput.getText().toString())) {
+					if (!TextUtils.isEmpty(mContentInput.getText().toString()) &&
+							null != IMChattingHelper.getInstance().getChatManager()) {
 						sendTextMsg();
 					}
 				}
