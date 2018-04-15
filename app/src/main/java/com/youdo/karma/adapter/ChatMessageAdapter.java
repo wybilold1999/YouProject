@@ -40,7 +40,6 @@ import com.youdo.karma.eventtype.SnackBarEvent;
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.DownloadImageRequest;
 import com.youdo.karma.ui.widget.CircularProgress;
-import com.youdo.karma.utils.DateUtil;
 import com.youdo.karma.utils.DensityUtil;
 import com.youdo.karma.utils.EmoticonUtil;
 import com.youdo.karma.utils.FileAccessorUtils;
@@ -671,12 +670,12 @@ public class ChatMessageAdapter extends
      * 设置显示时间
      */
     private void setChatTime(TextView chat_time, long time, boolean showTimer) {
-        chat_time.setVisibility(View.GONE);
+        /*chat_time.setVisibility(View.GONE);
         if (showTimer) {
             chat_time.setVisibility(View.VISIBLE);
             chat_time.setText(DateUtil.getDateString(time,
                     DateUtil.SHOW_TYPE_CALL_LOG).trim());
-        }
+        }*/
     }
 
 

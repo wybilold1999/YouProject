@@ -6,17 +6,15 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.youdo.karma.CSApplication;
-import com.youdo.karma.manager.AppManager;
-import com.youdo.karma.net.request.UploadTokenRequest;
-import com.youdo.karma.utils.PreferencesUtils;
-import com.youdo.karma.utils.PushMsgUtil;
 import com.igexin.sdk.GTIntentService;
 import com.igexin.sdk.PushConsts;
 import com.igexin.sdk.PushManager;
 import com.igexin.sdk.message.GTCmdMessage;
 import com.igexin.sdk.message.GTTransmitMessage;
 import com.igexin.sdk.message.SetTagCmdMessage;
+import com.youdo.karma.manager.AppManager;
+import com.youdo.karma.net.request.UploadTokenRequest;
+import com.youdo.karma.utils.PushMsgUtil;
 
 /**
  * 继承 GTIntentService 接收来自个推的消息, 所有消息在线程中回调, 如果注册了该服务, 则务必要在 AndroidManifest中声明, 否则无法接受消息<br>
@@ -66,9 +64,7 @@ public class MyIntentService extends GTIntentService {
 		if (!TextUtils.isEmpty(clientid) && !isAlreadyUpload) {
 			isAlreadyUpload = true;
 			PushManager.getInstance().bindAlias(context, AppManager.getClientUser().userId);
-			if (TextUtils.isEmpty(PreferencesUtils.getSettingsGtToken(CSApplication.getInstance()))) {
-				new UploadTokenRequest().request(clientid, "");
-			}
+			new UploadTokenRequest().request(clientid, "");
 		}
 	}
 

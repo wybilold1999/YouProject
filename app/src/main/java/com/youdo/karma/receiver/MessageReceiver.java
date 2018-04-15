@@ -1,7 +1,6 @@
 package com.youdo.karma.receiver;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.tencent.android.tpush.XGPushBaseReceiver;
@@ -9,9 +8,7 @@ import com.tencent.android.tpush.XGPushClickedResult;
 import com.tencent.android.tpush.XGPushRegisterResult;
 import com.tencent.android.tpush.XGPushShowedResult;
 import com.tencent.android.tpush.XGPushTextMessage;
-import com.youdo.karma.CSApplication;
 import com.youdo.karma.net.request.UploadTokenRequest;
-import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.PushMsgUtil;
 
 public class MessageReceiver extends XGPushBaseReceiver {
@@ -124,9 +121,7 @@ public class MessageReceiver extends XGPushBaseReceiver {
         if (errorCode == XGPushBaseReceiver.SUCCESS) {
             // 在这里拿token
             String token = message.getToken();
-            if (TextUtils.isEmpty(PreferencesUtils.getSettingsXgToken(CSApplication.getInstance()))) {
-                new UploadTokenRequest().request("", token);
-            }
+            new UploadTokenRequest().request("", token);
         }
     }
 

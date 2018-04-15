@@ -215,7 +215,7 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 
 		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bottomNavigationView.getChildAt(0);
 		if (menuView != null) {
-			mBadgeView = new QBadgeView(this).setGravityOffset((float) (DensityUtil.getWidthInPx(this) / 3.2), 2, false)
+			mBadgeView = new QBadgeView(this).setGravityOffset((float) (DensityUtil.getWidthInPx(this) / 1.25), 2, false)
 					.bindTarget(menuView);
 		}
 	}

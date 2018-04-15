@@ -1,17 +1,10 @@
 package com.youdo.karma.net.request;
 
 import android.support.v4.util.ArrayMap;
-import android.text.TextUtils;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.youdo.karma.CSApplication;
-import com.youdo.karma.R;
+
 import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.base.ResultPostExecute;
-import com.youdo.karma.utils.PreferencesUtils;
-
-import java.io.IOException;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -31,44 +24,17 @@ public class UploadTokenRequest extends ResultPostExecute<String> {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
-                if(response.isSuccessful()){
-                    try {
-                        parseJson(response.body().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
+                try {
+                    if (response.body() != null) {
                         response.body().close();
                     }
-                } else {
-                    onErrorExecute(CSApplication.getInstance()
-                            .getResources()
-                            .getString(R.string.network_requests_error));
+                } catch (Exception e) {
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                onErrorExecute(CSApplication.getInstance()
-                        .getResources()
-                        .getString(R.string.network_requests_error));
             }
         });
-    }
-
-    private void parseJson(String json){
-        try {
-            JsonObject obj = new JsonParser().parse(json).getAsJsonObject();
-            String gtToken = obj.get("gt").getAsString();
-            if (!TextUtils.isEmpty(gtToken)) {
-                PreferencesUtils.setSettingsGtToken(CSApplication.getInstance(), gtToken);
-            }
-            String xgToken = obj.get("xg").getAsString();
-            if (!TextUtils.isEmpty(xgToken)) {
-                PreferencesUtils.setSettingsXgToken(CSApplication.getInstance(), xgToken);
-            }
-        } catch (Exception e) {
-            onErrorExecute(CSApplication.getInstance().getResources()
-                    .getString(R.string.attention_faiure));
-        }
     }
 }
