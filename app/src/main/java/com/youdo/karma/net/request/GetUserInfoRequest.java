@@ -43,7 +43,9 @@ public class GetUserInfoRequest extends ResultPostExecute<ClientUser> {
                     onErrorExecute(CSApplication.getInstance().getResources()
                             .getString(R.string.data_load_error));
                 } finally {
-                    response.body().close();
+                    if (response.body() != null) {
+                        response.body().close();
+                    }
                 }
             }
 

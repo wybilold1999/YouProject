@@ -32,7 +32,10 @@ import com.youdo.karma.net.UserService;
 import com.youdo.karma.net.VideoService;
 import com.youdo.karma.utils.PreferencesUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.List;
@@ -514,6 +517,29 @@ public class AppManager {
 
 	public static void setIWX_PAY_API(IWXAPI IWX_PAY_API) {
 		sIWX_PAY_API = IWX_PAY_API;
+	}
+
+	public static String getProcessName(int pid) {
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader("/proc/" + pid + "/cmdline"));
+			String processName = reader.readLine();
+			if (!TextUtils.isEmpty(processName)) {
+				processName = processName.trim();
+			}
+			return processName;
+		} catch (Throwable throwable) {
+			throwable.printStackTrace();
+		} finally {
+			try {
+				if (reader != null) {
+					reader.close();
+				}
+			} catch (IOException exception) {
+				exception.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	/**

@@ -155,7 +155,9 @@ public class GiftMarketActivity extends BaseActivity implements View.OnClickList
 					showBuyGoldDialog();
 				} else {
 					AppManager.getClientUser().gold_num -= Integer.parseInt(gold);
-					new SendGiftTask().request(giftUser.userId, gift.dynamic_image_url, gold);
+					if (giftUser != null) {
+						new SendGiftTask().request(giftUser.userId, gift.dynamic_image_url, gold);
+					}
 				}
 			}
 		} else {
