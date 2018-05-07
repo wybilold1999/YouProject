@@ -10,8 +10,8 @@ android {
         applicationId "com.youdo.karma"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 8
-        versionName "1.8.0"
+        versionCode 9
+        versionName "1.8.1"
         multiDexEnabled true
 
         manifestPlaceholders = [
