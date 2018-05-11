@@ -128,6 +128,8 @@ public class PreferencesUtils {
 	public static final String SETTINGS_GT_TOKEN = "com.youdo.karma_gt_token";
 	/** 信鸽token*/
 	public static final String SETTINGS_XG_TOKEN = "com.youdo.karma_xg_token";
+	/** 是否上传好评截图*/
+	public static final String SETTINGS_APP_COMMENT = "com.youdo.karma_app_comment";
 
 	/**
 	 * 获取RL账号
@@ -1343,6 +1345,20 @@ public class PreferencesUtils {
 		SharedPreferences sp = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		return sp.getString(SETTINGS_XG_TOKEN, "");
+	}
+
+	public static boolean getIsUploadCommentImg(final Context context) {
+		SharedPreferences sp = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		return sp.getBoolean(SETTINGS_APP_COMMENT, false);
+	}
+
+	public static void setIsUploadCommentImg(final Context context,
+											 final Boolean isUpload) {
+		SharedPreferences sp = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		sp.edit().putBoolean(SETTINGS_APP_COMMENT, isUpload)
+				.commit();
 	}
 
 }
