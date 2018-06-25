@@ -48,6 +48,7 @@ import com.youdo.karma.net.request.GetUserNameRequest;
 import com.youdo.karma.ui.widget.CustomURLSpan;
 import com.youdo.karma.ui.widget.DividerItemDecoration;
 import com.youdo.karma.ui.widget.WrapperLinearLayoutManager;
+import com.youdo.karma.utils.CheckUtil;
 import com.youdo.karma.utils.DensityUtil;
 import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.ToastUtil;
@@ -118,6 +119,7 @@ public class VipCenterActivity extends BaseActivity {
 	private String mPref;//优惠信息
 	private ArrayList<String> mNameList;
 	private MemberBuy mMemberBuy;
+	private String channel = "";
 
 	@SuppressLint("HandlerLeak")
 	private Handler mHandler = new Handler() {
@@ -186,7 +188,8 @@ public class VipCenterActivity extends BaseActivity {
 	}
 
 	private void setupData() {
-		if (!AppManager.getClientUser().is_vip) {
+		channel = CheckUtil.getAppMetaData(this, "UMENG_CHANNEL");
+		if (!AppManager.getClientUser().is_vip && !"oppo".equals(channel)) {//oppo渠道，不显示这两个权限) {
 			mVip7Lay.setVisibility(View.VISIBLE);
 			mVip8Lay.setVisibility(View.VISIBLE);
 		} else {
@@ -336,7 +339,7 @@ public class VipCenterActivity extends BaseActivity {
 						array.add(Integer.parseInt(memberBuys.get(i).preferential));
 					}
 				}
-				if (array.size() == 0) {
+				if (array.size() == 0 || "oppo".equals(channel)) {//oppo渠道，不显示有什么人赠送话费
 					mPrefTelFareLay.setVisibility(View.VISIBLE);
 					mTvNameList.setVisibility(View.GONE);
 					mVerticalText.setVisibility(View.GONE);
@@ -388,9 +391,19 @@ public class VipCenterActivity extends BaseActivity {
 		@Override
 		public void onItemClick(View view, int position) {
 			MemberBuy memberBuy = mAdapter.getItem(position);
-			showPayDialog(memberBuy);
+			choicePayWay(memberBuy);
 		}
 	};
+
+	private void choicePayWay(MemberBuy memberBuy) {
+		if (memberBuy.isShowAliPay && memberBuy.isShowWePay) {
+			showPayDialog(memberBuy);
+		} else if (memberBuy.isShowAliPay) {
+			new GetAliPayOrderInfoTask().request(memberBuy.id, AppConstants.ALI_PAY_PLATFORM);
+		} else if (memberBuy.isShowWePay) {
+			new CreateOrderTask().request(memberBuy.id, AppConstants.WX_PAY_PLATFORM);
+		}
+	}
 
 	private void showPayDialog(final MemberBuy memberBuy) {
 		mMemberBuy = memberBuy;
