@@ -505,12 +505,23 @@ public class ChatActivity extends BaseActivity implements OnMessageReportCallbac
 				startActivity(intent);
 			}
 		});
-		builder.setNegativeButton(R.string.until_single, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+		if (AppManager.getClientUser().isShowGiveVip) {
+			builder.setNegativeButton(R.string.free_give_vip, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+					Intent intent = new Intent(ChatActivity.this, GiveVipActivity.class);
+					startActivity(intent);
+				}
+			});
+		} else {
+			builder.setNegativeButton(R.string.until_single, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			});
+		}
 		builder.show();
 	}
 

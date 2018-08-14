@@ -37,6 +37,8 @@ import com.amap.api.services.geocoder.RegeocodeResult;
 import com.dl7.tag.TagLayout;
 import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
+import com.youdo.karma.activity.ChatActivity;
+import com.youdo.karma.activity.GiveVipActivity;
 import com.youdo.karma.activity.MakeMoneyActivity;
 import com.youdo.karma.activity.MyGoldActivity;
 import com.youdo.karma.activity.VipCenterActivity;
@@ -584,12 +586,23 @@ public class TabPersonalFragment extends Fragment implements GeocodeSearch.OnGeo
 				startActivity(intent);
 			}
 		});
-		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+		if (AppManager.getClientUser().isShowGiveVip) {
+			builder.setNegativeButton(R.string.free_give_vip, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+					Intent intent = new Intent(getActivity(), GiveVipActivity.class);
+					startActivity(intent);
+				}
+			});
+		} else {
+			builder.setNegativeButton(R.string.until_single, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			});
+		}
 		builder.show();
 	}
 

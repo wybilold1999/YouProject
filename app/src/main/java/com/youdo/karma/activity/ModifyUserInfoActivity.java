@@ -227,9 +227,6 @@ public class ModifyUserInfoActivity extends BaseActivity implements ModifyUserIn
 				mPortraitPhoto.setImageURI(Uri.parse("file://" + clientUser.face_local));
 			} else if (!TextUtils.isEmpty(clientUser.face_url)) {
 				mPortraitPhoto.setImageURI(Uri.parse(clientUser.face_url));
-				new DownloadPortraitTask().request(clientUser.face_url,
-						FileAccessorUtils.getImagePathName().getAbsolutePath(),
-						Md5Util.md5(AppManager.getClientUser().face_url) + ".jpg");
 			}
 			if (AppManager.getClientUser().isShowLovers) {
 				mCardFriend.setVisibility(View.VISIBLE);
@@ -403,21 +400,6 @@ public class ModifyUserInfoActivity extends BaseActivity implements ModifyUserIn
 		}
 	}
 
-	/**
-	 * 下载头像
-	 */
-	class DownloadPortraitTask extends DownloadFileRequest {
-		@Override
-		public void onPostExecute(String s) {
-			ClientUser clientUser = AppManager.getClientUser();
-			clientUser.face_local = s;
-			AppManager.setClientUser(clientUser);
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-		}
-	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
