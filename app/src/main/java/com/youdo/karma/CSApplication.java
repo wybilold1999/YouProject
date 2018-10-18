@@ -65,15 +65,22 @@ public class CSApplication extends MultiDexApplication {
 	public void onCreate() {
 		super.onCreate();
 		sApplication = this;
-        initNetInterface();
-        AppManager.setContext(sApplication);
-        AppManager.setUserInfo();
+		initNetInterface();
+		AppManager.getExecutorService().execute(new Runnable() {
+			@Override
+			public void run() {
+				AppManager.setContext(sApplication);
+				AppManager.setUserInfo();
 
-        registerActivityLifecycleCallbacks(AppActivityLifecycleCallbacks.getInstance());
+				registerActivityLifecycleCallbacks(AppActivityLifecycleCallbacks.getInstance());
 
-        initFresco();
+				initFresco();
 
-        registerWeiXin();
+				registerWeiXin();
+
+			}
+		});
+
 		//初始化短信sdk
 		MobSDK.init(this);
 

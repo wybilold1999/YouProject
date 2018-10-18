@@ -169,5 +169,4 @@ dependencies {
     //mid包
     compile 'com.tencent.mid:mid:4.0.6-release'
     compile 'com.tencent.bugly:crashreport:latest.release'
-    compile 'com.tencent.bugly:nativecrashreport:latest.release'
 }
