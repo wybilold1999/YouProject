@@ -4,7 +4,6 @@ import android.arch.lifecycle.Lifecycle;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.ArrayMap;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -89,8 +88,6 @@ public class ContactsFragment extends Fragment implements OnHeaderClickListener,
 		if (parent != null) {
 			parent.removeView(rootView);
 		}
-		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(
-				R.string.tab_contacts);
 		return rootView;
 	}
 

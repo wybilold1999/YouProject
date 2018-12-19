@@ -17,6 +17,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
@@ -32,17 +38,10 @@ import com.youdo.karma.net.IUserApi;
 import com.youdo.karma.net.IUserFollowApi;
 import com.youdo.karma.net.IUserLoveApi;
 import com.youdo.karma.net.base.RetrofitFactory;
-import com.youdo.karma.utils.CheckUtil;
 import com.youdo.karma.utils.JsonUtils;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.RxBus;
 import com.youdo.karma.utils.ToastUtil;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.uber.autodispose.AutoDispose;
-import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
-import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -95,7 +94,6 @@ public class PersonalInfoActivity extends BaseActivity {
 
 	private ClientUser mClientUser; //当前用户
 	private String curUserId; //当前用户id
-	private String channel = "";
 
 	private Observable<UserEvent> observable;
 
@@ -127,12 +125,6 @@ public class PersonalInfoActivity extends BaseActivity {
 		fragmentList.add(personalFragment);
 		fragmentList.add(dynamicFragment);
 
-		if (AppManager.getClientUser().isShowAppointment) {
-			mLove.setText(R.string.tv_appointment);
-		} else {
-			mLove.setText(R.string.like);
-		}
-
 		rxBusSub();
 
 	}
@@ -147,7 +139,6 @@ public class PersonalInfoActivity extends BaseActivity {
 	}
 
 	private void setupData() {
-		channel = CheckUtil.getAppMetaData(this, "UMENG_CHANNEL");
 		curUserId = getIntent().getStringExtra(ValueKey.USER_ID);
 		if (!TextUtils.isEmpty(curUserId)) {
 			if (AppManager.getClientUser().userId.equals(curUserId)) {
@@ -168,10 +159,6 @@ public class PersonalInfoActivity extends BaseActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (AppManager.getClientUser().userId.equals(curUserId)) {
 			getMenuInflater().inflate(R.menu.personal_menu, menu);
-		} else if (AppManager.getClientUser().isShowVip) {
-			if (!AppManager.getClientUser().is_vip) {
-				getMenuInflater().inflate(R.menu.call_menu, menu);
-			}
 		}
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -180,12 +167,6 @@ public class PersonalInfoActivity extends BaseActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.modify_info) {
 			Intent intent = new Intent(this, ModifyUserInfoActivity.class);
-			startActivity(intent);
-		} else if (item.getItemId() == R.id.call) {
-			Intent intent = new Intent(this, VoipCallActivity.class);
-			intent.putExtra(ValueKey.IMAGE_URL, mClientUser == null ? "" : mClientUser.face_url);
-			intent.putExtra(ValueKey.USER_NAME, mClientUser == null ? "" : mClientUser.user_name);
-			intent.putExtra(ValueKey.FROM_ACTIVITY, "PersonalInfoActivity");
 			startActivity(intent);
 		} else {
 			finish();
@@ -228,19 +209,9 @@ public class PersonalInfoActivity extends BaseActivity {
 				startActivity(intent);
 				break;
 			case R.id.love:
-				if (AppManager.getClientUser().isShowAppointment && !TextUtils.isEmpty(curUserId)) {
-					if (mClientUser != null) {
-						/*intent.setClass(this, AppointmentActivity.class);
-						intent.putExtra(ValueKey.USER_ID, curUserId);
-						intent.putExtra(ValueKey.USER_NAME, mClientUser.user_name);
-						intent.putExtra(ValueKey.IMAGE_URL, mClientUser.face_url);
-						startActivity(intent);*/
-					}
-				} else {
-					if (null != mClientUser) {
-						sendGreet(mClientUser.userId);
-						addLove(mClientUser.userId);
-					}
+				if (null != mClientUser) {
+					sendGreet(mClientUser.userId);
+					addLove(mClientUser.userId);
 				}
 				break;
 			case R.id.message:

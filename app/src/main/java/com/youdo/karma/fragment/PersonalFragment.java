@@ -15,6 +15,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.AboutActivity;
 import com.youdo.karma.activity.AttentionMeActivity;
@@ -41,10 +45,6 @@ import com.youdo.karma.utils.JsonUtils;
 import com.youdo.karma.utils.Md5Util;
 import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.RxBus;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.uber.autodispose.AutoDispose;
-import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
-import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 
@@ -119,8 +119,6 @@ public class PersonalFragment extends Fragment {
 	RelativeLayout mFeedBack;
 	@BindView(R.id.custom_service)
 	RelativeLayout mCustomService;
-	@BindView(R.id.my_appointment_lay)
-	RelativeLayout mAppointmentLay;
 	@BindView(R.id.give_vip)
 	RelativeLayout mGiveVipLay;
 
@@ -229,11 +227,6 @@ public class PersonalFragment extends Fragment {
 				mVipCard.setVisibility(View.GONE);
 				vipLay.setVisibility(View.GONE);
 			}
-			if (clientUser.isShowAppointment) {
-				mAppointmentLay.setVisibility(View.VISIBLE);
-			} else {
-				mAppointmentLay.setVisibility(View.GONE);
-			}
 			if (clientUser.isShowVip && clientUser.isShowGiveVip) {
 				mGiveVipLay.setVisibility(View.VISIBLE);
 			} else {
@@ -267,7 +260,7 @@ public class PersonalFragment extends Fragment {
 	@OnClick({
 			R.id.head_portrait_lay, R.id.vip_lay, R.id.my_attention,
 			R.id.attentioned_user, R.id.good_user, R.id.setting, R.id.about, R.id.my_gifts,
-			R.id.feedback, R.id.custom_service, R.id.my_appointment_lay, R.id.give_vip})
+			R.id.feedback, R.id.custom_service, R.id.give_vip})
 	public void onClick(View view) {
 		Intent intent = new Intent();
 		switch (view.getId()) {
@@ -314,10 +307,6 @@ public class PersonalFragment extends Fragment {
 			case R.id.custom_service:
 				intent.setClass(getActivity(), CustomServiceActivity.class);
 				startActivity(intent);
-				break;
-			case R.id.my_appointment_lay:
-//				intent.setClass(getActivity(), MyAppointmentActivity.class);
-//				startActivity(intent);
 				break;
 			case R.id.give_vip:
 				intent.setClass(getActivity(), GiveVipActivity.class);

@@ -160,7 +160,11 @@ public class SelectSexActivity extends BaseActivity<IUserLoginLogOut.Presenter> 
             }
 
             Intent intent = new Intent();
-            intent.setClass(SelectSexActivity.this, MainActivity.class);
+            if (AppManager.getClientUser().isShowNormal) {
+                intent.setClass(SelectSexActivity.this, MainActivity.class);
+            } else {
+                intent.setClass(SelectSexActivity.this, MainNewActivity.class);
+            }
             startActivity(intent);
             finishAll();
         } else {

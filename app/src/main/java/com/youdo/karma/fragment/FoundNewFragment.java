@@ -4,7 +4,6 @@ import android.arch.lifecycle.Lifecycle;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.ArrayMap;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -72,9 +71,6 @@ public class FoundNewFragment extends Fragment implements ModifyContactsListener
         if (parent != null) {
             parent.removeView(rootView);
         }
-        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(
-                R.string.tab_found);
         return rootView;
     }
 

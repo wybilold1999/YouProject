@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,10 +110,6 @@ public class MyPersonalFragment extends Fragment {
 		if (parent != null) {
 			parent.removeView(rootView);
 		}
-		((AppCompatActivity) getActivity()).getSupportActionBar().show();
-		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(
-				R.string.tab_personal);
-		ButterKnife.bind(this, rootView);
 		return rootView;
 	}
 
