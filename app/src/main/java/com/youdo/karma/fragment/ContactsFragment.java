@@ -1,7 +1,9 @@
 package com.youdo.karma.fragment;
 
+import android.arch.lifecycle.Lifecycle;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.eowise.recyclerview.stickyheaders.OnHeaderClickListener;
+import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
+import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
+import com.lb.recyclerview_fast_scroller.RecyclerViewFastScroller;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.adapter.BigramHeaderAdapter;
 import com.youdo.karma.adapter.ContactsAdapter;
@@ -17,16 +26,14 @@ import com.youdo.karma.db.ContactSqlManager;
 import com.youdo.karma.entity.Contact;
 import com.youdo.karma.listener.ModifyContactsListener;
 import com.youdo.karma.listener.ModifyContactsListener.OnDataChangedListener;
-import com.youdo.karma.net.request.ContactsRequest;
+import com.youdo.karma.manager.AppManager;
+import com.youdo.karma.net.IUserApi;
+import com.youdo.karma.net.base.RetrofitFactory;
 import com.youdo.karma.ui.widget.CircularProgress;
+import com.youdo.karma.utils.JsonUtils;
 import com.youdo.karma.utils.PinYinUtil;
 import com.youdo.karma.utils.StringUtil;
 import com.youdo.karma.utils.ToastUtil;
-import com.eowise.recyclerview.stickyheaders.OnHeaderClickListener;
-import com.eowise.recyclerview.stickyheaders.StickyHeadersBuilder;
-import com.eowise.recyclerview.stickyheaders.StickyHeadersItemDecoration;
-import com.lb.recyclerview_fast_scroller.RecyclerViewFastScroller;
-import com.umeng.analytics.MobclickAgent;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -34,6 +41,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 
@@ -67,7 +77,7 @@ public class ContactsFragment extends Fragment implements OnHeaderClickListener,
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 		if (rootView == null) {
 			rootView = inflater.inflate(R.layout.fragment_contacts, null);
 			setupViews();
@@ -133,7 +143,7 @@ public class ContactsFragment extends Fragment implements OnHeaderClickListener,
 		if (contactList != null && contactList.size() > 0) {
 			getNotifyContact(contactList);
 		} else {
-			new ContactsTask().request(pageIndex, pageSize, GENDER, mUserScopeType);
+			getContactsRequest(pageIndex, pageSize, GENDER, mUserScopeType);
 		}
 	}
 
@@ -173,25 +183,30 @@ public class ContactsFragment extends Fragment implements OnHeaderClickListener,
 		getNotifyContact(contactList);
 	}
 
-	/**
-	 * 获取通讯录
-	 */
-	class ContactsTask extends ContactsRequest {
-		@Override
-		public void onPostExecute(List<Contact> result) {
-			if (null != result && result.size() > 0) {
-				mContacts.clear();
-				items.clear();
-				getNotifyContact(result);
-			}
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-			ToastUtil.showMessage(error);
-			mProgress.setVisibility(View.GONE);
-			mAdapter.notifyDataSetChanged();
-		}
+	private void getContactsRequest(final int pageNo, final int pageSize,
+									final String gender, final String mUserScopeTypen) {
+		ArrayMap<String, String> params = new ArrayMap<>();
+		params.put("pageNo", String.valueOf(pageNo));
+		params.put("pageSize", String.valueOf(pageSize));
+		params.put("gender", gender);
+		params.put("user_scope_type", mUserScopeType);
+		RetrofitFactory.getRetrofit().create(IUserApi.class)
+				.getContactList(AppManager.getClientUser().sessionId, params)
+				.subscribeOn(Schedulers.io())
+				.map(responseBody -> JsonUtils.parseListContact(responseBody.string()))
+				.observeOn(AndroidSchedulers.mainThread())
+				.as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)))
+				.subscribe(contactList -> {
+					if (null != contactList && contactList.size() > 0) {
+						mContacts.clear();
+						items.clear();
+						getNotifyContact(contactList);
+					}
+				}, throwable -> {
+					ToastUtil.showMessage(R.string.network_requests_error);
+					mProgress.setVisibility(View.GONE);
+					mAdapter.notifyDataSetChanged();
+				});
 	}
 
 	/**

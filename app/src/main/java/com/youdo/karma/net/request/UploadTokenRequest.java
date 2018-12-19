@@ -2,9 +2,10 @@ package com.youdo.karma.net.request;
 
 import android.support.v4.util.ArrayMap;
 
-
 import com.youdo.karma.manager.AppManager;
+import com.youdo.karma.net.IUserApi;
 import com.youdo.karma.net.base.ResultPostExecute;
+import com.youdo.karma.net.base.RetrofitFactory;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -16,11 +17,12 @@ import retrofit2.Callback;
  * @email 395044952@qq.com
  */
 public class UploadTokenRequest extends ResultPostExecute<String> {
-    public void request(String gtClientId, String xgToken){
+    public void request(String gtClientId, String xgToken, String hwToken){
         ArrayMap<String, String> map = new ArrayMap<>();
         map.put("gtClientId", gtClientId);
         map.put("xgToken", xgToken);
-        Call<ResponseBody> call = AppManager.getUserService().uploadToken(map, AppManager.getClientUser().sessionId);
+        map.put("hwToken", hwToken);
+        Call<ResponseBody> call = RetrofitFactory.getRetrofit().create(IUserApi.class).uploadToken(map, AppManager.getClientUser().sessionId);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {

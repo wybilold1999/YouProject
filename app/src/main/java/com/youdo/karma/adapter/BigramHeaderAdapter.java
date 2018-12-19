@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.youdo.karma.R;
 import com.eowise.recyclerview.stickyheaders.StickyHeadersAdapter;
+import com.youdo.karma.R;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * Created by aurel on 24/09/14.
  */
 public class BigramHeaderAdapter implements
-		StickyHeadersAdapter<BigramHeaderAdapter.ViewHolder> {
+        StickyHeadersAdapter<BigramHeaderAdapter.ViewHolder> {
 
 	private List<String> items;
 

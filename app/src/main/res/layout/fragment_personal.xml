@@ -108,209 +108,6 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:id="@+id/identify_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                app:cardBackgroundColor="#fff"
-                app:cardCornerRadius="0dp"
-                app:cardElevation="1dp"
-                app:cardPreventCornerOverlap="true"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <RelativeLayout
-                        android:id="@+id/identify_lay"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:descendantFocusability="blocksDescendants">
-
-                        <ImageView
-                            android:id="@+id/identify_img"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/my_profile_certificate_icon"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_toRightOf="@id/identify_img"
-                            android:text="@string/identify"
-                            android:textSize="16sp"/>
-
-                        <ImageView
-                            android:id="@id/personal_enter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="20dp"
-                            android:layout_marginRight="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/personal_enter"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/divider_height"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginLeft="@dimen/divider_margin_left"
-                            android:background="@color/divider_color"
-                            android:contentDescription="@null"/>
-                    </RelativeLayout>
-
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/video_show_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                app:cardBackgroundColor="#fff"
-                app:cardCornerRadius="0dp"
-                app:cardElevation="1dp"
-                app:cardPreventCornerOverlap="true">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <RelativeLayout
-                        android:id="@+id/video_show_lay"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:descendantFocusability="blocksDescendants">
-
-                        <ImageView
-                            android:id="@+id/video_show_img"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/icon_video_show"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_toRightOf="@id/video_show_img"
-                            android:text="@string/video_show"
-                            android:textSize="16sp"/>
-
-                        <ImageView
-                            android:id="@id/personal_enter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="20dp"
-                            android:layout_marginRight="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/personal_enter"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/divider_height"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginLeft="@dimen/divider_margin_left"
-                            android:background="@color/divider_color"
-                            android:contentDescription="@null"/>
-                    </RelativeLayout>
-
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/money_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                app:cardBackgroundColor="#fff"
-                app:cardCornerRadius="0dp"
-                app:cardElevation="1dp"
-                app:cardPreventCornerOverlap="true"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <RelativeLayout
-                        android:id="@+id/money_lay"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:descendantFocusability="blocksDescendants">
-
-                        <ImageView
-                            android:id="@+id/money_img"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/sales_amount"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_toRightOf="@id/money_img"
-                            android:text="@string/money_packet"
-                            android:textSize="16sp"/>
-
-                        <ImageView
-                            android:id="@id/personal_enter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="20dp"
-                            android:layout_marginRight="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/personal_enter"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/divider_height"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginLeft="@dimen/divider_margin_left"
-                            android:background="@color/divider_color"
-                            android:contentDescription="@null"/>
-                    </RelativeLayout>
-
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
@@ -379,7 +176,8 @@
                         android:layout_height="50dp"
                         android:background="?android:selectableItemBackground"
                         android:clickable="true"
-                        android:descendantFocusability="blocksDescendants">
+                        android:descendantFocusability="blocksDescendants"
+                        android:visibility="gone">
 
                         <ImageView
                             android:id="@+id/my_appointment_img"
@@ -500,7 +298,6 @@
                             android:background="@color/divider_color"
                             android:contentDescription="@null"/>
                     </RelativeLayout>
-
 
                     <RelativeLayout
                         android:id="@+id/attentioned_user"
@@ -670,8 +467,7 @@
                 app:cardBackgroundColor="#fff"
                 app:cardCornerRadius="0dp"
                 app:cardElevation="1dp"
-                app:cardPreventCornerOverlap="true"
-                android:visibility="gone">
+                app:cardPreventCornerOverlap="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -704,105 +500,6 @@
                             android:layout_marginStart="10dp"
                             android:layout_toRightOf="@id/vip_img"
                             android:text="@string/vip_center"
-                            android:textSize="16sp"/>
-
-                        <ImageView
-                            android:id="@id/personal_enter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="20dp"
-                            android:layout_marginRight="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/personal_enter"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/divider_height"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginLeft="@dimen/divider_margin_left"
-                            android:background="@color/divider_color"
-                            android:contentDescription="@null"/>
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:id="@+id/download_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:descendantFocusability="blocksDescendants">
-
-                        <ImageView
-                            android:id="@+id/download_img"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/icon_download_make_money"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_toRightOf="@id/download_img"
-                            android:text="@string/download_make_money"
-                            android:textSize="16sp"/>
-
-                        <ImageView
-                            android:id="@id/personal_enter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="20dp"
-                            android:layout_marginRight="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/personal_enter"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/divider_height"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginLeft="@dimen/divider_margin_left"
-                            android:background="@color/divider_color"
-                            android:contentDescription="@null"/>
-
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:id="@+id/my_gold"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:descendantFocusability="blocksDescendants">
-
-                        <ImageView
-                            android:id="@+id/my_gold_img"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/me_score"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_toRightOf="@id/my_gold_img"
-                            android:text="@string/my_gold"
                             android:textSize="16sp"/>
 
                         <ImageView
@@ -879,15 +576,14 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:id="@+id/lovers_card"
+                android:id="@+id/card_feedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 app:cardBackgroundColor="#fff"
                 app:cardCornerRadius="0dp"
                 app:cardElevation="1dp"
-                app:cardPreventCornerOverlap="true"
-                android:visibility="gone">
+                app:cardPreventCornerOverlap="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -895,7 +591,7 @@
                     android:orientation="vertical">
 
                     <RelativeLayout
-                        android:id="@+id/lovers_lay"
+                        android:id="@+id/custom_service"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:background="?android:selectableItemBackground"
@@ -903,14 +599,14 @@
                         android:descendantFocusability="blocksDescendants">
 
                         <ImageView
-                            android:id="@+id/lovers_img"
+                            android:id="@+id/iv_cs"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_alignParentLeft="true"
                             android:layout_centerVertical="true"
                             android:layout_marginLeft="20dp"
                             android:contentDescription="@null"
-                            android:src="@mipmap/find_rank"/>
+                            android:src="@mipmap/vip_free_message"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -918,8 +614,8 @@
                             android:layout_centerVertical="true"
                             android:layout_marginLeft="10dp"
                             android:layout_marginStart="10dp"
-                            android:layout_toRightOf="@id/lovers_img"
-                            android:text="@string/lovers_service"
+                            android:layout_toRightOf="@id/iv_cs"
+                            android:text="@string/my_custom_service_tv"
                             android:textSize="16sp"/>
 
                         <ImageView
@@ -944,7 +640,7 @@
                     </RelativeLayout>
 
                     <RelativeLayout
-                        android:id="@+id/success_case"
+                        android:id="@+id/feedback"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:background="?android:selectableItemBackground"
@@ -952,14 +648,14 @@
                         android:descendantFocusability="blocksDescendants">
 
                         <ImageView
-                            android:id="@+id/success_case_img"
+                            android:id="@+id/iv_feedback"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_alignParentLeft="true"
                             android:layout_centerVertical="true"
                             android:layout_marginLeft="20dp"
                             android:contentDescription="@null"
-                            android:src="@mipmap/squre_peach_icon"/>
+                            android:src="@mipmap/vip_free_signup"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -967,57 +663,8 @@
                             android:layout_centerVertical="true"
                             android:layout_marginLeft="10dp"
                             android:layout_marginStart="10dp"
-                            android:layout_toRightOf="@id/success_case_img"
-                            android:text="@string/success_case"
-                            android:textSize="16sp"/>
-
-                        <ImageView
-                            android:id="@id/personal_enter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="20dp"
-                            android:layout_marginRight="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/personal_enter"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/divider_height"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginLeft="@dimen/divider_margin_left"
-                            android:background="@color/divider_color"
-                            android:contentDescription="@null"/>
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:id="@+id/near_party"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:descendantFocusability="blocksDescendants">
-
-                        <ImageView
-                            android:id="@+id/near_party_img"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="20dp"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/squre_offline_icon"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_toRightOf="@id/near_party_img"
-                            android:text="@string/near_party"
+                            android:layout_toRightOf="@id/iv_feedback"
+                            android:text="@string/feed_back"
                             android:textSize="16sp"/>
 
                         <ImageView

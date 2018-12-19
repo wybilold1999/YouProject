@@ -94,7 +94,7 @@ public class FindLoveAdapter extends
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             itemViewHolder.userName.setText(clientUser.user_name);
             itemViewHolder.age.setText(String.valueOf(clientUser.age));
-            if ("男".equals(clientUser.sex)) {
+            if ("1".equals(clientUser.sex)) {
                 itemViewHolder.mSexImg.setImageResource(R.mipmap.list_male);
             } else {
                 itemViewHolder.mSexImg.setImageResource(R.mipmap.list_female);

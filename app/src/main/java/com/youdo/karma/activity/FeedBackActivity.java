@@ -7,11 +7,13 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
+import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
 
@@ -33,6 +35,8 @@ public class FeedBackActivity extends BaseActivity {
     TextView mTextNum;
     @BindView(R.id.submit)
     FancyButton mSubmit;
+    @BindView(R.id.offical_qq)
+    TextView mOfficalQQ;
 
     private int limit = 100;//最多允许输入
 
@@ -58,6 +62,11 @@ public class FeedBackActivity extends BaseActivity {
         mContent.setHorizontallyScrolling(false);
         mContent.setFocusable(true);
         mTextNum.setText(String.valueOf(limit));
+        if (AppManager.getClientUser().isShowDownloadVip || !AppManager.getClientUser().isShowGiveVip) {
+            mOfficalQQ.setVisibility(View.VISIBLE);
+        } else {
+            mOfficalQQ.setVisibility(View.GONE);
+        }
     }
 
     private void setupEvent() {

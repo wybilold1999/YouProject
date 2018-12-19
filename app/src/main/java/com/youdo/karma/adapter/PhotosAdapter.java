@@ -11,15 +11,15 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
-import com.youdo.karma.R;
-import com.youdo.karma.activity.ViewPagerPhotoViewActivity;
-import com.youdo.karma.config.ValueKey;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.youdo.karma.R;
+import com.youdo.karma.activity.ViewPagerPhotoViewActivity;
+import com.youdo.karma.config.ValueKey;
 
 import java.util.ArrayList;
 import java.util.List;

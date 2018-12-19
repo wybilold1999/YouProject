@@ -1,7 +1,9 @@
 package com.youdo.karma.fragment;
 
+import android.arch.lifecycle.Lifecycle;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,21 +12,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.adapter.FoundNewAdapter;
 import com.youdo.karma.db.ContactSqlManager;
 import com.youdo.karma.entity.Contact;
 import com.youdo.karma.listener.ModifyContactsListener;
-import com.youdo.karma.net.request.ContactsRequest;
+import com.youdo.karma.manager.AppManager;
+import com.youdo.karma.net.IUserApi;
+import com.youdo.karma.net.base.RetrofitFactory;
 import com.youdo.karma.ui.widget.CircularProgress;
 import com.youdo.karma.ui.widget.DividerItemDecoration;
 import com.youdo.karma.ui.widget.WrapperLinearLayoutManager;
 import com.youdo.karma.utils.DensityUtil;
+import com.youdo.karma.utils.JsonUtils;
 import com.youdo.karma.utils.ToastUtil;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author: wangyb
@@ -92,7 +102,7 @@ public class FoundNewFragment extends Fragment implements ModifyContactsListener
         mAdapter = new FoundNewAdapter(mNetContacts, getActivity());
         mRecyclerView.setAdapter(mAdapter);
         mProgressBar.setVisibility(View.VISIBLE);
-        new ContactsTask().request(pageIndex, pageSize, GENDER, mUserScopeType);
+        getContactsRequest(pageIndex, pageSize, GENDER, mUserScopeType);
 
         mContacts = ContactSqlManager.getInstance(getActivity()).queryAllContactsByFrom(true);
     }
@@ -115,7 +125,7 @@ public class FoundNewFragment extends Fragment implements ModifyContactsListener
                     && mAdapter.isShowFooter()) {
                 //加载更多
                 //请求数据
-                new ContactsTask().request(++pageIndex, pageSize, GENDER, mUserScopeType);
+                getContactsRequest(++pageIndex, pageSize, GENDER, mUserScopeType);
             }
         }
     };
@@ -142,43 +152,51 @@ public class FoundNewFragment extends Fragment implements ModifyContactsListener
 
     }
 
-    class ContactsTask extends ContactsRequest {
-        @Override
-        public void onPostExecute(List<Contact> result) {
-            if (mContacts != null && mContacts.size() > 0) {
-                List<Contact> clientUsers = new ArrayList<>();
-                clientUsers.addAll(result);
-                for (Contact contact : mContacts) {
-                    for (Contact clientUser : clientUsers) {
-                        if (contact.userId.equals(clientUser.userId)) {
-                            result.remove(clientUser);
-                            break;
+    private void getContactsRequest(final int pageNo, final int pageSize,
+                                    final String gender, final String mUserScopeTypen) {
+        ArrayMap<String, String> params = new ArrayMap<>();
+        params.put("pageNo", String.valueOf(pageNo));
+        params.put("pageSize", String.valueOf(pageSize));
+        params.put("gender", gender);
+        params.put("user_scope_type", mUserScopeType);
+        RetrofitFactory.getRetrofit().create(IUserApi.class)
+                .getContactList(AppManager.getClientUser().sessionId, params)
+                .subscribeOn(Schedulers.io())
+                .map(responseBody -> JsonUtils.parseListContact(responseBody.string()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(contactList -> {
+                    if (mContacts != null && mContacts.size() > 0) {
+                        List<Contact> clientUsers = new ArrayList<>();
+                        clientUsers.addAll(contactList);
+                        for (Contact contact : mContacts) {
+                            for (Contact clientUser : clientUsers) {
+                                if (contact.userId.equals(clientUser.userId)) {
+                                    contactList.remove(clientUser);
+                                    break;
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            mProgressBar.setVisibility(View.GONE);
-            if (pageIndex == 1) {//进行筛选的时候，滑动到顶部
-                layoutManager.scrollToPositionWithOffset(0, 0);
-            }
-            if(result == null || result.size() == 0){
-                mAdapter.setIsShowFooter(false);
-                mAdapter.notifyDataSetChanged();
-                ToastUtil.showMessage(R.string.no_more_data);
-            } else {
-                mNetContacts.addAll(result);
-                mAdapter.setIsShowFooter(true);
-                mAdapter.setClientUsers(mNetContacts);
-            }
-        }
-
-        @Override
-        public void onErrorExecute(String error) {
-            ToastUtil.showMessage(error);
-            mProgressBar.setVisibility(View.GONE);
-            mAdapter.notifyDataSetChanged();
-        }
+                    mProgressBar.setVisibility(View.GONE);
+                    if (pageIndex == 1) {//进行筛选的时候，滑动到顶部
+                        layoutManager.scrollToPositionWithOffset(0, 0);
+                    }
+                    if(contactList == null || contactList.size() == 0){
+                        mAdapter.setIsShowFooter(false);
+                        mAdapter.notifyDataSetChanged();
+                        ToastUtil.showMessage(R.string.no_more_data);
+                    } else {
+                        mNetContacts.addAll(contactList);
+                        mAdapter.setIsShowFooter(true);
+                        mAdapter.setClientUsers(mNetContacts);
+                    }
+                }, throwable -> {
+                    ToastUtil.showMessage(R.string.network_requests_error);
+                    mProgressBar.setVisibility(View.GONE);
+                    mAdapter.notifyDataSetChanged();
+                });
     }
 
     @Override

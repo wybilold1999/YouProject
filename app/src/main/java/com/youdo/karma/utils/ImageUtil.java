@@ -75,9 +75,7 @@ public class ImageUtil {
 				e.printStackTrace();
 			} finally {
 				try {
-					if (fileOutputStream != null) {
-						fileOutputStream.close();
-					}
+					fileOutputStream.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

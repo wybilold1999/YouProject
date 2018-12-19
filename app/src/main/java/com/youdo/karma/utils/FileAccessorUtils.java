@@ -20,29 +20,26 @@ public class FileAccessorUtils {
 			+ "/youlove";
 	/** 文件存储路径 */
 	public static final String FILE_PATH = getExternalStorePath()
-			+ "/youlove/.file";
+			+ "/youlove/file";
 	/** 图像的存储路径 */
 	public static final String IMESSAGE_IMAGE = getExternalStorePath()
-			+ "/youlove/.image";
+			+ "/youlove/image";
 	/** 头像存储路径 */
 	public static final String FACE_IMAGE = getExternalStorePath()
-			+ "/youlove/.face";
+			+ "/youlove/face";
 	/** 语音存储路径 */
 	public static final String VOICE_PATH = getExternalStorePath()
-			+ "/youlove/.voice";
+			+ "/youlove/voice";
 	/** 视频存储路径 */
 	public static final String VIDEO_PATH = getExternalStorePath()
-			+ "/youlove/.video";
-	/** 缓存路径 */
-	public static final String CACHE_PATH = getExternalStorePath()
-			+ "/youlove/.cache";
+			+ "/youlove/video";
 	/** crash路径 */
 	public static final String CRASH_PATH = getExternalStorePath()
-			+ "/youlove/.crash";
+			+ "/youlove/crash";
 
 	/** APK文件暂时存放的路径 */
 	public static final String APK_PATH = getExternalStorePath()
-			+ "/youlove/.apk";
+			+ "/youlove/apk";
 	/** 在线表情存储路径 */
 	public static final String EXPRESSION_FILE = getExternalStorePath()
 			+ "/youlove/.expression";
@@ -71,24 +68,6 @@ public class FileAccessorUtils {
 		} else {
 			return false;
 		}
-	}
-
-	/**
-	 * 获取在线表情存放目录
-	 * @return
-	 */
-	public static File getExpressionPathName(){
-		if (!isExistExternalStore()) {
-			ToastUtil.showMessage(R.string.media_ejected);
-			return null;
-		}
-
-		File directory = new File(EXPRESSION_FILE);
-		if (!directory.exists() && !directory.mkdirs()) {
-			ToastUtil.showMessage("Path to file could not be created");
-			return null;
-		}
-		return directory;
 	}
 
 
@@ -208,24 +187,6 @@ public class FileAccessorUtils {
 	}
 
 	/**
-	 * 返回缓存目录
-	 *
-	 * @return
-	 */
-	public static File getCachePathName() {
-		if (!isExistExternalStore()) {
-			ToastUtil.showMessage(R.string.media_ejected);
-			return null;
-		}
-
-		File directory = new File(CACHE_PATH);
-		if (!directory.exists() && !directory.mkdirs()) {
-			directory.mkdir();
-		}
-		return directory;
-	}
-
-	/**
 	 * 返回Crash目录
 	 *
 	 * @return
@@ -245,18 +206,18 @@ public class FileAccessorUtils {
 	}
 
 	/**
-	 * 返回APK目录
-	 *
+	 * 获取在线表情存放目录
 	 * @return
 	 */
-	public static File getAPKPathName() {
+	public static File getExpressionPathName(){
 		if (!isExistExternalStore()) {
 			ToastUtil.showMessage(R.string.media_ejected);
 			return null;
 		}
 
-		File directory = new File(APK_PATH);
+		File directory = new File(EXPRESSION_FILE);
 		if (!directory.exists() && !directory.mkdirs()) {
+			ToastUtil.showMessage("Path to file could not be created");
 			return null;
 		}
 		return directory;

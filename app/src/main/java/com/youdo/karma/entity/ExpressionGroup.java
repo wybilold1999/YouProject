@@ -50,7 +50,7 @@ public class ExpressionGroup {
 
 	@Generated(hash = 1365131776)
 	public ExpressionGroup(Long id, @NotNull String cover, int id_pic_themes,
-			@NotNull String name, @NotNull String zip) {
+                           @NotNull String name, @NotNull String zip) {
 		this.id = id;
 		this.cover = cover;
 		this.id_pic_themes = id_pic_themes;

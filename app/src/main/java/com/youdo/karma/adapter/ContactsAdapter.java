@@ -12,13 +12,13 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.lb.recyclerview_fast_scroller.RecyclerViewFastScroller.BubbleTextGetter;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.ContactInfoActivity;
 import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.entity.Contact;
 import com.youdo.karma.utils.PinYinUtil;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.lb.recyclerview_fast_scroller.RecyclerViewFastScroller.BubbleTextGetter;
 
 import java.util.List;
 

@@ -14,6 +14,7 @@ import com.youdo.karma.manager.AppManager;
 import com.youdo.karma.net.request.UploadCrashRequest;
 import com.youdo.karma.utils.CheckUtil;
 import com.youdo.karma.utils.FileAccessorUtils;
+import com.youdo.karma.utils.NetworkUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -84,12 +85,12 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 	private void dumpExceptionToSDCard(Throwable ex) throws IOException {
 		File crashFileDir = FileAccessorUtils.getCrashPathName();
 		if (!crashFileDir.exists()) {
-			crashFileDir.mkdir();
+			crashFileDir.mkdirs();
 		}
 		long currentTime = System.currentTimeMillis();
 		String crashTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 				.format(new Date(currentTime));
-		File crashFile = new File(FileAccessorUtils.CRASH_PATH, "crash" + crashTime + ".log");
+		File crashFile = new File(FileAccessorUtils.getCrashPathName().getAbsolutePath(), "crash" + crashTime + ".log");
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(crashFile)));
 			pw.println(crashTime);
@@ -136,6 +137,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 		//CPU架构
 		pw.print("CPU ABI：");
 		pw.println(Build.CPU_ABI);
+
+		//网络环境
+		pw.print("NETWORK：");
+		pw.println(NetworkUtils.getNetType(mContext));
 
 	}
 

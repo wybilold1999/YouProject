@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.db.ExpressionGroupSqlManager;
@@ -19,9 +22,6 @@ import com.youdo.karma.net.request.DownloadExpressionRequest;
 import com.youdo.karma.utils.FileAccessorUtils;
 import com.youdo.karma.utils.FileUtils;
 import com.youdo.karma.utils.ToastUtil;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
-import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -101,7 +101,7 @@ public class DownloadExpressionAdapter extends
 	}
 
 	public class ViewHolder extends RecyclerView.ViewHolder implements
-			OnClickListener {
+            OnClickListener {
 
 		SimpleDraweeView expression_icon;
 		TextView expression_title;

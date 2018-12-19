@@ -2,32 +2,28 @@ package com.youdo.karma.fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
+import com.youdo.karma.activity.BandPhoneActivity;
 import com.youdo.karma.adapter.HomeTabFragmentAdapter;
-import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.manager.AppManager;
-import com.youdo.karma.service.DownloadUpdateService;
-import com.youdo.karma.utils.CheckUtil;
-import com.youdo.karma.utils.ToastUtil;
+import com.youdo.karma.service.ConnectServerService;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * 作者：wangyb
@@ -40,10 +36,9 @@ public class HomeLoveFragment extends Fragment {
 	TabLayout mTabLayout;
 	@BindView(R.id.viewpager)
 	ViewPager mViewpager;
-	@BindView(R.id.fab)
-	FloatingActionButton mFab;
 
 	private View rootView;
+
 	private List<String> tabList;
 
 	@Override
@@ -59,10 +54,6 @@ public class HomeLoveFragment extends Fragment {
 		if (parent != null) {
 			parent.removeView(rootView);
 		}
-		((AppCompatActivity) getActivity()).getSupportActionBar().show();
-		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(
-				R.string.tab_find_love);
-		ButterKnife.bind(this, rootView);
 		return rootView;
 	}
 
@@ -84,44 +75,37 @@ public class HomeLoveFragment extends Fragment {
 	}
 
 	private void setupData() {
-		if (AppManager.getClientUser().versionCode > AppManager.getVersionCode()) {
-			showVersionInfo();
+		startConnectServerService();
+		if (AppManager.getClientUser().isShowVip &&
+				AppManager.getClientUser().isShowTd &&
+				!AppManager.getClientUser().isCheckPhone) {//显示vip，并且isShowTd为true且未绑定号码的时候
+			showBandPhoneDialog();
 		}
 	}
 
-	private void showVersionInfo() {
+	private void startConnectServerService() {
+		Intent intent = new Intent(getActivity(), ConnectServerService.class);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			getActivity().startForegroundService(intent);
+		} else {
+			getActivity().startService(intent);
+		}
+	}
+
+	private void showBandPhoneDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle(R.string.new_version);
-		builder.setMessage(AppManager.getClientUser().versionUpdateInfo);
-		builder.setPositiveButton(getResources().getString(R.string.update),
+		builder.setTitle(R.string.bangding_phone);
+		builder.setMessage(R.string.band_phone_for_u);
+		builder.setPositiveButton(getResources().getString(R.string.bangding_phone),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
-						/**
-						 * 开始下载apk文件
-						 */
-						Intent intent = new Intent(getActivity(), DownloadUpdateService.class);
-						intent.putExtra(ValueKey.APK_URL, AppManager.getClientUser().apkUrl);
-						getActivity().startService(intent);
-						ToastUtil.showMessage(R.string.bg_downloading);
-//						AppManager.goToMarket(getActivity(), channel);
+						Intent intent = new Intent(getActivity(), BandPhoneActivity.class);
+						getActivity().startActivity(intent);
 					}
 				});
-		if (!AppManager.getClientUser().isForceUpdate) {
-			builder.setNegativeButton(getResources().getString(R.string.cancel),
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					});
-		}
 		builder.setCancelable(false);
 		builder.show();
-	}
-
-	@OnClick(R.id.fab)
-	public void onClick() {
 	}
 
 	@Override

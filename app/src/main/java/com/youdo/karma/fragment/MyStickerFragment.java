@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.adapter.DownloadExpressionAdapter;
 import com.youdo.karma.db.ExpressionGroupSqlManager;
@@ -17,7 +18,6 @@ import com.youdo.karma.entity.ExpressionGroup;
 import com.youdo.karma.eventtype.StickerEvent;
 import com.youdo.karma.ui.widget.CircularProgress;
 import com.youdo.karma.ui.widget.WrapperLinearLayoutManager;
-import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -38,9 +38,9 @@ import butterknife.ButterKnife;
 public class MyStickerFragment extends Fragment {
 
 	@BindView(R.id.recyclerview)
-	RecyclerView mRecyclerView;
+    RecyclerView mRecyclerView;
 	@BindView(R.id.progress_bar)
-	CircularProgress mProgressBar;
+    CircularProgress mProgressBar;
 
 	private View rootView;
 	private DownloadExpressionAdapter mAdapter;
@@ -50,7 +50,7 @@ public class MyStickerFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 		if (rootView == null) {
 			rootView = inflater.inflate(R.layout.fragment_sticker_market, null);
 			ButterKnife.bind(this, rootView);

@@ -24,7 +24,7 @@ import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.entity.Conversation;
 import com.youdo.karma.listener.MessageUnReadListener;
-import com.youdo.karma.manager.NotificationManager;
+import com.youdo.karma.manager.NotificationManagerUtils;
 import com.youdo.karma.utils.DateUtil;
 import com.youdo.karma.utils.EmoticonUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -63,6 +63,8 @@ public class MessageAdapter extends
             } else {
                 holder.mPortrait.setImageURI(Uri.parse("file://" + conversation.localPortrait));
             }
+        } else {
+            holder.mPortrait.setImageURI(Uri.parse(conversation.faceUrl));
         }
         holder.mTitle.setText(conversation.talkerName);
         holder.mContent.setText(Html.fromHtml(
@@ -161,7 +163,7 @@ public class MessageAdapter extends
                                             mConversations.clear();
                                             notifyDataSetChanged();
                                             MessageUnReadListener.getInstance().notifyDataSetChanged(0);
-                                            NotificationManager.getInstance().cancelNotification();
+                                            NotificationManagerUtils.getInstance().cancelNotification();
                                             break;
                                     }
                                     dialog.dismiss();

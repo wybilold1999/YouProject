@@ -21,8 +21,8 @@ public class DownloadProgressExpressionListener {
 
 	public interface OnExpressionProgressChangedListener {
 		public void onDownloadExpressionProgressChanged(
-				ExpressionGroup expressionGroup, int progress,
-				boolean is_changed_down_view);
+                ExpressionGroup expressionGroup, int progress,
+                boolean is_changed_down_view);
 	}
 
 	public static DownloadProgressExpressionListener getInstance() {
@@ -54,8 +54,8 @@ public class DownloadProgressExpressionListener {
 	}
 
 	public void notifyExpressionProgressChanged(
-			ExpressionGroup expressionGroup, int progress,
-			boolean is_changed_down_view) {
+            ExpressionGroup expressionGroup, int progress,
+            boolean is_changed_down_view) {
 		for (OnExpressionProgressChangedListener listener : mOnExpressionProgressChangedListener) {
 			if (listener != null) {
 				listener.onDownloadExpressionProgressChanged(expressionGroup,

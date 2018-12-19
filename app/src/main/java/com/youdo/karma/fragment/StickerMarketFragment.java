@@ -1,5 +1,6 @@
 package com.youdo.karma.fragment;
 
+import android.arch.lifecycle.Lifecycle;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,6 +13,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.adapter.DownloadExpressionAdapter;
 import com.youdo.karma.db.ExpressionGroupSqlManager;
@@ -20,18 +24,21 @@ import com.youdo.karma.listener.DownloadProgressExpressionListener;
 import com.youdo.karma.listener.DownloadProgressExpressionListener.OnExpressionProgressChangedListener;
 import com.youdo.karma.listener.UserStickerPackListener;
 import com.youdo.karma.listener.UserStickerPackListener.OnUserStickerPackListener;
-import com.youdo.karma.net.request.ExpressionRequest;
+import com.youdo.karma.net.IUserApi;
+import com.youdo.karma.net.base.RetrofitFactory;
 import com.youdo.karma.ui.widget.CircularProgress;
 import com.youdo.karma.ui.widget.WrapperLinearLayoutManager;
+import com.youdo.karma.utils.JsonUtils;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
@@ -41,11 +48,11 @@ import mehdi.sakout.fancybuttons.FancyButton;
  * @description:
  */
 public class StickerMarketFragment extends Fragment implements OnExpressionProgressChangedListener,
-		OnUserStickerPackListener {
+        OnUserStickerPackListener {
 	@BindView(R.id.recyclerview)
-	RecyclerView mRecyclerView;
+    RecyclerView mRecyclerView;
 	@BindView(R.id.progress_bar)
-	CircularProgress mProgressBar;
+    CircularProgress mProgressBar;
 
 	private View rootView;
 
@@ -60,7 +67,7 @@ public class StickerMarketFragment extends Fragment implements OnExpressionProgr
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 		if (rootView == null) {
 			rootView = inflater.inflate(R.layout.fragment_sticker_market, null);
 			ButterKnife.bind(this, rootView);
@@ -101,43 +108,42 @@ public class StickerMarketFragment extends Fragment implements OnExpressionProgr
 		mAdapter = new DownloadExpressionAdapter(mExpressionGroups, isMySticker);
 		mRecyclerView.setAdapter(mAdapter);
 		ProgressDialogUtils.getInstance(getActivity()).show(R.string.dialog_request_data);
-		new ExpressionTask().request();
+		getExpressionRequest();
 	}
 
-	/**
-	 * 在线表情数据请求
-	 */
-	class ExpressionTask extends ExpressionRequest {
-		@Override
-		public void onPostExecute(List<ExpressionGroup> result) {
-			ProgressDialogUtils.getInstance(getActivity()).dismiss();
-			if (result != null) {
-				mExpressionGroups.clear();
-				mExpressionGroups.addAll(result);
-				// 遍历处理已经下载过的表情
-				for (int i = 0; i < mExpressionGroups.size(); i++) {
-					for (int j = 0; j < mPresenceExpression.size(); j++) {
-						if (mExpressionGroups.get(i).id_pic_themes == mPresenceExpression
-								.get(j).id_pic_themes) {
-							mExpressionGroups.get(i).status = ExpressionGroup.ExpressionGroupStatus.ALREADY_DOWNLOAD;
+	private void getExpressionRequest() {
+		RetrofitFactory.getRetrofit().create(IUserApi.class)
+				.getExpressionGroup()
+				.subscribeOn(Schedulers.io())
+				.map(responseBody -> JsonUtils.parseJsonExpression(responseBody.string()))
+				.observeOn(AndroidSchedulers.mainThread())
+				.as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)))
+				.subscribe(expressionGroupList -> {
+					ProgressDialogUtils.getInstance(getActivity()).dismiss();
+					if (expressionGroupList != null) {
+						mExpressionGroups.clear();
+						mExpressionGroups.addAll(expressionGroupList);
+						// 遍历处理已经下载过的表情
+						for (int i = 0; i < mExpressionGroups.size(); i++) {
+							for (int j = 0; j < mPresenceExpression.size(); j++) {
+								if (mExpressionGroups.get(i).id_pic_themes == mPresenceExpression
+										.get(j).id_pic_themes) {
+									mExpressionGroups.get(i).status = ExpressionGroup.ExpressionGroupStatus.ALREADY_DOWNLOAD;
+								}
+							}
 						}
+						mAdapter.notifyDataSetChanged();
 					}
-				}
-				mAdapter.notifyDataSetChanged();
-			}
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-			ToastUtil.showMessage(error);
-			ProgressDialogUtils.getInstance(getActivity()).dismiss();
-		}
+				}, throwable -> {
+					ToastUtil.showMessage(R.string.network_requests_error);
+					ProgressDialogUtils.getInstance(getActivity()).dismiss();
+				});
 	}
 
 	@Override
 	public void onDownloadExpressionProgressChanged(
-			ExpressionGroup expressionGroup, int progress,
-			boolean is_changed_down_view) {
+            ExpressionGroup expressionGroup, int progress,
+            boolean is_changed_down_view) {
 		if (!is_changed_down_view) {
 			return;
 		}

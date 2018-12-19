@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.ValueKey;
+import com.umeng.analytics.MobclickAgent;
 
 import me.relex.photodraweeview.PhotoDraweeView;
 import uk.co.senab.photoview.PhotoViewAttacher;
@@ -37,6 +37,7 @@ public class PhotoViewActivity extends BaseActivity implements View.OnClickListe
     private void setupView(){
         mPhotoView = (PhotoDraweeView) findViewById(R.id.photo_drawee_view);
         mAttacher = new PhotoViewAttacher(mPhotoView);
+
     }
 
     private void setupEvent() {

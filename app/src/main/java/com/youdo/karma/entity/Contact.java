@@ -65,9 +65,9 @@ public class Contact implements Serializable {
 
 	@Generated(hash = 1192323034)
 	public Contact(Long id, @NotNull String userId, String nickname,
-				   String user_name, String birthday, String face_url, String sex,
-				   String signature, String rename, String pyInitial, String conRemarkPYShort,
-				   String state_marry, String constellation, boolean isFromAdd) {
+                   String user_name, String birthday, String face_url, String sex,
+                   String signature, String rename, String pyInitial, String conRemarkPYShort,
+                   String state_marry, String constellation, boolean isFromAdd) {
 		this.id = id;
 		this.userId = userId;
 		this.nickname = nickname;

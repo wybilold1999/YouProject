@@ -1,7 +1,6 @@
 package com.youdo.karma.adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
@@ -13,10 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.youdo.karma.R;
+import com.youdo.karma.activity.GiveVipActivity;
 import com.youdo.karma.activity.PhotoViewActivity;
 import com.youdo.karma.activity.VipCenterActivity;
 import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.entity.ReceiveGiftModel;
+import com.youdo.karma.manager.AppManager;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.List;
@@ -171,20 +172,21 @@ public class MyGiftsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private void showVipDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setMessage(R.string.see_more_send_gift_data);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        builder.setPositiveButton(R.string.ok, ((dialog, i) -> {
+            dialog.dismiss();
+            Intent intent = new Intent();
+            intent.setClass(mContext, VipCenterActivity.class);
+            mContext.startActivity(intent);
+        }));
+        if (AppManager.getClientUser().isShowGiveVip) {
+            builder.setNegativeButton(R.string.free_give_vip, ((dialog, i) -> {
                 dialog.dismiss();
-                Intent intent = new Intent(mContext, VipCenterActivity.class);
+                Intent intent = new Intent(mContext, GiveVipActivity.class);
                 mContext.startActivity(intent);
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+            }));
+        } else {
+            builder.setNegativeButton(R.string.until_single, ((dialog, i) -> dialog.dismiss()));
+        }
         builder.show();
     }
 

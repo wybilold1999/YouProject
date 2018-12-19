@@ -1,21 +1,29 @@
 package com.youdo.karma.activity;
 
+import android.arch.lifecycle.Lifecycle;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.AppConstants;
 import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.manager.AppManager;
+import com.youdo.karma.net.IUserPictureApi;
+import com.youdo.karma.net.base.RetrofitFactory;
 import com.youdo.karma.net.request.OSSImagUploadRequest;
-import com.youdo.karma.net.request.UploadCommentImgRequest;
 import com.youdo.karma.utils.CheckUtil;
 import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
+import com.youdo.karma.utils.Utils;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.List;
@@ -23,6 +31,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
@@ -95,7 +105,7 @@ public class GiveVipActivity extends BaseActivity {
         Intent intent = new Intent();
         switch (view.getId()) {
             case R.id.skip_market:
-                AppManager.goToMarket(this, CheckUtil.getAppMetaData(this, "UMENG_CHANNEL"));
+                Utils.goToMarket(this, CheckUtil.getAppMetaData(this, "UMENG_CHANNEL"));
                 break;
             case R.id.upload_img:
                 intent.setClass(this, PhotoChoserActivity.class);
@@ -122,7 +132,7 @@ public class GiveVipActivity extends BaseActivity {
         @Override
         public void onPostExecute(String s) {
             String url = AppConstants.OSS_IMG_ENDPOINT + s;
-            new UploadCImgTask().request(url);
+            getDiscoverInfo(url);
         }
 
         @Override
@@ -131,21 +141,32 @@ public class GiveVipActivity extends BaseActivity {
         }
     }
 
-    class UploadCImgTask extends UploadCommentImgRequest {
-        @Override
-        public void onPostExecute(String s) {
-            ProgressDialogUtils.getInstance(GiveVipActivity.this).dismiss();
-            ToastUtil.showMessage(s);
-            PreferencesUtils.setIsUploadCommentImg(GiveVipActivity.this, true);
-            mUploadImg.setEnabled(false);
-            mUploadImg.setFocusBackgroundColor(getResources().getColor(R.color.gray_text));
-            mUploadImg.setBackgroundColor(getResources().getColor(R.color.gray_text));
-        }
-
-        @Override
-        public void onErrorExecute(String error) {
-            ProgressDialogUtils.getInstance(GiveVipActivity.this).dismiss();
-            ToastUtil.showMessage(error);
-        }
+    private void getDiscoverInfo(String imageUrl) {
+        RetrofitFactory.getRetrofit().create(IUserPictureApi.class)
+                .uploadCommentImg(AppManager.getClientUser().sessionId, imageUrl)
+                .subscribeOn(Schedulers.io())
+                .map(responseBody -> {
+                    JsonObject obj = new JsonParser().parse(responseBody.string()).getAsJsonObject();
+                    int code = obj.get("code").getAsInt();
+                    if(code == 0){
+                        return CSApplication.getInstance().getResources()
+                                .getString(R.string.upload_success);
+                    }
+                    return CSApplication.getInstance().getResources()
+                            .getString(R.string.upload_faiure);
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(s -> {
+                    ProgressDialogUtils.getInstance(GiveVipActivity.this).dismiss();
+                    ToastUtil.showMessage(s);
+                    PreferencesUtils.setIsUploadCommentImg(GiveVipActivity.this, true);
+                    mUploadImg.setEnabled(false);
+                    mUploadImg.setFocusBackgroundColor(getResources().getColor(R.color.gray_text));
+                    mUploadImg.setBackgroundColor(getResources().getColor(R.color.gray_text));
+                }, throwable -> {
+                    ProgressDialogUtils.getInstance(GiveVipActivity.this).dismiss();
+                    ToastUtil.showMessage(R.string.network_requests_error);
+                });
     }
 }

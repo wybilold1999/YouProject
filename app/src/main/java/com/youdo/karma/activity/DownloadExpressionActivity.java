@@ -1,5 +1,6 @@
 package com.youdo.karma.activity;
 
+import android.arch.lifecycle.Lifecycle;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
@@ -10,6 +11,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.adapter.DownloadExpressionAdapter;
@@ -19,16 +23,19 @@ import com.youdo.karma.listener.DownloadProgressExpressionListener;
 import com.youdo.karma.listener.DownloadProgressExpressionListener.OnExpressionProgressChangedListener;
 import com.youdo.karma.listener.UserStickerPackListener;
 import com.youdo.karma.listener.UserStickerPackListener.OnUserStickerPackListener;
-import com.youdo.karma.net.request.ExpressionRequest;
+import com.youdo.karma.net.IUserApi;
+import com.youdo.karma.net.base.RetrofitFactory;
 import com.youdo.karma.ui.widget.DividerItemDecoration;
 import com.youdo.karma.utils.DensityUtil;
+import com.youdo.karma.utils.JsonUtils;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
@@ -39,7 +46,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
  * @Date:2015年6月12日上午11:08:54
  */
 public class DownloadExpressionActivity extends BaseActivity implements
-		OnRefreshListener, OnExpressionProgressChangedListener,
+        OnRefreshListener, OnExpressionProgressChangedListener,
 		OnUserStickerPackListener {
 
 	private SwipeRefreshLayout mSwipeRefresh;
@@ -106,52 +113,52 @@ public class DownloadExpressionActivity extends BaseActivity implements
 		mRecyclerView.setAdapter(mAdapter);
 		ProgressDialogUtils.getInstance(this)
 				.show(R.string.dialog_request_data);
-		new ExpressionTask().request();
+		getExpressionRequest();
 
 	}
 
-	/**
-	 * 在线表情数据请求
-	 */
-	class ExpressionTask extends ExpressionRequest {
-		@Override
-		public void onPostExecute(List<ExpressionGroup> result) {
-			ProgressDialogUtils.getInstance(DownloadExpressionActivity.this)
-					.dismiss();
-			if (result != null) {
-				mExpressionGroups.clear();
-				mExpressionGroups.addAll(result);
-				// 遍历处理已经下载过的表情
-				for (int i = 0; i < mExpressionGroups.size(); i++) {
-					for (int j = 0; j < mPresenceExpression.size(); j++) {
-						if (mExpressionGroups.get(i).id_pic_themes == mPresenceExpression
-								.get(j).id_pic_themes) {
-							mExpressionGroups.get(i).status = ExpressionGroup.ExpressionGroupStatus.ALREADY_DOWNLOAD;
+	private void getExpressionRequest() {
+		RetrofitFactory.getRetrofit().create(IUserApi.class)
+				.getExpressionGroup()
+				.subscribeOn(Schedulers.io())
+				.map(responseBody -> JsonUtils.parseJsonExpression(responseBody.string()))
+				.observeOn(AndroidSchedulers.mainThread())
+				.as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)))
+				.subscribe(expressionGroupList -> {
+					ProgressDialogUtils.getInstance(DownloadExpressionActivity.this)
+							.dismiss();
+					if (expressionGroupList != null) {
+						mExpressionGroups.clear();
+						mExpressionGroups.addAll(expressionGroupList);
+						// 遍历处理已经下载过的表情
+						for (int i = 0; i < mExpressionGroups.size(); i++) {
+							for (int j = 0; j < mPresenceExpression.size(); j++) {
+								if (mExpressionGroups.get(i).id_pic_themes == mPresenceExpression
+										.get(j).id_pic_themes) {
+									mExpressionGroups.get(i).status = ExpressionGroup.ExpressionGroupStatus.ALREADY_DOWNLOAD;
+								}
+							}
 						}
+						mAdapter.notifyDataSetChanged();
 					}
-				}
-				mAdapter.notifyDataSetChanged();
-			}
-			mSwipeRefresh.setRefreshing(false);
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-			ToastUtil.showMessage(error);
-			ProgressDialogUtils.getInstance(DownloadExpressionActivity.this)
-					.dismiss();
-		}
+					mSwipeRefresh.setRefreshing(false);
+				}, throwable -> {
+					ToastUtil.showMessage(R.string.network_requests_error);
+					ProgressDialogUtils.getInstance(DownloadExpressionActivity.this)
+							.dismiss();
+				});
 	}
+
 
 	@Override
 	public void onRefresh() {
-		new ExpressionTask().request();
+		getExpressionRequest();
 	}
 
 	@Override
 	public void onDownloadExpressionProgressChanged(
-			ExpressionGroup expressionGroup, int progress,
-			boolean is_changed_down_view) {
+            ExpressionGroup expressionGroup, int progress,
+            boolean is_changed_down_view) {
 		if (!is_changed_down_view) {
 			return;
 		}
@@ -247,6 +254,5 @@ public class DownloadExpressionActivity extends BaseActivity implements
 				break;
 			}
 		}
-
 	}
 }

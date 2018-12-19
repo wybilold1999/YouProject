@@ -3,13 +3,19 @@ package com.youdo.karma.net.request;
 import android.content.Context;
 
 import com.youdo.karma.entity.ExpressionGroup;
+import com.youdo.karma.listener.DownloadListener;
 import com.youdo.karma.listener.DownloadProgressExpressionListener;
-import com.youdo.karma.listener.NetFileDownloadListener;
+import com.youdo.karma.net.IDownLoadApi;
 import com.youdo.karma.net.base.ResultPostExecute;
-import com.liulishuo.filedownloader.BaseDownloadTask;
-import com.liulishuo.filedownloader.FileDownloader;
+import com.youdo.karma.net.base.RetrofitFactory;
+import com.youdo.karma.utils.FileUtils;
 
 import java.io.File;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * 
@@ -30,31 +36,39 @@ public class DownloadExpressionRequest extends ResultPostExecute<String> {
 	 *            保存地址
 	 */
 	public void request(Context context, String url, String savePath,
-			String fileName, final ExpressionGroup expressionGroup) {
+                        String fileName, final ExpressionGroup expressionGroup) {
 		final File file = new File(savePath, fileName);
-		FileDownloader.getImpl().create(url)
-				.setPath(file.getAbsolutePath())
-				.setListener(new NetFileDownloadListener(){
+		RetrofitFactory.getRetrofit().create(IDownLoadApi.class)
+				.downloadFileWithDynamicUrlSync(url)
+				.enqueue(new Callback<ResponseBody>() {
 					@Override
-					protected void completed(BaseDownloadTask task) {
-						onPostExecute(file.getPath());
+					public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+						FileUtils.writeResponseBodyToDisk(response.body(), file.getAbsolutePath(), new DownloadListener(){
+							@Override
+							public void progress(int progress) {
+								if (expressionGroup != null)
+									DownloadProgressExpressionListener.getInstance()
+											.notifyExpressionProgressChanged(expressionGroup,
+													progress, true);
+							}
+
+							@Override
+							public void completed(String path) {
+								onPostExecute(file.getPath());
+							}
+
+							@Override
+							public void error(String error) {
+								onErrorExecute("下载失败");
+							}
+						});
 					}
 
 					@Override
-					protected void error(BaseDownloadTask task, Throwable e) {
+					public void onFailure(Call<ResponseBody> call, Throwable t) {
 						onErrorExecute("下载失败");
 					}
-
-					@Override
-					protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-						int progress = (int) ((totalBytes > 0) ? (soFarBytes * 1.0 / totalBytes) * 100
-								: -1);
-						if (expressionGroup != null)
-							DownloadProgressExpressionListener.getInstance()
-									.notifyExpressionProgressChanged(expressionGroup,
-											progress, true);
-					}
-				}).start();
+				});
 	}
 
 }

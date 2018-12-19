@@ -45,7 +45,7 @@ public class Expression {
 	public String url;
 	@Generated(hash = 1540775386)
 	public Expression(Long id, @NotNull String note, @NotNull String pic_id,
-			@NotNull String theme, int theme_id, @NotNull String type, @NotNull String url) {
+                      @NotNull String theme, int theme_id, @NotNull String type, @NotNull String url) {
 		this.id = id;
 		this.note = note;
 		this.pic_id = pic_id;

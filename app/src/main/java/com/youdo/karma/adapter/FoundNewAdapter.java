@@ -11,12 +11,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dl7.tag.TagLayout;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.ContactInfoActivity;
 import com.youdo.karma.config.ValueKey;
 import com.youdo.karma.entity.Contact;
-import com.dl7.tag.TagLayout;
-import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.List;
 

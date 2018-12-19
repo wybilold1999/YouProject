@@ -1,21 +1,20 @@
 package com.youdo.karma.activity;
 
 import android.Manifest;
+import android.arch.lifecycle.Lifecycle;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -25,6 +24,14 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.dl7.tag.TagLayout;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.config.AppConstants;
@@ -33,19 +40,20 @@ import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.eventtype.UserEvent;
 import com.youdo.karma.listener.ModifyUserInfoListener;
 import com.youdo.karma.manager.AppManager;
+import com.youdo.karma.net.IUserApi;
+import com.youdo.karma.net.base.RetrofitFactory;
 import com.youdo.karma.net.request.DownloadFileRequest;
 import com.youdo.karma.net.request.OSSImagUploadRequest;
-import com.youdo.karma.net.request.UpdateUserInfoRequest;
 import com.youdo.karma.ui.widget.ClearEditText;
+import com.youdo.karma.utils.CheckUtil;
 import com.youdo.karma.utils.FileAccessorUtils;
 import com.youdo.karma.utils.FileUtils;
 import com.youdo.karma.utils.Md5Util;
 import com.youdo.karma.utils.ProgressDialogUtils;
+import com.youdo.karma.utils.RxBus;
+import com.youdo.karma.utils.StringUtil;
 import com.youdo.karma.utils.ToastUtil;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.umeng.analytics.MobclickAgent;
-
-import org.greenrobot.eventbus.EventBus;
+import com.youdo.karma.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,6 +65,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
+import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+import static com.youdo.karma.config.AppConstants.UPDATE_USER_INFO;
 
 /**
  * @author Cloudsoar(wangyb)
@@ -107,17 +121,59 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 	TextView mMarried;
 	@BindView(R.id.married_lay)
 	RelativeLayout mMarriedLay;
+	@BindView(R.id.purpose)
+	TextView mPurpose;
+	@BindView(R.id.purpose_lay)
+	RelativeLayout mPurposeLay;
+	@BindView(R.id.love_where)
+	TextView mLoveWhere;
+	@BindView(R.id.love_where_lay)
+	RelativeLayout mLoveWhereLay;
+	@BindView(R.id.do_what_first)
+	TextView mDoWhatFirst;
+	@BindView(R.id.do_what_first_lay)
+	RelativeLayout mDoWhatFirstLay;
+	@BindView(R.id.conception)
+	TextView mConception;
+	@BindView(R.id.conception_lay)
+	RelativeLayout mConceptionLay;
+	@BindView(R.id.lable_text)
+	TextView mLableText;
+	@BindView(R.id.lable_flowlayout)
+	TagLayout mLableFlowlayout;
+	@BindView(R.id.lable_lay)
+	RelativeLayout mLableLay;
+	@BindView(R.id.part_text)
+	TextView mPartText;
+	@BindView(R.id.part_flowlayout)
+	TagLayout mPartFlowlayout;
+	@BindView(R.id.part_lay)
+	RelativeLayout mPartLay;
+	@BindView(R.id.intrest_text)
+	TextView mIntrestText;
+	@BindView(R.id.intrest_flowlayout)
+	TagLayout mIntrestFlowlayout;
+	@BindView(R.id.intrest_lay)
+	RelativeLayout mIntrestLay;
+	@BindView(R.id.weixin)
+	TextView mWeixin;
+	@BindView(R.id.weixin_lay)
+	RelativeLayout mWeixinLay;
+	@BindView(R.id.qq)
+	TextView mQq;
+	@BindView(R.id.qq_lay)
+	RelativeLayout mQqLay;
+	@BindView(R.id.tv_friend)
+	TextView mTvFriend;
+	@BindView(R.id.card_friend)
+	CardView mCardFriend;
 
-
-	private String mPhotoPath;
-	private File mPhotoFile;
 	private Uri mPhotoOnSDCardUri;
 	private Uri mPortraitUri;
 	private File mCutFile;
 
 
 	private ClientUser clientUser;
-	private String currentFaceUrl;//用于判断用户是否只是修改了头像就返回
 	private List<String> mVals = null;
 
 	/**
@@ -133,22 +189,23 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 	 */
 	public final static int PHOTO_CUT_RESULT = 106;
 	/**
-	 * 读写文件夹
+	 * 相机和存储权限
 	 */
-	private final int REQUEST_PERMISSION_WRITE = 1000;
-	/**
-	 * 跳转设置界面
-	 */
-	private final int REQUEST_PERMISSION_SETTING = 10001;
-	/**
-	 * 是否拥有读写权限
-	 */
-	private boolean isWritePersimmion = false;
+	public final static int REQUEST_PERMISSION_CAMERA_WRITE_EXTERNAL = 1000;
+
+    private RxPermissions rxPermissions;
+
+	private String AUTHORITY = "com.youdo.karma.fileProvider";
+
+	private boolean isUploadPortrait = false;
+
+	private boolean isOpenCamara = false;//是否打开相机
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_modify_userinfo_new);
+		setContentView(R.layout.activity_modify_userinfo);
 		ButterKnife.bind(this);
 		Toolbar toolbar = getActionBarToolbar();
 		if (toolbar != null) {
@@ -174,20 +231,19 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 	private void setUserInfo() {
 		clientUser = AppManager.getClientUser();
 		if (clientUser != null) {
-			currentFaceUrl = clientUser.face_url;
 			if (!TextUtils.isEmpty(clientUser.face_local) && new File(clientUser.face_local).exists()) {
 				mPortraitPhoto.setImageURI(Uri.parse("file://" + clientUser.face_local));
 			} else if (!TextUtils.isEmpty(clientUser.face_url)) {
 				mPortraitPhoto.setImageURI(Uri.parse(clientUser.face_url));
 				new DownloadPortraitTask().request(clientUser.face_url,
-						FileAccessorUtils.getImagePathName().getAbsolutePath(),
+						FileAccessorUtils.FACE_IMAGE,
 						Md5Util.md5(AppManager.getClientUser().face_url) + ".jpg");
 			}
 			if (!TextUtils.isEmpty(clientUser.user_name)) {
 				mNickName.setText(clientUser.user_name);
 			}
 			if (!TextUtils.isEmpty(clientUser.sex)) {
-				mSex.setText(clientUser.sex);
+				mSex.setText("1".equals(clientUser.sex) ? "男" : "女");
 			}
 			if (!TextUtils.isEmpty(String.valueOf(clientUser.age))) {
 				mAge.setText(String.valueOf(clientUser.age));
@@ -213,12 +269,66 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 			if (!TextUtils.isEmpty(clientUser.constellation)) {
 				mConstellation.setText(clientUser.constellation);
 			}
+			if (!TextUtils.isEmpty(clientUser.purpose)) {
+				mPurpose.setText(clientUser.purpose);
+			}
+			if (!TextUtils.isEmpty(clientUser.love_where)) {
+				mLoveWhere.setText(clientUser.love_where);
+			}
+			if (!TextUtils.isEmpty(clientUser.do_what_first)) {
+				mDoWhatFirst.setText(clientUser.do_what_first);
+			}
+			if (!TextUtils.isEmpty(clientUser.conception)) {
+				mConception.setText(clientUser.conception);
+			}
+			if (!TextUtils.isEmpty(clientUser.qq_no)) {
+				mQq.setText(clientUser.qq_no);
+			}
+			if (!TextUtils.isEmpty(clientUser.weixin_no)) {
+				mWeixin.setText(clientUser.weixin_no);
+			}
+			if (!TextUtils.isEmpty(clientUser.personality_tag)) {
+				mLableFlowlayout.setVisibility(View.VISIBLE);
+				mLableText.setVisibility(View.GONE);
+				mVals.clear();
+				mVals = StringUtil.stringToIntList(clientUser.personality_tag);
+				for (int i = 0; i < mVals.size(); i++) {
+					if ("".equals(mVals.get(i)) || " ".equals(mVals.get(i))) {
+						mVals.remove(i);
+					}
+				}
+				mLableFlowlayout.setTags(mVals);
+//				mLableFlowlayout.setAdapter(
+//						new PartLableTagAdapter(mVals, mLableFlowlayout));
+			}
+			if (!TextUtils.isEmpty(clientUser.part_tag)) {
+				mPartFlowlayout.setVisibility(View.VISIBLE);
+				mPartText.setVisibility(View.GONE);
+				mVals.clear();
+				mVals = StringUtil.stringToIntList(clientUser.part_tag);
+				for (int i = 0; i < mVals.size(); i++) {
+					if ("".equals(mVals.get(i)) || " ".equals(mVals.get(i))) {
+						mVals.remove(i);
+					}
+				}
+				mPartFlowlayout.setTags(mVals);
+			}
+			if (!TextUtils.isEmpty(clientUser.intrest_tag)) {
+				mIntrestFlowlayout.setVisibility(View.VISIBLE);
+				mIntrestText.setVisibility(View.GONE);
+				mVals.clear();
+				mVals = StringUtil.stringToIntList(clientUser.intrest_tag);
+				for (int i = 0; i < mVals.size(); i++) {
+					if ("".equals(mVals.get(i)) || " ".equals(mVals.get(i))) {
+						mVals.remove(i);
+					}
+				}
+				mIntrestFlowlayout.setTags(mVals);
+			}
 		}
 	}
 
-	@OnClick({R.id.portrait_lay, R.id.nick_name_lay, R.id.sex_lay, R.id.age_lay, R.id.signature_lay,
-			R.id.occupation_type_lay, R.id.education_type_lay, R.id.constellation_lay, R.id.tall_lay, R.id.weight_lay,
-			R.id.married_lay})
+	@OnClick({R.id.portrait_lay, R.id.nick_name_lay, R.id.sex_lay, R.id.age_lay, R.id.signature_lay, R.id.occupation_type_lay, R.id.education_type_lay, R.id.constellation_lay, R.id.tall_lay, R.id.weight_lay, R.id.married_lay, R.id.purpose_lay, R.id.love_where_lay, R.id.do_what_first_lay, R.id.conception_lay, R.id.lable_flowlayout, R.id.lable_lay, R.id.part_flowlayout, R.id.part_lay, R.id.intrest_flowlayout, R.id.intrest_lay, R.id.weixin_lay, R.id.qq_lay})
 	public void onClick(View view) {
 		switch (view.getId()) {
 			case R.id.portrait_lay:
@@ -255,6 +365,42 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 			case R.id.married_lay:
 				showMarriedSelectDialog();
 				break;
+			case R.id.purpose_lay:
+				showSelectPurposeDialog();
+				break;
+			case R.id.love_where_lay:
+				showSelectLoveWhereDialog();
+				break;
+			case R.id.do_what_first_lay:
+				showSelectdoWhatFirstDialog();
+				break;
+			case R.id.conception_lay:
+				showSelectConceptionDialog();
+				break;
+			case R.id.lable_flowlayout:
+				showOnClickFlowLayoutDialog(R.id.lable_flowlayout);
+				break;
+			case R.id.lable_lay:
+				showLableDialog();
+				break;
+			case R.id.part_flowlayout:
+				showOnClickFlowLayoutDialog(R.id.part_flowlayout);
+				break;
+			case R.id.part_lay:
+				showPartDialog();
+				break;
+			case R.id.intrest_flowlayout:
+				showOnClickFlowLayoutDialog(R.id.intrest_flowlayout);
+				break;
+			case R.id.intrest_lay:
+				showIntrestDialog();
+				break;
+			case R.id.weixin_lay:
+				showEditDialog(mWeixin, R.string.weixin);
+				break;
+			case R.id.qq_lay:
+				showEditDialog(mQq, R.string.qq);
+				break;
 		}
 	}
 
@@ -284,11 +430,9 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() ==  R.id.save) {
 			ProgressDialogUtils.getInstance(this).show(R.string.dialog_save_data);
-			AppManager.setClientUser(clientUser);
-			AppManager.saveUserInfo();
-			EventBus.getDefault().post(new UserEvent());
+			RxBus.getInstance().post(UPDATE_USER_INFO, new UserEvent());
 			if (clientUser != null) {
-				new UpdateUserInfoTask().request(clientUser);
+				updateUserInfo(clientUser);
 			}
 		} else {
 			finish();
@@ -297,19 +441,69 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 		return true;
 	}
 
-	class UpdateUserInfoTask extends UpdateUserInfoRequest {
-		@Override
-		public void onPostExecute(String s) {
-			ToastUtil.showMessage(R.string.save_success);
-			ProgressDialogUtils.getInstance(ModifyUserInfoNewActivity.this).dismiss();
-			finish();
-		}
+	private void updateUserInfo(ClientUser clientUser) {
+		RetrofitFactory.getRetrofit().create(IUserApi.class)
+				.updateUserInfo(AppManager.getClientUser().sessionId, getParam(AppManager.getClientUser()))
+				.subscribeOn(Schedulers.io())
+				.map(responseBody -> {
+					AppManager.setClientUser(clientUser);
+					AppManager.saveUserInfo();
+					JsonObject obj = new JsonParser().parse(responseBody.string()).getAsJsonObject();
+					int code = obj.get("code").getAsInt();
+					return code;
+				})
+				.observeOn(AndroidSchedulers.mainThread())
+				.as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)))
+				.subscribe(integer -> {
+					ProgressDialogUtils.getInstance(ModifyUserInfoNewActivity.this).dismiss();
+					if (integer == 0) {//保存成功
+						ToastUtil.showMessage(R.string.save_success);
+						if(!isUploadPortrait) {//上传头像，不退出界面
+							finish();
+						}
+					} else {
+						ToastUtil.showMessage(R.string.save_fail);
+					}
+				}, throwable -> {
+					ProgressDialogUtils.getInstance(ModifyUserInfoNewActivity.this).dismiss();
+					ToastUtil.showMessage(R.string.network_requests_error);
+				});
+	}
 
-		@Override
-		public void onErrorExecute(String error) {
-			ToastUtil.showMessage(R.string.save_fail);
-			ProgressDialogUtils.getInstance(ModifyUserInfoNewActivity.this).dismiss();
+	private ArrayMap<String, String> getParam(ClientUser clientUser) {
+		ArrayMap<String, String> params = new ArrayMap<>();
+		params.put("sex", clientUser.sex);
+		params.put("nickName", clientUser.user_name);
+		params.put("faceurl", clientUser.face_url);
+		if(!TextUtils.isEmpty(clientUser.personality_tag)){
+			params.put("personalityTag", clientUser.personality_tag);
 		}
+		if(!TextUtils.isEmpty(clientUser.part_tag)){
+			params.put("partTag", clientUser.part_tag);
+		}
+		if(!TextUtils.isEmpty(clientUser.intrest_tag)){
+			params.put("intrestTag", clientUser.intrest_tag);
+		}
+		params.put("age", String.valueOf(clientUser.age));
+		params.put("signature", clientUser.signature == null ? "" : clientUser.signature);
+		params.put("qq", clientUser.qq_no == null ? "" : clientUser.qq_no);
+		params.put("wechat", clientUser.weixin_no == null ? "" : clientUser.weixin_no);
+		params.put("publicSocialNumber", String.valueOf(clientUser.publicSocialNumber));
+		params.put("emotionStatus", clientUser.state_marry == null ? "" : clientUser.state_marry);
+		params.put("tall", clientUser.tall == null ? "" : clientUser.tall);
+		params.put("weight", clientUser.weight == null ? "" : clientUser.weight);
+		params.put("constellation", clientUser.constellation == null ? "" : clientUser.constellation);
+		params.put("occupation", clientUser.occupation == null ? "" : clientUser.occupation);
+		params.put("education", clientUser.education == null ? "" : clientUser.education);
+		params.put("purpose", clientUser.purpose == null ? "" : clientUser.purpose);
+		params.put("loveWhere", clientUser.love_where == null ? "" : clientUser.love_where);
+		params.put("doWhatFirst", clientUser.do_what_first == null ? "" : clientUser.do_what_first);
+		params.put("conception", clientUser.conception == null ? "" : clientUser.conception);
+		params.put("isDownloadVip", String.valueOf(clientUser.is_download_vip));
+		params.put("goldNum", String.valueOf(clientUser.gold_num));
+		params.put("phone", clientUser.mobile);
+		params.put("isCheckPhone", String.valueOf(clientUser.isCheckPhone));
+		return params;
 	}
 
 
@@ -330,15 +524,12 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
 							case 0:
-								if (AppManager.checkPermission(ModifyUserInfoNewActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_PERMISSION_WRITE)) {
-									isWritePersimmion = true;
-									if (AppManager.checkPermission(ModifyUserInfoNewActivity.this, Manifest.permission.CAMERA, CAMERA_RESULT)) {
-										openCamera();
-									}
-								}
+								isOpenCamara = true;
+								checkPOpenCameraAlbums();
 								break;
 							case 1:
-								openAlbums();
+								isOpenCamara = false;
+								checkPOpenCameraAlbums();
 								break;
 						}
 						dialog.dismiss();
@@ -346,6 +537,55 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 				});
 		builder.show();
 	}
+
+	private void checkPOpenCameraAlbums() {
+		if (!CheckUtil.isGetPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+				!CheckUtil.isGetPermission(this, Manifest.permission.CAMERA) ||
+				!CheckUtil.isGetPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+			if (rxPermissions == null) {
+				rxPermissions = new RxPermissions(this);
+			}
+			rxPermissions.requestEachCombined(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+					Manifest.permission.CAMERA,
+					Manifest.permission.READ_EXTERNAL_STORAGE)
+					.subscribe(permission -> {// will emit 1 Permission object
+						if (permission.granted) {
+							// All permissions are granted !
+							if (isOpenCamara) {
+								openCamera();
+							} else {
+								openAlbums();
+							}
+						} else if (permission.shouldShowRequestPermissionRationale) {
+							// At least one denied permission without ask never again
+							showPermissionDialog(R.string.open_camera_write_external_permission, REQUEST_PERMISSION_CAMERA_WRITE_EXTERNAL);
+						} else {
+							// At least one denied permission with ask never again
+							// Need to go to the settings
+							showPermissionDialog(R.string.open_camera_write_external_permission, REQUEST_PERMISSION_CAMERA_WRITE_EXTERNAL);
+						}
+					}, throwable -> {
+
+					});
+		} else {
+			if (isOpenCamara) {
+				openCamera();
+			} else {
+				openAlbums();
+			}
+		}
+	}
+
+    private void showPermissionDialog(int textResId, int requestCode) {
+        Builder builder = new Builder(this);
+		builder.setTitle(R.string.permission_request);
+        builder.setMessage(textResId);
+        builder.setPositiveButton(R.string.ok, (dialog, i) -> {
+            dialog.dismiss();
+            Utils.goToSetting(this, requestCode);
+        });
+        builder.show();
+    }
 
 	/**
 	 * 年龄
@@ -403,6 +643,234 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 			}
 		});
 		builder.show();
+	}
+
+	/**
+	 * 交友目的
+	 */
+	private void showSelectPurposeDialog(){
+		final String[] array = getResources().getStringArray(R.array.purpose);
+		Builder builder = new Builder(this);
+		builder.setSingleChoiceItems(array, 3, null);
+		builder.setPositiveButton(R.string.ok, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
+				clientUser.purpose = array[selectedPosition];
+				mPurpose.setText(array[selectedPosition]);
+			}
+		});
+		builder.show();
+	}
+
+	/**
+	 * 喜欢爱爱地点
+	 */
+	private void showSelectLoveWhereDialog(){
+		final String[] array = getResources().getStringArray(R.array.where);
+		Builder builder = new Builder(this);
+		builder.setSingleChoiceItems(array, 3, null);
+		builder.setPositiveButton(R.string.ok, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
+				clientUser.love_where = array[selectedPosition];
+				mLoveWhere.setText(array[selectedPosition]);
+			}
+		});
+		builder.show();
+	}
+
+	/**
+	 * 首次见面
+	 */
+	private void showSelectdoWhatFirstDialog(){
+		final String[] array = getResources().getStringArray(R.array.doWhatFirst);
+		Builder builder = new Builder(this);
+		builder.setSingleChoiceItems(array, 3, null);
+		builder.setPositiveButton(R.string.ok, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
+				clientUser.do_what_first = array[selectedPosition];
+				mDoWhatFirst.setText(array[selectedPosition]);
+			}
+		});
+		builder.show();
+	}
+
+	/**
+	 * 恋爱观念
+	 */
+	private void showSelectConceptionDialog(){
+		final String[] array = getResources().getStringArray(R.array.conception);
+		Builder builder = new Builder(this);
+		builder.setSingleChoiceItems(array, 3, null);
+		builder.setPositiveButton(R.string.ok, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
+				clientUser.conception = array[selectedPosition];
+				mConception.setText(array[selectedPosition]);
+			}
+		});
+		builder.show();
+	}
+
+	/**
+	 * 我的个性标签
+	 */
+	private void showLableDialog() {
+		mVals.clear();
+		if ("1".equals(AppManager.getClientUser().sex)) {
+			commonDialog(R.string.lable,
+					getResources().getStringArray(R.array.male_lable), null, mLableFlowlayout, mLableText);
+		} else {
+			commonDialog(R.string.lable,
+					getResources().getStringArray(R.array.female_lable), null, mLableFlowlayout, mLableText);
+		}
+	}
+
+	/**
+	 * 最满意部位
+	 */
+	private void showPartDialog() {
+		mVals.clear();
+		if ("1".equals(AppManager.getClientUser().sex)) {
+			commonDialog(R.string.satisfacies_part,
+					getResources().getStringArray(R.array.male_sex_part), null, mPartFlowlayout, mPartText);
+		} else {
+			commonDialog(R.string.satisfacies_part,
+					getResources().getStringArray(R.array.female_sex_part), null, mPartFlowlayout, mPartText);
+		}
+	}
+
+	/**
+	 * 我的兴趣
+	 */
+	private void showIntrestDialog() {
+		mVals.clear();
+		commonDialog(R.string.intrest,
+				getResources().getStringArray(R.array.intrest), null, mIntrestFlowlayout, mIntrestText);
+	}
+
+	private void commonDialog(int resId, final String[] array, final boolean[] isSelected,
+							  final TagLayout mLayout, final TextView textView) {
+		Builder builder = new Builder(this);
+		builder.setTitle(resId);
+		builder.setMultiChoiceItems(array, isSelected, new DialogInterface.OnMultiChoiceClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+				if (isChecked) {
+					mVals.add(array[which]);
+				} else {
+					mVals.remove(array[which]);
+				}
+			}
+		});
+		builder.setNegativeButton(R.string.cancel, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			}
+		});
+		builder.setPositiveButton(R.string.ok, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if (mVals != null && mVals.size() == 0) {
+					mVals.add(array[0]);
+				}
+				if (mVals != null && mVals.size() > 0) {
+					mLayout.setVisibility(View.VISIBLE);
+					textView.setVisibility(View.GONE);
+					mLayout.setTags(mVals);
+					String value = StringUtil.listToString(mVals);
+					if (mLayout == mLableFlowlayout) {
+						clientUser.personality_tag = value;
+					} else if (mLayout == mPartFlowlayout){
+						clientUser.part_tag = value;
+					} else {
+						clientUser.intrest_tag = value;
+					}
+				} else {
+					mLayout.setVisibility(View.GONE);
+					textView.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+		builder.show();
+	}
+
+	/**
+	 * 点击流式布局之后显示的dialog
+	 *
+	 * @param
+	 */
+	private void showOnClickFlowLayoutDialog(int id) {
+		mVals.clear();
+		switch (id) {
+			case R.id.lable_flowlayout:
+				String lableTag = ";" + clientUser.personality_tag;
+				if (!TextUtils.isEmpty(lableTag)) {
+					String[] lableArray = null;
+					if ("1".equals(AppManager.getClientUser().sex)) {
+						lableArray = getResources().getStringArray(R.array.male_lable);
+					} else {
+						lableArray = getResources().getStringArray(R.array.female_lable);
+					}
+					boolean[] lableSelected = new boolean[lableArray.length];
+					for (int i = 0; i < lableArray.length; i++) {
+						if (lableTag.indexOf(lableArray[i]) > 0) {
+							mVals.add(lableArray[i]);
+							lableSelected[i] = true;
+						} else {
+							lableSelected[i] = false;
+						}
+					}
+					commonDialog(R.string.lable, lableArray, lableSelected, mLableFlowlayout, mLableText);
+				}
+				break;
+			case R.id.part_flowlayout:
+				String partTag = ";" + clientUser.part_tag;
+				if (!TextUtils.isEmpty(partTag)) {
+					String[] partArray = null;
+					if ("1".equals(AppManager.getClientUser().sex)) {
+						partArray = getResources().getStringArray(R.array.male_sex_part);
+					} else {
+						partArray = getResources().getStringArray(R.array.female_sex_part);
+					}
+					boolean[] partSelected = new boolean[partArray.length];
+					for (int i = 0; i < partArray.length; i++) {
+						if (partTag.indexOf(partArray[i]) > 0) {
+							mVals.add(partArray[i]);
+							partSelected[i] = true;
+						} else {
+							partSelected[i] = false;
+						}
+					}
+					commonDialog(R.string.satisfacies_part, partArray, partSelected, mPartFlowlayout, mPartText);
+				}
+				break;
+			case R.id.intrest_flowlayout:
+				String intrestTag = ";" + clientUser.intrest_tag;
+				if (!TextUtils.isEmpty(intrestTag)) {
+					String[] intrestArray = getResources().getStringArray(R.array.intrest);
+					boolean[] partSelected = new boolean[intrestArray.length];
+					for (int i = 0; i < intrestArray.length; i++) {
+						if (intrestTag.indexOf(intrestArray[i]) > 0) {
+							mVals.add(intrestArray[i]);
+							partSelected[i] = true;
+						} else {
+							partSelected[i] = false;
+						}
+					}
+					commonDialog(R.string.satisfacies_part, intrestArray, partSelected, mIntrestFlowlayout, mIntrestText);
+				}
+				break;
+		}
 	}
 
 	/**
@@ -553,35 +1021,33 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 	 * 打开相机
 	 */
 	private void openCamera() {
-		hideSoftKeyboard();
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		if (intent.resolveActivity(getPackageManager())!=null){
-			String mPhotoDirPath = Environment
-					.getExternalStoragePublicDirectory(
-							Environment.DIRECTORY_DCIM).getPath();
+
+			String mPhotoDirPath = Environment.getExternalStorageDirectory()+"/Android/data/com.youdo.karma/files/";
 			File mPhotoDirFile = new File(mPhotoDirPath);
 			if (!mPhotoDirFile.exists()) {
-				mPhotoDirFile.mkdir();
+				mPhotoDirFile.mkdirs();
 			}
-			mPhotoPath = mPhotoDirPath + File.separator + getPhotoFileName();
-			mPhotoFile = new File(mPhotoPath);
-			if (!mPhotoFile.exists()) {
+			mCutFile = new File(mPhotoDirPath, getPhotoFileName());//照相机的File对象
+			if (mPhotoDirFile.exists() && !mCutFile.exists()) {
 				try {
-					mPhotoFile.createNewFile();
+					mCutFile.createNewFile();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			if (mPhotoFile != null) {
-				//FileProvider 是一个特殊的 ContentProvider 的子类，
-				//它使用 content:// Uri 代替了 file:/// Uri. ，更便利而且安全的为另一个app分享文件
-				mPhotoOnSDCardUri = FileProvider.getUriForFile(this,
-						"com.youdo.karma.fileProvider",
-						mPhotoFile);
-				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
-				intent.putExtra(MediaStore.EXTRA_OUTPUT, mPhotoOnSDCardUri);
-				startActivityForResult(intent, CAMERA_RESULT);
+			Intent intentFromCapture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {//7.0及以上
+				mPhotoOnSDCardUri = FileProvider.getUriForFile(this, AUTHORITY, mCutFile);
+				intentFromCapture.putExtra(MediaStore.EXTRA_OUTPUT, mPhotoOnSDCardUri);
+				intentFromCapture.addFlags(FLAG_GRANT_READ_URI_PERMISSION);
+				intentFromCapture.addFlags(FLAG_GRANT_WRITE_URI_PERMISSION);
+			} else {
+				mPhotoOnSDCardUri = Uri.fromFile(mCutFile);
+				intentFromCapture.putExtra(MediaStore.EXTRA_OUTPUT, mPhotoOnSDCardUri);
 			}
+			startActivityForResult(intentFromCapture, CAMERA_RESULT);
 		}
 	}
 
@@ -601,40 +1067,67 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 	 * 打开相册
 	 */
 	private void openAlbums() {
-		Intent openAlbumIntent = new Intent(Intent.ACTION_GET_CONTENT);
-		openAlbumIntent.setType("image/*");
-		startActivityForResult(openAlbumIntent, ALBUMS_RESULT);
+		String mPhotoDirPath = Environment.getExternalStorageDirectory()+"/Android/data/com.youdo.karma/files/";
+		File mPhotoDirFile = new File(mPhotoDirPath);
+		if (!mPhotoDirFile.exists()) {
+			mPhotoDirFile.mkdirs();
+		}
+		mCutFile = new File(mPhotoDirPath, "cutphoto.png");
+		if (!mCutFile.exists()) {
+			try {
+				mCutFile.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		intent.setType("image/*");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {//如果大于等于7.0使用FileProvider
+			Uri uriForFile = FileProvider.getUriForFile
+					(this, AUTHORITY, mCutFile);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, uriForFile);
+			intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			startActivityForResult(intent, ALBUMS_RESULT);
+		} else {
+			startActivityForResult(intent, ALBUMS_RESULT);
+		}
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK && requestCode == CAMERA_RESULT) {
-			Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-					mPhotoOnSDCardUri);
+			Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, mPhotoOnSDCardUri);
 			sendBroadcast(intent);
-			if (mPhotoOnSDCardUri != null) {
-				File file = new File(mPhotoPath);
-				if (file.exists()) {
-					cutPhoto(file);
-				}
+			if (mPhotoOnSDCardUri != null && null != mCutFile && mCutFile.exists()) {
+				Utils.cutPhoto(this, mPhotoOnSDCardUri, mCutFile, PHOTO_CUT_RESULT);
 			}
 		} else if (resultCode == RESULT_OK && requestCode == ALBUMS_RESULT) {
-			Uri originalUri = data.getData();
-			if (!TextUtils.isEmpty(FileUtils.getPath(this, originalUri))) {
-				cutPhoto(new File(FileUtils.getPath(this, originalUri)));
+			if (mCutFile != null) {
+				Uri originalUri = data.getData();
+				File originalFile = new File(FileUtils.getPath(this, originalUri));
+				Uri dataUri;
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					dataUri = FileProvider.getUriForFile(this, AUTHORITY, originalFile);
+				} else {
+					dataUri = originalUri;
+				}
+				Utils.cutPhoto(this, dataUri, mCutFile, PHOTO_CUT_RESULT);
 			}
 		} else if (resultCode == RESULT_OK && requestCode == PHOTO_CUT_RESULT) {
 			mPortraitUri = data.getData();
 			if (mPortraitUri == null && mCutFile != null) {
-				mPortraitUri = Uri.parse(mCutFile.getPath());
+				mPortraitUri = FileProvider.getUriForFile(this, AUTHORITY, mCutFile);
 			}
-			if (mPortraitUri != null
-					&& new File(mPortraitUri.getPath()).exists()) {
+			if (mPortraitUri != null && null != mCutFile && mCutFile.exists()) {
 				ProgressDialogUtils.getInstance(this).show(R.string.dialog_request_uploda);
 				new OSSImgUploadTask().request(AppManager.getFederationToken().bucketName,
-						AppManager.getOSSFacePath(), mPortraitUri.getPath());
+						AppManager.getOSSFacePath(), mCutFile.getAbsolutePath());
 			}
+		} else if (requestCode == REQUEST_PERMISSION_CAMERA_WRITE_EXTERNAL) {
+			checkPOpenCameraAlbums();
 		}
 	}
 
@@ -644,67 +1137,21 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 	class OSSImgUploadTask extends OSSImagUploadRequest {
 		@Override
 		public void onPostExecute(String s) {
-			ProgressDialogUtils.getInstance(ModifyUserInfoNewActivity.this).dismiss();
+			if (null != ModifyUserInfoNewActivity.this && !ModifyUserInfoNewActivity.this.isFinishing()) {
+				ProgressDialogUtils.getInstance(ModifyUserInfoNewActivity.this).dismiss();
+			}
 			clientUser.face_url = AppConstants.OSS_IMG_ENDPOINT + s;
 			clientUser.face_local = mPortraitUri.getPath();
-//			mPortraitPhoto.setImageURI(Uri.parse("file://" + mPortraitUri.getPath()));
 			mPortraitPhoto.setImageURI(clientUser.face_url);
-			AppManager.setClientUser(clientUser);
-			AppManager.saveUserInfo();
-			EventBus.getDefault().post(new UserEvent());
-			new UpdateUserTask().request(clientUser);
+            RxBus.getInstance().post(UPDATE_USER_INFO, new UserEvent());
+            updateUserInfo(clientUser);
+            isUploadPortrait = true;
 		}
 
 		@Override
 		public void onErrorExecute(String error) {
 			ToastUtil.showMessage(error);
 		}
-	}
-
-	class UpdateUserTask extends UpdateUserInfoRequest {
-		@Override
-		public void onPostExecute(String s) {
-			ToastUtil.showMessage(R.string.save_success);
-			ProgressDialogUtils.getInstance(ModifyUserInfoNewActivity.this).dismiss();
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-			ToastUtil.showMessage(R.string.save_fail);
-			ProgressDialogUtils.getInstance(ModifyUserInfoNewActivity.this).dismiss();
-		}
-	}
-
-	/**
-	 * 剪切图片
-	 *
-	 * @param file
-	 */
-	private void cutPhoto(File file) {
-		mCutFile = new File(FileAccessorUtils.getImagePathName(),
-				"cutphoto.png");
-		if (!mCutFile.exists()) {
-			try {
-				mCutFile.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-//		Uri imageUri=FileProvider.getUriForFile(this, "com.youdo.karma.fileProvider", file);//通过FileProvider创建一个content类型的Uri
-		Uri imageUri = Uri.fromFile(file);
-		Intent intent = new Intent("com.android.camera.action.CROP");
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		intent.setDataAndType(imageUri, "image/*");
-		intent.putExtra("crop", "true");
-		intent.putExtra("outputX", 500);
-		intent.putExtra("outputY", 500);
-		intent.putExtra("aspectX", 1);
-		intent.putExtra("aspectY", 1);
-		intent.putExtra("scale", true);
-		intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mCutFile));
-		intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
-		intent.putExtra("noFaceDetection", true); // no face detection
-		startActivityForResult(intent, PHOTO_CUT_RESULT);
 	}
 
 	@Override
@@ -724,67 +1171,5 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 		super.onPause();
 		MobclickAgent.onPageEnd(this.getClass().getName());
 		MobclickAgent.onPause(this);
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-		if (requestCode == CAMERA_RESULT) {
-			// 拒绝授权
-			if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-				// 勾选了不再提示
-				if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-					showOpenCameraDialog();
-				} else {
-				}
-			} else if (isWritePersimmion) {
-				openCamera();
-			}
-		} else if (requestCode == REQUEST_PERMISSION_WRITE) {//读写文件夹权限
-			// 拒绝授权
-			if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-				// 勾选了不再提示
-				if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-					showWriteDialog();
-				}
-			} else {
-				isWritePersimmion = true;
-				AppManager.checkPermission(this, Manifest.permission.CAMERA, CAMERA_RESULT);
-			}
-		}
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-	}
-
-	private void showOpenCameraDialog(){
-		Builder builder = new Builder(this);
-		builder.setMessage(R.string.open_camera_permission);
-		builder.setPositiveButton(R.string.ok, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-				Uri uri = Uri.fromParts("package", getPackageName(), null);
-				intent.setData(uri);
-				startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-
-			}
-		});
-		builder.show();
-	}
-
-	private void showWriteDialog(){
-		Builder builder = new Builder(this);
-		builder.setMessage(R.string.open_write_external);
-		builder.setPositiveButton(R.string.ok, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-				Uri uri = Uri.fromParts("package", getPackageName(), null);
-				intent.setData(uri);
-				startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-
-			}
-		});
-		builder.show();
 	}
 }

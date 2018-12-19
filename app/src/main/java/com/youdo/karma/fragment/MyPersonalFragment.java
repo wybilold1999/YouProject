@@ -1,10 +1,12 @@
 package com.youdo.karma.fragment;
 
+import android.arch.lifecycle.Lifecycle;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -15,6 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.AboutActivity;
 import com.youdo.karma.activity.ExpressionActivity;
@@ -27,20 +35,18 @@ import com.youdo.karma.db.ExpressionGroupSqlManager;
 import com.youdo.karma.db.ExpressionSqlManager;
 import com.youdo.karma.db.IMessageDaoManager;
 import com.youdo.karma.db.MyGoldDaoManager;
-import com.youdo.karma.db.NameListDaoManager;
 import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.eventtype.UserEvent;
 import com.youdo.karma.manager.AppManager;
-import com.youdo.karma.manager.NotificationManager;
+import com.youdo.karma.manager.NotificationManagerUtils;
+import com.youdo.karma.net.IUserApi;
+import com.youdo.karma.net.base.RetrofitFactory;
 import com.youdo.karma.net.request.DownloadFileRequest;
-import com.youdo.karma.net.request.LogoutRequest;
 import com.youdo.karma.utils.FileAccessorUtils;
 import com.youdo.karma.utils.Md5Util;
 import com.youdo.karma.utils.PreferencesUtils;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.ToastUtil;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -51,6 +57,8 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.youdo.karma.activity.base.BaseActivity.finishAll;
 
@@ -63,25 +71,25 @@ import static com.youdo.karma.activity.base.BaseActivity.finishAll;
 public class MyPersonalFragment extends Fragment {
 
 	@BindView(R.id.user_name)
-	TextView userName;
+    TextView userName;
 	@BindView(R.id.signature)
-	TextView signature;
+    TextView signature;
 	@BindView(R.id.user_info)
-	LinearLayout userInfo;
+    LinearLayout userInfo;
 	@BindView(R.id.head_portrait_lay)
-	RelativeLayout headPortraitLay;
+    RelativeLayout headPortraitLay;
 	@BindView(R.id.portrait)
-	SimpleDraweeView mPortrait;
+    SimpleDraweeView mPortrait;
 	@BindView(R.id.quit)
-	RelativeLayout mQuit;
+    RelativeLayout mQuit;
 	@BindView(R.id.setting)
-	RelativeLayout setting;
+    RelativeLayout setting;
 	@BindView(R.id.about)
-	RelativeLayout about;
+    RelativeLayout about;
 	@BindView(R.id.sticker_market)
-	RelativeLayout mSticker;
+    RelativeLayout mSticker;
 	@BindView(R.id.feed_back)
-	RelativeLayout mFeedBack;
+    RelativeLayout mFeedBack;
 
 	private View rootView;
 
@@ -89,7 +97,7 @@ public class MyPersonalFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 		if (rootView == null) {
 			rootView = inflater.inflate(R.layout.fragment_my_personal, null);
 			ButterKnife.bind(this, rootView);
@@ -191,27 +199,45 @@ public class MyPersonalFragment extends Fragment {
 		}
 	}
 
-	class LogoutTask extends LogoutRequest {
-		@Override
-		public void onPostExecute(String s) {
-			ProgressDialogUtils.getInstance(getActivity()).dismiss();
-			MobclickAgent.onProfileSignOff();
-			release();
-			NotificationManager.getInstance().cancelNotification();
-			finishAll();
-			PreferencesUtils.setIsLogin(getActivity(), false);
-			Intent intent = getActivity().getPackageManager()
-					.getLaunchIntentForPackage(
-							getActivity().getPackageName());
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-			ProgressDialogUtils.getInstance(getActivity()).dismiss();
-			ToastUtil.showMessage(error);
-		}
+	private void logoutRequest() {
+		ArrayMap<String, String> params = new ArrayMap<>();
+		params.put("deviceName", AppManager.getDeviceName());
+		params.put("appVersion", String.valueOf(AppManager.getVersionCode()));
+		params.put("systemVersion", AppManager.getDeviceSystemVersion());
+		params.put("deviceId", AppManager.getDeviceId());
+		RetrofitFactory.getRetrofit().create(IUserApi.class)
+				.userLogout(AppManager.getClientUser().sessionId, params)
+				.subscribeOn(Schedulers.io())
+				.map(responseBody -> {
+					ClientUser clientUser = new ClientUser();
+					JsonObject obj = new JsonParser().parse(responseBody.string()).getAsJsonObject();
+					int code = obj.get("code").getAsInt();
+					if (code == 1) {
+						clientUser.age = 1;//用age代表code
+					} else {
+						clientUser.age = 0;
+					}
+					return clientUser;
+				})
+				.observeOn(AndroidSchedulers.mainThread())
+				.as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)))
+				.subscribe(mClientUser -> {
+					ProgressDialogUtils.getInstance(getActivity()).dismiss();
+							MobclickAgent.onProfileSignOff();
+							release();
+							NotificationManagerUtils.getInstance().cancelNotification();
+							finishAll();
+							PreferencesUtils.setIsLogin(getActivity(), false);
+							Intent intent = getActivity().getPackageManager()
+									.getLaunchIntentForPackage(
+											getActivity().getPackageName());
+							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(intent);
+				},
+				throwable -> {
+					ProgressDialogUtils.getInstance(getActivity()).dismiss();
+					ToastUtil.showMessage(R.string.network_requests_error);
+				});
 	}
 
 	/**
@@ -228,7 +254,7 @@ public class MyPersonalFragment extends Fragment {
 								switch (which) {
 									case 0:
 										ProgressDialogUtils.getInstance(getActivity()).show(R.string.dialog_logout_tips);
-										new LogoutTask().request();
+										logoutRequest();
 										break;
 									case 1:
 										finishAll();
@@ -248,7 +274,6 @@ public class MyPersonalFragment extends Fragment {
 		ContactSqlManager.reset();
 		ExpressionGroupSqlManager.reset();
 		ExpressionSqlManager.reset();
-		NameListDaoManager.reset();
 	}
 
 

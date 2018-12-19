@@ -6,12 +6,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.adapter.TabFragmentAdapter;
 import com.youdo.karma.fragment.MyStickerFragment;
 import com.youdo.karma.fragment.StickerMarketFragment;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +22,12 @@ import butterknife.ButterKnife;
 /**
  * 表情相关
  */
-public class ExpressionActivity extends BaseActivity  {
+public class ExpressionActivity extends BaseActivity {
 
 	@BindView(R.id.tabs)
-	TabLayout mTabLayout;
+    TabLayout mTabLayout;
 	@BindView(R.id.viewpager)
-	ViewPager mViewpager;
+    ViewPager mViewpager;
 
 	private List<String> tabList;
 	private List<Fragment> fragmentList;
@@ -35,7 +35,7 @@ public class ExpressionActivity extends BaseActivity  {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_make_money);
+		setContentView(R.layout.activity_expression);
 		ButterKnife.bind(this);
 		Toolbar toolbar = getActionBarToolbar();
 		if (toolbar != null) {

@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.db.base.DBManager;
+import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.entity.Conversation;
 import com.youdo.karma.greendao.ConversationDao;
 import com.youdo.karma.listener.MessageChangedListener;

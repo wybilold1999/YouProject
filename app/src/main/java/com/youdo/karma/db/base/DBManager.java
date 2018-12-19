@@ -14,7 +14,7 @@ import com.youdo.karma.manager.AppManager;
  * 描述：数据库管理类
  */
 public class DBManager {
-	private final static String dbName = "you_db";
+	private final static String dbName = "mo_db";
 	private static DaoMaster.OpenHelper openHelper;
 	private Context context;
 	private static SQLiteDatabase sqliteDB;

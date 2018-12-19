@@ -1,8 +1,10 @@
 package com.youdo.karma.activity;
 
+import android.arch.lifecycle.Lifecycle;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -11,6 +13,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
 import com.youdo.karma.adapter.PhotosAdapter;
@@ -19,14 +25,15 @@ import com.youdo.karma.db.ContactSqlManager;
 import com.youdo.karma.entity.ClientUser;
 import com.youdo.karma.entity.Contact;
 import com.youdo.karma.listener.ModifyContactsListener;
-import com.youdo.karma.net.request.GetUserPictureRequest;
+import com.youdo.karma.manager.AppManager;
+import com.youdo.karma.net.IUserPictureApi;
+import com.youdo.karma.net.base.RetrofitFactory;
 import com.youdo.karma.ui.widget.NoScrollGridView;
+import com.youdo.karma.utils.JsonUtils;
 import com.youdo.karma.utils.ToastUtil;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.umeng.analytics.MobclickAgent;
 
-import java.util.List;
-
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
@@ -106,30 +113,33 @@ public class ContactInfoActivity extends BaseActivity implements OnClickListener
 			mAddFriend.setVisibility(View.GONE);
 		}
 		if (mContact != null) {
-			new GetUserPicTask().request(mContact.userId, pageNo, pageSize);
+			getUserPicRequest(mContact.userId, pageNo, pageSize);
 			setContactInfo(mContact);
 		}
 	}
 
-	class GetUserPicTask extends GetUserPictureRequest {
-
-		@Override
-		public void onPostExecute(List<String> strings) {
-			if (strings != null && strings.size() > 0) {
-				mGridView.setVisibility(View.VISIBLE);
-				mAdapter = new PhotosAdapter(ContactInfoActivity.this, strings, mGridView);
-				mGridView.setAdapter(mAdapter);
-			} else {
-				mGridView.setVisibility(View.GONE);
-			}
-		}
-
-		@Override
-		public void onErrorExecute(String error) {
-		}
-
+	private void getUserPicRequest(String userId, int pageNo, int pageSize) {
+		ArrayMap<String, String> params = new ArrayMap<>();
+		params.put("pageNo", String.valueOf(pageNo));
+		params.put("pageSize", String.valueOf(pageSize));
+		params.put("uid", userId);
+		RetrofitFactory.getRetrofit().create(IUserPictureApi.class)
+				.getUserPictureList(AppManager.getClientUser().sessionId, params)
+				.subscribeOn(Schedulers.io())
+				.map(responseBody -> JsonUtils.parseJsonPics(responseBody.string()))
+				.observeOn(AndroidSchedulers.mainThread())
+				.as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)))
+				.subscribe(pics -> {
+					if (pics != null && pics.size() > 0) {
+						mGridView.setVisibility(View.VISIBLE);
+						mAdapter = new PhotosAdapter(ContactInfoActivity.this, pics, mGridView);
+						mGridView.setAdapter(mAdapter);
+					} else {
+						mGridView.setVisibility(View.GONE);
+					}
+				}, throwable -> {
+				});
 	}
-
 
 	/**
 	 * 设置通讯录信息
