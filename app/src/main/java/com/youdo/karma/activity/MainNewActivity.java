@@ -233,11 +233,11 @@ public class MainNewActivity extends BaseActivity implements MessageUnReadListen
 				if(bottomNavigationView.getMenu().getItem(position).isChecked()){
 					bottomNavigationView.getMenu().getItem(position).setChecked(false);
 				}
-				String title = getResources().getString(R.string.tab_find_love);
+				String title = getResources().getString(R.string.tab_message);
 				if (position == 1) {
-					title = getResources().getString(R.string.tab_found);
+					title = getResources().getString(R.string.tab_contacts);
 				} else if (position == 2) {
-					title = getResources().getString(R.string.tab_message);
+					title = getResources().getString(R.string.tab_found);
 				} else if (position == 3) {
 					title = getResources().getString(R.string.tab_personal);
 				}

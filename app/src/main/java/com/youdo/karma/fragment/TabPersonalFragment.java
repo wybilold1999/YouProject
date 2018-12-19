@@ -359,7 +359,7 @@ public class TabPersonalFragment extends Fragment implements GeocodeSearch.OnGeo
 	}
 
 	private void setUserInfo(ClientUser clientUser) {
-		if (AppManager.getClientUser().isShowVip) {
+		if (AppManager.getClientUser().isShowGold) {
 			mSocialCard.setVisibility(View.VISIBLE);
 			mSocialText.setVisibility(View.VISIBLE);
 		} else {

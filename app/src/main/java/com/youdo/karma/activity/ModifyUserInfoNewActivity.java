@@ -14,7 +14,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -24,7 +23,6 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.dl7.tag.TagLayout;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -51,7 +49,6 @@ import com.youdo.karma.utils.FileUtils;
 import com.youdo.karma.utils.Md5Util;
 import com.youdo.karma.utils.ProgressDialogUtils;
 import com.youdo.karma.utils.RxBus;
-import com.youdo.karma.utils.StringUtil;
 import com.youdo.karma.utils.ToastUtil;
 import com.youdo.karma.utils.Utils;
 
@@ -121,52 +118,8 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 	TextView mMarried;
 	@BindView(R.id.married_lay)
 	RelativeLayout mMarriedLay;
-	@BindView(R.id.purpose)
-	TextView mPurpose;
-	@BindView(R.id.purpose_lay)
-	RelativeLayout mPurposeLay;
-	@BindView(R.id.love_where)
-	TextView mLoveWhere;
-	@BindView(R.id.love_where_lay)
-	RelativeLayout mLoveWhereLay;
-	@BindView(R.id.do_what_first)
-	TextView mDoWhatFirst;
-	@BindView(R.id.do_what_first_lay)
-	RelativeLayout mDoWhatFirstLay;
-	@BindView(R.id.conception)
-	TextView mConception;
-	@BindView(R.id.conception_lay)
-	RelativeLayout mConceptionLay;
-	@BindView(R.id.lable_text)
-	TextView mLableText;
-	@BindView(R.id.lable_flowlayout)
-	TagLayout mLableFlowlayout;
-	@BindView(R.id.lable_lay)
-	RelativeLayout mLableLay;
-	@BindView(R.id.part_text)
-	TextView mPartText;
-	@BindView(R.id.part_flowlayout)
-	TagLayout mPartFlowlayout;
-	@BindView(R.id.part_lay)
-	RelativeLayout mPartLay;
-	@BindView(R.id.intrest_text)
-	TextView mIntrestText;
-	@BindView(R.id.intrest_flowlayout)
-	TagLayout mIntrestFlowlayout;
-	@BindView(R.id.intrest_lay)
-	RelativeLayout mIntrestLay;
-	@BindView(R.id.weixin)
-	TextView mWeixin;
-	@BindView(R.id.weixin_lay)
-	RelativeLayout mWeixinLay;
-	@BindView(R.id.qq)
-	TextView mQq;
-	@BindView(R.id.qq_lay)
-	RelativeLayout mQqLay;
-	@BindView(R.id.tv_friend)
-	TextView mTvFriend;
-	@BindView(R.id.card_friend)
-	CardView mCardFriend;
+
+
 
 	private Uri mPhotoOnSDCardUri;
 	private Uri mPortraitUri;
@@ -205,7 +158,7 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_modify_userinfo);
+		setContentView(R.layout.activity_modify_userinfo_new);
 		ButterKnife.bind(this);
 		Toolbar toolbar = getActionBarToolbar();
 		if (toolbar != null) {
@@ -269,66 +222,10 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 			if (!TextUtils.isEmpty(clientUser.constellation)) {
 				mConstellation.setText(clientUser.constellation);
 			}
-			if (!TextUtils.isEmpty(clientUser.purpose)) {
-				mPurpose.setText(clientUser.purpose);
-			}
-			if (!TextUtils.isEmpty(clientUser.love_where)) {
-				mLoveWhere.setText(clientUser.love_where);
-			}
-			if (!TextUtils.isEmpty(clientUser.do_what_first)) {
-				mDoWhatFirst.setText(clientUser.do_what_first);
-			}
-			if (!TextUtils.isEmpty(clientUser.conception)) {
-				mConception.setText(clientUser.conception);
-			}
-			if (!TextUtils.isEmpty(clientUser.qq_no)) {
-				mQq.setText(clientUser.qq_no);
-			}
-			if (!TextUtils.isEmpty(clientUser.weixin_no)) {
-				mWeixin.setText(clientUser.weixin_no);
-			}
-			if (!TextUtils.isEmpty(clientUser.personality_tag)) {
-				mLableFlowlayout.setVisibility(View.VISIBLE);
-				mLableText.setVisibility(View.GONE);
-				mVals.clear();
-				mVals = StringUtil.stringToIntList(clientUser.personality_tag);
-				for (int i = 0; i < mVals.size(); i++) {
-					if ("".equals(mVals.get(i)) || " ".equals(mVals.get(i))) {
-						mVals.remove(i);
-					}
-				}
-				mLableFlowlayout.setTags(mVals);
-//				mLableFlowlayout.setAdapter(
-//						new PartLableTagAdapter(mVals, mLableFlowlayout));
-			}
-			if (!TextUtils.isEmpty(clientUser.part_tag)) {
-				mPartFlowlayout.setVisibility(View.VISIBLE);
-				mPartText.setVisibility(View.GONE);
-				mVals.clear();
-				mVals = StringUtil.stringToIntList(clientUser.part_tag);
-				for (int i = 0; i < mVals.size(); i++) {
-					if ("".equals(mVals.get(i)) || " ".equals(mVals.get(i))) {
-						mVals.remove(i);
-					}
-				}
-				mPartFlowlayout.setTags(mVals);
-			}
-			if (!TextUtils.isEmpty(clientUser.intrest_tag)) {
-				mIntrestFlowlayout.setVisibility(View.VISIBLE);
-				mIntrestText.setVisibility(View.GONE);
-				mVals.clear();
-				mVals = StringUtil.stringToIntList(clientUser.intrest_tag);
-				for (int i = 0; i < mVals.size(); i++) {
-					if ("".equals(mVals.get(i)) || " ".equals(mVals.get(i))) {
-						mVals.remove(i);
-					}
-				}
-				mIntrestFlowlayout.setTags(mVals);
-			}
 		}
 	}
 
-	@OnClick({R.id.portrait_lay, R.id.nick_name_lay, R.id.sex_lay, R.id.age_lay, R.id.signature_lay, R.id.occupation_type_lay, R.id.education_type_lay, R.id.constellation_lay, R.id.tall_lay, R.id.weight_lay, R.id.married_lay, R.id.purpose_lay, R.id.love_where_lay, R.id.do_what_first_lay, R.id.conception_lay, R.id.lable_flowlayout, R.id.lable_lay, R.id.part_flowlayout, R.id.part_lay, R.id.intrest_flowlayout, R.id.intrest_lay, R.id.weixin_lay, R.id.qq_lay})
+	@OnClick({R.id.portrait_lay, R.id.nick_name_lay, R.id.sex_lay, R.id.age_lay, R.id.signature_lay, R.id.occupation_type_lay, R.id.education_type_lay, R.id.constellation_lay, R.id.tall_lay, R.id.weight_lay, R.id.married_lay})
 	public void onClick(View view) {
 		switch (view.getId()) {
 			case R.id.portrait_lay:
@@ -364,42 +261,6 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 				break;
 			case R.id.married_lay:
 				showMarriedSelectDialog();
-				break;
-			case R.id.purpose_lay:
-				showSelectPurposeDialog();
-				break;
-			case R.id.love_where_lay:
-				showSelectLoveWhereDialog();
-				break;
-			case R.id.do_what_first_lay:
-				showSelectdoWhatFirstDialog();
-				break;
-			case R.id.conception_lay:
-				showSelectConceptionDialog();
-				break;
-			case R.id.lable_flowlayout:
-				showOnClickFlowLayoutDialog(R.id.lable_flowlayout);
-				break;
-			case R.id.lable_lay:
-				showLableDialog();
-				break;
-			case R.id.part_flowlayout:
-				showOnClickFlowLayoutDialog(R.id.part_flowlayout);
-				break;
-			case R.id.part_lay:
-				showPartDialog();
-				break;
-			case R.id.intrest_flowlayout:
-				showOnClickFlowLayoutDialog(R.id.intrest_flowlayout);
-				break;
-			case R.id.intrest_lay:
-				showIntrestDialog();
-				break;
-			case R.id.weixin_lay:
-				showEditDialog(mWeixin, R.string.weixin);
-				break;
-			case R.id.qq_lay:
-				showEditDialog(mQq, R.string.qq);
 				break;
 		}
 	}
@@ -643,234 +504,6 @@ public class ModifyUserInfoNewActivity extends BaseActivity implements ModifyUse
 			}
 		});
 		builder.show();
-	}
-
-	/**
-	 * 交友目的
-	 */
-	private void showSelectPurposeDialog(){
-		final String[] array = getResources().getStringArray(R.array.purpose);
-		Builder builder = new Builder(this);
-		builder.setSingleChoiceItems(array, 3, null);
-		builder.setPositiveButton(R.string.ok, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
-				clientUser.purpose = array[selectedPosition];
-				mPurpose.setText(array[selectedPosition]);
-			}
-		});
-		builder.show();
-	}
-
-	/**
-	 * 喜欢爱爱地点
-	 */
-	private void showSelectLoveWhereDialog(){
-		final String[] array = getResources().getStringArray(R.array.where);
-		Builder builder = new Builder(this);
-		builder.setSingleChoiceItems(array, 3, null);
-		builder.setPositiveButton(R.string.ok, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
-				clientUser.love_where = array[selectedPosition];
-				mLoveWhere.setText(array[selectedPosition]);
-			}
-		});
-		builder.show();
-	}
-
-	/**
-	 * 首次见面
-	 */
-	private void showSelectdoWhatFirstDialog(){
-		final String[] array = getResources().getStringArray(R.array.doWhatFirst);
-		Builder builder = new Builder(this);
-		builder.setSingleChoiceItems(array, 3, null);
-		builder.setPositiveButton(R.string.ok, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
-				clientUser.do_what_first = array[selectedPosition];
-				mDoWhatFirst.setText(array[selectedPosition]);
-			}
-		});
-		builder.show();
-	}
-
-	/**
-	 * 恋爱观念
-	 */
-	private void showSelectConceptionDialog(){
-		final String[] array = getResources().getStringArray(R.array.conception);
-		Builder builder = new Builder(this);
-		builder.setSingleChoiceItems(array, 3, null);
-		builder.setPositiveButton(R.string.ok, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
-				clientUser.conception = array[selectedPosition];
-				mConception.setText(array[selectedPosition]);
-			}
-		});
-		builder.show();
-	}
-
-	/**
-	 * 我的个性标签
-	 */
-	private void showLableDialog() {
-		mVals.clear();
-		if ("1".equals(AppManager.getClientUser().sex)) {
-			commonDialog(R.string.lable,
-					getResources().getStringArray(R.array.male_lable), null, mLableFlowlayout, mLableText);
-		} else {
-			commonDialog(R.string.lable,
-					getResources().getStringArray(R.array.female_lable), null, mLableFlowlayout, mLableText);
-		}
-	}
-
-	/**
-	 * 最满意部位
-	 */
-	private void showPartDialog() {
-		mVals.clear();
-		if ("1".equals(AppManager.getClientUser().sex)) {
-			commonDialog(R.string.satisfacies_part,
-					getResources().getStringArray(R.array.male_sex_part), null, mPartFlowlayout, mPartText);
-		} else {
-			commonDialog(R.string.satisfacies_part,
-					getResources().getStringArray(R.array.female_sex_part), null, mPartFlowlayout, mPartText);
-		}
-	}
-
-	/**
-	 * 我的兴趣
-	 */
-	private void showIntrestDialog() {
-		mVals.clear();
-		commonDialog(R.string.intrest,
-				getResources().getStringArray(R.array.intrest), null, mIntrestFlowlayout, mIntrestText);
-	}
-
-	private void commonDialog(int resId, final String[] array, final boolean[] isSelected,
-							  final TagLayout mLayout, final TextView textView) {
-		Builder builder = new Builder(this);
-		builder.setTitle(resId);
-		builder.setMultiChoiceItems(array, isSelected, new DialogInterface.OnMultiChoiceClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-				if (isChecked) {
-					mVals.add(array[which]);
-				} else {
-					mVals.remove(array[which]);
-				}
-			}
-		});
-		builder.setNegativeButton(R.string.cancel, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-			}
-		});
-		builder.setPositiveButton(R.string.ok, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if (mVals != null && mVals.size() == 0) {
-					mVals.add(array[0]);
-				}
-				if (mVals != null && mVals.size() > 0) {
-					mLayout.setVisibility(View.VISIBLE);
-					textView.setVisibility(View.GONE);
-					mLayout.setTags(mVals);
-					String value = StringUtil.listToString(mVals);
-					if (mLayout == mLableFlowlayout) {
-						clientUser.personality_tag = value;
-					} else if (mLayout == mPartFlowlayout){
-						clientUser.part_tag = value;
-					} else {
-						clientUser.intrest_tag = value;
-					}
-				} else {
-					mLayout.setVisibility(View.GONE);
-					textView.setVisibility(View.VISIBLE);
-				}
-			}
-		});
-		builder.show();
-	}
-
-	/**
-	 * 点击流式布局之后显示的dialog
-	 *
-	 * @param
-	 */
-	private void showOnClickFlowLayoutDialog(int id) {
-		mVals.clear();
-		switch (id) {
-			case R.id.lable_flowlayout:
-				String lableTag = ";" + clientUser.personality_tag;
-				if (!TextUtils.isEmpty(lableTag)) {
-					String[] lableArray = null;
-					if ("1".equals(AppManager.getClientUser().sex)) {
-						lableArray = getResources().getStringArray(R.array.male_lable);
-					} else {
-						lableArray = getResources().getStringArray(R.array.female_lable);
-					}
-					boolean[] lableSelected = new boolean[lableArray.length];
-					for (int i = 0; i < lableArray.length; i++) {
-						if (lableTag.indexOf(lableArray[i]) > 0) {
-							mVals.add(lableArray[i]);
-							lableSelected[i] = true;
-						} else {
-							lableSelected[i] = false;
-						}
-					}
-					commonDialog(R.string.lable, lableArray, lableSelected, mLableFlowlayout, mLableText);
-				}
-				break;
-			case R.id.part_flowlayout:
-				String partTag = ";" + clientUser.part_tag;
-				if (!TextUtils.isEmpty(partTag)) {
-					String[] partArray = null;
-					if ("1".equals(AppManager.getClientUser().sex)) {
-						partArray = getResources().getStringArray(R.array.male_sex_part);
-					} else {
-						partArray = getResources().getStringArray(R.array.female_sex_part);
-					}
-					boolean[] partSelected = new boolean[partArray.length];
-					for (int i = 0; i < partArray.length; i++) {
-						if (partTag.indexOf(partArray[i]) > 0) {
-							mVals.add(partArray[i]);
-							partSelected[i] = true;
-						} else {
-							partSelected[i] = false;
-						}
-					}
-					commonDialog(R.string.satisfacies_part, partArray, partSelected, mPartFlowlayout, mPartText);
-				}
-				break;
-			case R.id.intrest_flowlayout:
-				String intrestTag = ";" + clientUser.intrest_tag;
-				if (!TextUtils.isEmpty(intrestTag)) {
-					String[] intrestArray = getResources().getStringArray(R.array.intrest);
-					boolean[] partSelected = new boolean[intrestArray.length];
-					for (int i = 0; i < intrestArray.length; i++) {
-						if (intrestTag.indexOf(intrestArray[i]) > 0) {
-							mVals.add(intrestArray[i]);
-							partSelected[i] = true;
-						} else {
-							partSelected[i] = false;
-						}
-					}
-					commonDialog(R.string.satisfacies_part, intrestArray, partSelected, mIntrestFlowlayout, mIntrestText);
-				}
-				break;
-		}
 	}
 
 	/**

@@ -20,6 +20,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alipay.sdk.app.PayTask;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.sunfusheng.marqueeview.MarqueeView;
+import com.tencent.mm.sdk.modelpay.PayReq;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
+import com.umeng.analytics.MobclickAgent;
 import com.youdo.karma.CSApplication;
 import com.youdo.karma.R;
 import com.youdo.karma.activity.base.BaseActivity;
@@ -40,14 +48,6 @@ import com.youdo.karma.utils.DensityUtil;
 import com.youdo.karma.utils.JsonUtils;
 import com.youdo.karma.utils.RxBus;
 import com.youdo.karma.utils.ToastUtil;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.sunfusheng.marqueeview.MarqueeView;
-import com.tencent.mm.sdk.modelpay.PayReq;
-import com.uber.autodispose.AutoDispose;
-import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
-import com.umeng.analytics.MobclickAgent;
 import com.yuntongxun.ecsdk.ECInitParams;
 
 import java.util.ArrayList;
@@ -75,14 +75,16 @@ public class VipCenterActivity extends BaseActivity {
 	RecyclerView mRecyclerView;
 	@BindView(R.id.preferential)
 	TextView mPreferential;//优惠的说明文字，可以控制什么时候显示
-	@BindView(R.id.vip_7_lay)
-	RelativeLayout mVip7Lay;
 	@BindView(R.id.scrollView)
 	NestedScrollView mScrollView;
 	@BindView(R.id.pref_tel_fare_lay)
 	LinearLayout mPrefTelFareLay;
 	@BindView(R.id.cum_qq)
 	TextView mCumQQ;
+	@BindView(R.id.speaker_lay)
+	RelativeLayout mSpeakerLay;
+	@BindView(R.id.vip_social_lay)
+	RelativeLayout mSocialLay;
 
 	private MemberBuyAdapter mAdapter;
 
@@ -175,10 +177,10 @@ public class VipCenterActivity extends BaseActivity {
 	}
 
 	private void setupData() {
-		if (!AppManager.getClientUser().is_vip) {
-			mVip7Lay.setVisibility(View.VISIBLE);
+		if (AppManager.getClientUser().isShowGold) {
+			mSocialLay.setVisibility(View.VISIBLE);
 		} else {
-			mVip7Lay.setVisibility(View.GONE);
+			mSocialLay.setVisibility(View.GONE);
 		}
 		if (!AppManager.getClientUser().isShowGiveVip || AppManager.getClientUser().isShowDownloadVip) {
 			mCumQQ.setVisibility(View.VISIBLE);
@@ -238,12 +240,14 @@ public class VipCenterActivity extends BaseActivity {
 							}
 						}
 						if (array.size() == 0) {
+							getUserName(1, 100);
 							mPrefTelFareLay.setVisibility(View.VISIBLE);
+							mSpeakerLay.setVisibility(View.VISIBLE);
 						} else {
 							mPrefTelFareLay.setVisibility(View.GONE);
+							mSpeakerLay.setVisibility(View.GONE);
 						}
 					}
-					getUserName(1, 100);
 				}, throwable -> {});
 	}
 
