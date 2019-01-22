@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">有约恋爱交友</string>
+    <string name="app_name">有缘恋爱交友</string>
     <string name="setting">设置</string>
     <string name="about">关于</string>
     <string name="feed_back">意见反馈</string>
@@ -230,7 +230,7 @@
     </string>
     <string name="no_responsibility">免责声明</string>
 
-    <string name="quit_app_name">退出有约恋爱交友</string>
+    <string name="quit_app_name">退出有缘恋爱交友</string>
     <string name="quit_are_you_sure">确定要退出吗？</string>
 
     <string name="action_add_friends_success">添加好友成功</string>
